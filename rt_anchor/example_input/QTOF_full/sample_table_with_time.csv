@@ -1,0 +1,7 @@
+sample_name,is_qc,is_blank,group,VALID,ABSOLUTE_PATH,time,analytical_order,batch_id
+P_QC2,True,False,QC,True,/Users/bowen/Desktop/Caley_RT/mzML/qtof/samples_pos/data/P_QC2.mzML,,0,0
+P_A1-1,False,False,SA1,True,/Users/bowen/Desktop/Caley_RT/mzML/qtof/samples_pos/data/P_A1-1.mzML,,1,0
+P_A2-1,False,False,SA2,True,/Users/bowen/Desktop/Caley_RT/mzML/qtof/samples_pos/data/P_A2-1.mzML,,2,0
+P_A2-2,False,False,SA2,True,/Users/bowen/Desktop/Caley_RT/mzML/qtof/samples_pos/data/P_A2-2.mzML,,3,0
+P_A3-1,False,False,SA3,True,/Users/bowen/Desktop/Caley_RT/mzML/qtof/samples_pos/data/P_A3-1.mzML,,4,0
+P_A3-2,False,False,SA3,True,/Users/bowen/Desktop/Caley_RT/mzML/qtof/samples_pos/data/P_A3-2.mzML,,5,0

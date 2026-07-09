@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rt-anchor"
+version = "0.1.0"
+description = "Standard-panel retention-index (iRT) calibration for LC-MS lipidomics feature tables (MS-DIAL / MZmine / MassCube / LipidScreener)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Bowen Yang" }]
+keywords = [
+    "retention index", "iRT", "retention time", "calibration",
+    "lipidomics", "metabolomics", "LC-MS", "mass spectrometry",
+    "MS-DIAL", "MZmine", "MassCube", "LipidScreener",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy>=1.21",
+    "pandas>=1.3",
+    "scipy>=1.7",
+    "matplotlib>=3.5",
+    "plotly>=5.0",
+]
+
+[project.optional-dependencies]
+excel = ["openpyxl>=3.0"]
+report = ["matplotlib>=3.5", "plotly>=5.0"]
+structures = ["rdkit>=2022.9"]   # optional: molecular-structure hover for the default panel
+test = ["pytest>=7.0", "openpyxl>=3.0"]
+
+[project.scripts]
+rt-anchor = "rt_anchor.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+rt_anchor = ["py.typed"]

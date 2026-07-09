@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RT Anchor</title>
+<link rel="stylesheet" href="styles.css">
+<script src="vendor/plotly.min.js"></script>
+</head>
+<body>
+
+<!-- ============================ INPUT VIEW ============================ -->
+<section id="view-input" class="view view-input">
+  <div class="input-wrap">
+    <header class="brand">
+      <div class="wordmark">RT<span>ANCHOR</span></div>
+      <div class="tagline">Retention-index calibration &nbsp;/&nbsp; standard-panel iRT</div>
+      <button type="button" class="btn-example" id="load-example">↓ Load example dataset</button>
+    </header>
+
+    <div class="form">
+      <div class="section-lbl">Required</div>
+
+      <div class="field req" data-key="samples">
+        <div class="field-head"><span class="lbl">Sample feature table</span><span class="req-tag">required</span></div>
+        <div class="picker"><button class="btn-file" data-pick="file" data-target="samples">Choose file</button>
+          <div class="path" id="path-samples">no file selected</div></div>
+        <div class="hint">MS-DIAL · MZmine · MassCube · LipidScreener — auto-detected</div>
+      </div>
+
+      <div class="field req" data-key="standards">
+        <div class="field-head"><span class="lbl">Standards run</span><span class="req-tag">required</span></div>
+        <div class="picker"><button class="btn-file" data-pick="file" data-target="standards">Choose file</button>
+          <div class="path" id="path-standards">no file selected</div></div>
+        <div class="hint">The standard-panel run — builds the native anchor template</div>
+      </div>
+
+      <div class="field req seg-field">
+        <div class="field-head"><span class="lbl">Polarity</span><span class="req-tag">required</span></div>
+        <div class="seg" data-seg="polarity">
+          <button class="active" data-val="positive">Positive</button><button data-val="negative">Negative</button>
+        </div>
+      </div>
+
+      <div class="adv" id="adv">
+        <button type="button" class="adv-toggle" id="adv-toggle" aria-expanded="false">
+          <span class="adv-chev">▸</span>
+          <span class="adv-title">Advanced</span>
+          <span class="adv-sub">optional inputs &amp; matching parameters</span>
+        </button>
+        <div class="adv-body" id="adv-body">
+          <div class="field" data-key="single_files">
+            <div class="field-head"><span class="lbl">Per-injection files</span><span class="opt-tag">optional</span></div>
+            <div class="picker"><button class="btn-file" data-pick="folder" data-target="single_files">Choose folder</button>
+              <div class="path" id="path-single_files">no folder selected</div></div>
+            <div class="hint">Enables per-sample self-anchoring &amp; repeatability QC</div>
+          </div>
+
+          <div class="row2">
+            <div class="num-field">
+              <label class="lbl" for="adv-mz">m/z tolerance <span class="unit">ppm</span></label>
+              <input class="num" id="adv-mz" type="number" step="0.1" min="0" value="15" inputmode="decimal">
+            </div>
+            <div class="num-field">
+              <label class="lbl" for="adv-rtw">RT window <span class="unit">min</span></label>
+              <input class="num" id="adv-rtw" type="number" step="0.05" min="0" value="0.5" inputmode="decimal">
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="num-field">
+              <label class="lbl" for="adv-minanchors">Min anchors</label>
+              <input class="num" id="adv-minanchors" type="number" step="1" min="3" value="6" inputmode="numeric">
+            </div>
+            <label class="chk-field" for="adv-extrapolate">
+              <input class="chk" id="adv-extrapolate" type="checkbox">
+              <span class="lbl">Extrapolate beyond anchor span</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <button id="run" class="btn-run">Run calibration <span class="arw">→</span></button>
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ OUTPUT VIEW =========================== -->
+<section id="view-output" class="view view-output hidden">
+  <aside class="sidebar">
+    <div class="side-brand">RT<span>ANCHOR</span></div>
+    <nav class="nav" id="nav"></nav>
+    <button id="new-run" class="btn-new">＋ New calibration</button>
+  </aside>
+  <main class="main">
+    <header class="main-head">
+      <h1 id="sec-title">Overview</h1>
+      <div class="main-meta" id="main-meta"></div>
+    </header>
+    <div class="main-body" id="main-body"></div>
+  </main>
+</section>
+
+<div id="toast" class="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>

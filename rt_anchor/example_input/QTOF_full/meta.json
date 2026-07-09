@@ -1,0 +1,8 @@
+{
+  "instrument": "QTOF",
+  "polarity": "positive",
+  "scale_constants": {
+    "RT_lo_min": 1.0,
+    "RT_hi_min": 18.4
+  }
+}

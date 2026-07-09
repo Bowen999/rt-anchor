@@ -1,0 +1,16 @@
+name,class,exact_mass,adduct_pos,adduct_neg,endogenous,void
+PC 6:0_6:0,PC,453.24915,[M+H]+,[M+HCOO]-,False,True
+PC 9:0_9:0,PC,537.343055,[M+H]+,[M+HCOO]-,False,True
+PC 11:0_11:0,PC,593.405655,[M+H]+,[M+HCOO]-,False,False
+PC 12:0_12:0,PC,621.436955,[M+H]+,[M+HCOO]-,False,False
+PC 13:0_13:0,PC,649.468256,[M+H]+,[M+HCOO]-,False,False
+PC 14:0_14:0,PC,677.499556,[M+H]+,[M+HCOO]-,False,False
+PC 16:0_18:3,PC,755.546506,[M+H]+,[M+HCOO]-,True,False
+PC 16:0_18:2,PC,757.562156,[M+H]+,[M+HCOO]-,True,False
+PC 16:0_18:1,PC,759.577806,[M+H]+,[M+HCOO]-,True,False
+PC 18:0_18:1,PC,787.609106,[M+H]+,[M+HCOO]-,True,False
+PC 18:0_18:0,PC,789.624756,[M+H]+,[M+HCOO]-,True,False
+DG 16:0_18:0,DG,596.537976,[M+NH4]+,[M+HCOO]-,True,False
+DG 18:0_18:0,DG,624.569276,[M+NH4]+,[M+HCOO]-,True,False
+CE 20:5,CE,670.568881,[M+NH4]+,ND,False,False
+CE 18:1,CE,650.600181,[M+NH4]+,ND,False,False
