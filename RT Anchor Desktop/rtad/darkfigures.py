@@ -90,19 +90,22 @@ def _remap_fill(c):
 def build_bundle(result) -> Dict:
     from rt_anchor.viz import metrics, performance, repeatability, structures, tic
 
+    # LIGHT ("day mode") canvas: the plots keep their native light report theme
+    # (white paper, blue data) and sit on light cards inside the dark brutalist
+    # chrome. The dark-remap (`_dark`) is retained only for the selftest.
     figures = {
-        "detection": _dark(metrics.figure_plotly(result)).to_json(),
-        "profile": _dark(tic.figure_plotly(result, "clean")).to_json(),
-        "warp": _dark(performance.figure_plotly(result)).to_json(),
+        "detection": metrics.figure_plotly(result).to_json(),
+        "profile": tic.figure_plotly(result, "clean").to_json(),
+        "warp": performance.figure_plotly(result).to_json(),
     }
     if repeatability.is_applicable(result):
-        figures["repeatability"] = _dark(repeatability.figure_plotly(result)).to_json()
+        figures["repeatability"] = repeatability.figure_plotly(result).to_json()
 
     struct = structures.render_default_structures() if result.default_panel else {}
     m = metrics.compute_metrics(result)
     return {
         "kpis": [{"label": l, "value": str(v), "sub": s} for l, v, s in metrics.kpi_tiles(result)],
-        "radar": _dark(metrics.radar_plotly(result), polar=True).to_json(),
+        "radar": metrics.radar_plotly(result).to_json(),
         "figures": figures,
         "notes": {"detection": metrics.DETECTION_NOTE},
         "structures": struct,

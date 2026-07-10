@@ -81,6 +81,7 @@
       </div>
 
       <button id="run" class="btn-run">Run calibration <span class="arw">→</span></button>
+      <div id="progress" class="progress hidden"><div class="progress-bar"></div></div>
       <div id="status" class="status"></div>
     </div>
   </div>
@@ -89,20 +90,42 @@
 <!-- ============================ OUTPUT VIEW =========================== -->
 <section id="view-output" class="view view-output hidden">
   <aside class="sidebar">
-    <div class="side-brand">RT<span>ANCHOR</span></div>
+    <div class="side-head">
+      <div class="side-brand">RT<span>ANCHOR</span></div>
+      <div class="side-sub">iRT calibration</div>
+    </div>
     <nav class="nav" id="nav"></nav>
     <button id="new-run" class="btn-new">＋ New calibration</button>
+    <div class="sb-engine">
+      <div class="sb-engine-h">Engine</div>
+      <div class="sb-engine-d">RT Anchor · standard-panel anchor warp</div>
+    </div>
   </aside>
   <main class="main">
     <header class="main-head">
       <h1 id="sec-title">Overview</h1>
-      <div class="main-meta" id="main-meta"></div>
     </header>
     <div class="main-body" id="main-body"></div>
   </main>
 </section>
 
 <div id="toast" class="toast"></div>
+
+<!-- ============================ ERROR MODAL =========================== -->
+<div id="modal" class="modal hidden">
+  <div class="modal-backdrop" id="modal-backdrop"></div>
+  <div class="modal-card" role="alertdialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-bar">
+      <span class="modal-tag" id="modal-tag">Error</span>
+      <button class="modal-x" id="modal-x" aria-label="Close">✕</button>
+    </div>
+    <h2 class="modal-title" id="modal-title"></h2>
+    <div class="modal-msg" id="modal-msg"></div>
+    <div class="modal-detail" id="modal-detail"></div>
+    <div class="modal-actions"><button class="modal-ok" id="modal-ok">Dismiss</button></div>
+  </div>
+</div>
+
 <script src="app.js"></script>
 </body>
 </html>

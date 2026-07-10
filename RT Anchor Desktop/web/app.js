@@ -30,8 +30,10 @@ const PREVIEW_API = {
   load_example: async () => ({ ok: true, samples: "/preview/example/samples.txt",
     standards: "/preview/example/standards.txt", polarity: "positive" }),
   run_calibration: async () => window.__PREVIEW__ || { ok: false, error: "no preview data" },
-  export_csv: async () => ({ ok: true, path: "(preview)" }),
+  export_csv: async () => ({ ok: true, path: "(preview)/calibrated.csv" }),
   export_report: async () => ({ ok: true, paths: {} }),
+  export_run_info: async () => ({ ok: true, path: "(preview)/run_info.json" }),
+  export_all: async () => ({ ok: true, dir: "(preview)/outputs", n_files: 7 }),
 };
 
 /* ---- toast ---- */
@@ -45,13 +47,20 @@ function hideToast() { const t = $("#toast"); clearTimeout(toastT); t.className 
 /* ===================== INPUT VIEW ===================== */
 function shortPath(p) { return p ? p.split("/").slice(-2).join("/") : ""; }
 
+/* set a file/folder field + flip it to the "filled" (green) state */
+function markField(target, path) {
+  state.params[target] = path;
+  const el = $("#path-" + target);
+  el.textContent = shortPath(path); el.title = path; el.classList.add("set");
+  const field = document.querySelector(`.field[data-key="${target}"]`);
+  if (field) field.classList.add("filled");
+}
+
 $$(".btn-file").forEach(btn => btn.addEventListener("click", async () => {
   const target = btn.dataset.target, kind = btn.dataset.pick;
   const path = kind === "folder" ? await api().pick_folder() : await api().pick_file();
   if (!path) return;
-  state.params[target] = path;
-  const el = $("#path-" + target);
-  el.textContent = shortPath(path); el.title = path; el.classList.add("set");
+  markField(target, path);
 }));
 
 $$(".seg").forEach(seg => seg.addEventListener("click", e => {
@@ -61,21 +70,16 @@ $$(".seg").forEach(seg => seg.addEventListener("click", e => {
 }));
 
 /* load the bundled demo dataset into the Required fields */
-function setPath(target, path) {
-  state.params[target] = path;
-  const el = $("#path-" + target);
-  el.textContent = shortPath(path); el.title = path; el.classList.add("set");
-}
 const loadExBtn = $("#load-example");
 if (loadExBtn) loadExBtn.addEventListener("click", async () => {
   const r = await api().load_example();
-  if (!r || !r.ok) { setStatus((r && r.error) || "Could not load the example.", "err"); return; }
-  setPath("samples", r.samples);
-  setPath("standards", r.standards);
+  if (!r || !r.ok) { showError((r && r.error) || "Could not load the example dataset."); return; }
+  markField("samples", r.samples);
+  markField("standards", r.standards);
   state.params.polarity = r.polarity || "positive";
   const seg = $('[data-seg="polarity"]');
   if (seg) $$("button", seg).forEach(b => b.classList.toggle("active", b.dataset.val === state.params.polarity));
-  setStatus("Example dataset loaded — press Run calibration.", "busy");
+  setStatus("Example dataset loaded — press Run calibration.", "ok");
 });
 
 /* Advanced section collapse/expand */
@@ -101,17 +105,57 @@ async function run() {
   if (!state.params.standards) { setStatus("Choose a standards run — it is required.", "err"); return; }
   collectAdvanced();
   const btn = $("#run"); btn.disabled = true;
-  setStatus("Calibrating — identifying anchors, fitting warp…", "busy");
+  showProgress(true);
+  setStatus("Calibrating — identifying anchors, fitting the warp…", "busy");
   let res;
   try { res = await api().run_calibration(state.params); }
   catch (e) { res = { ok: false, error: String(e) }; }
-  btn.disabled = false;
-  if (!res || !res.ok) { setStatus((res && res.error) || "Calibration failed.", "err"); return; }
+  btn.disabled = false; showProgress(false);
+  if (!res || !res.ok) { setStatus("", ""); showError((res && res.error) || "Calibration failed."); return; }
   setStatus("");
   state.bundle = res;
   buildNav(); openOutput(); selectSection("overview");
 }
 function setStatus(msg, cls) { const s = $("#status"); s.textContent = msg; s.className = "status" + (cls ? " " + cls : ""); }
+function showProgress(on) { $("#progress").classList.toggle("hidden", !on); }
+
+/* ---- error modal (clearer than an inline line) ---- */
+function showModal(tag, title, message, detail) {
+  $("#modal-tag").textContent = tag || "Error";
+  $("#modal-title").textContent = title || "Something went wrong";
+  $("#modal-msg").textContent = message || "";
+  const d = $("#modal-detail");
+  d.textContent = detail || ""; d.style.display = detail ? "block" : "none";
+  $("#modal").classList.remove("hidden");
+}
+function hideModal() { $("#modal").classList.add("hidden"); }
+$("#modal-x").addEventListener("click", hideModal);
+$("#modal-ok").addEventListener("click", hideModal);
+$("#modal-backdrop").addEventListener("click", hideModal);
+document.addEventListener("keydown", e => { if (e.key === "Escape") hideModal(); });
+
+/* turn a raw backend error into a plain-language title + hint (+ technical detail) */
+const ERROR_HINTS = [
+  [/AnchorIdentificationError/i, "No standards were detected",
+    "None of the panel standards were found. Check that the polarity matches how the data were acquired, that the standards run really contains the panel, and try widening the m/z tolerance or RT window under Advanced."],
+  [/PanelError/i, "Panel / polarity problem",
+    "The standard panel couldn't be built for this polarity. Use “positive” or “negative” to match the acquisition mode."],
+  [/CalibrationError/i, "The warp couldn't be fitted",
+    "There were too few or non-monotonic anchors to fit a calibration curve. Check the standards run and the matching tolerances."],
+  [/ColumnResolutionError|InputFormatError/i, "Unrecognised input table",
+    "The file format, or its m/z / retention-time columns, couldn't be read. Confirm it's an MS-DIAL, MZmine, MassCube or LipidScreener export."],
+  [/RTUnitError/i, "Retention-time unit problem",
+    "The retention-time unit couldn't be inferred from the table."],
+  [/ConfigError/i, "Missing or invalid input", null],
+];
+function showError(raw) {
+  const err = String(raw || "Calibration failed.");
+  const technical = err.includes(": ") ? err.slice(err.indexOf(": ") + 2) : err;
+  for (const [re, title, hint] of ERROR_HINTS) {
+    if (re.test(err)) { showModal("Error", title, hint || technical, hint ? technical : ""); return; }
+  }
+  showModal("Error", "Calibration failed", technical, "");
+}
 
 /* ===================== OUTPUT VIEW ===================== */
 function openOutput() { $("#view-input").classList.add("hidden"); $("#view-output").classList.remove("hidden"); }
@@ -136,13 +180,8 @@ function selectSection(id) {
   const s = SECTIONS.find(x => x.id === id);
   $("#sec-title").textContent = s.title;
   $$(".nav-item").forEach(n => n.classList.toggle("active", n.dataset.id === id));
-  const m = state.bundle.meta;
-  $("#main-meta").innerHTML =
-    `${cap(m.source_format)} · ${m.polarity} &nbsp;|&nbsp; <b>${m.scope}</b> calibration ` +
-    `&nbsp;|&nbsp; ${m.n_detected}/${m.n_panel} standards &nbsp;|&nbsp; ${Number(m.n_features).toLocaleString()} features`;
   render(id);
 }
-const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
 
 function render(id) {
   const body = $("#main-body");
@@ -155,13 +194,15 @@ function render(id) {
   // a single figure section
   const fig = state.bundle.figures[id];
   if (!fig) { body.innerHTML = `<div class="panel"><div class="panel-h">Not available</div></div>`; return; }
-  const div = plotInto(body, "");
+  const sec = SECTIONS.find(x => x.id === id);
+  const div = plotInto(body, sec ? sec.title : "");
   drawPlot(div, fig);
   if (id === "detection" || id === "warp") attachStructures(div);
   const note = state.bundle.notes && state.bundle.notes[id];
   if (note) {
     const n = document.createElement("div");
-    n.className = "fig-note"; n.innerHTML = note; body.appendChild(n);
+    n.className = "fig-note"; n.innerHTML = note;
+    div.parentElement.appendChild(n);   // inside the light card, under the plot
   }
 }
 
@@ -181,28 +222,43 @@ function renderOverview(body) {
 
 function renderExport(body) {
   body.innerHTML =
-    `<div class="export-row">
-       <button class="btn-exp" id="exp-csv"><div class="t">Calibrated table (CSV)</div>
-         <div class="d">Original columns + RI, RI_uncertainty, RI_reliability, RI_spread, flags</div></button>
-       <button class="btn-exp" id="exp-report"><div class="t">Report (HTML + PDF)</div>
-         <div class="d">The full interactive HTML report and a static PDF</div></button>
+    `<div class="export-all">
+       <button class="btn-exp big" id="exp-all"><div class="t">Export all outputs →</div>
+         <div class="d">Writes everything into one folder: calibrated CSV · model.json · anchors.csv · log.txt · report (HTML + PDF) · run_info.json</div></button>
+     </div>
+     <div class="export-row">
+       <button class="btn-exp" id="exp-csv"><div class="t">Calibrated table</div>
+         <div class="d">CSV — original columns + RI, RI_uncertainty, RI_reliability, RI_spread, flags</div></button>
+       <button class="btn-exp" id="exp-report"><div class="t">Report</div>
+         <div class="d">Interactive HTML + static PDF (detection, warp, repeatability)</div></button>
+       <button class="btn-exp" id="exp-info"><div class="t">Run info</div>
+         <div class="d">JSON — parameters, run time, versions, and a result summary</div></button>
      </div>`;
-  $("#exp-csv").addEventListener("click", async () => {
-    const r = await api().export_csv();
-    if (!r.ok && r.error === "cancelled") return;               // user dismissed the save dialog
-    toast(r.ok ? "Saved: " + shortPath(r.path) : (r.error || "export failed"), !r.ok);
-  });
-  $("#exp-report").addEventListener("click", async () => {
-    toast("Writing report…");
-    const r = await api().export_report();
-    if (!r.ok && r.error === "cancelled") { hideToast(); return; }
-    toast(r.ok ? "Report written" : (r.error || "export failed"), !r.ok);
-  });
+  const doExport = async (busyMsg, call, okMsg) => {
+    if (busyMsg) toast(busyMsg);
+    let r;
+    try { r = await call(); } catch (e) { r = { ok: false, error: String(e) }; }
+    if (r && !r.ok && r.error === "cancelled") { hideToast(); return; }   // user dismissed the dialog
+    if (!r || !r.ok) { hideToast(); showError((r && r.error) || "Export failed."); return; }
+    toast(okMsg(r));
+  };
+  $("#exp-all").addEventListener("click", () => doExport("Writing all outputs…",
+    () => api().export_all(), r => `Wrote ${r.n_files} files to ${shortPath(r.dir)}`));
+  $("#exp-csv").addEventListener("click", () => doExport(null,
+    () => api().export_csv(), r => "Saved: " + shortPath(r.path)));
+  $("#exp-report").addEventListener("click", () => doExport("Writing report…",
+    () => api().export_report(), () => "Report written"));
+  $("#exp-info").addEventListener("click", () => doExport(null,
+    () => api().export_run_info(), r => "Saved: " + shortPath(r.path)));
 }
 
 /* ---- plotly helpers ---- */
-function plotInto(body) {
+function plotInto(body, title) {
   const panel = document.createElement("div"); panel.className = "panel";
+  if (title) {
+    const h = document.createElement("div"); h.className = "panel-h"; h.textContent = title;
+    panel.appendChild(h);
+  }
   const div = document.createElement("div"); div.className = "plot"; panel.appendChild(div);
   body.appendChild(panel); return div;
 }
@@ -218,8 +274,8 @@ function attachStructures(div) {
   const S = state.bundle.structures; if (!S || !Object.keys(S).length) return;
   if (!structPop) {
     structPop = document.createElement("div"); structPop.id = "struct-pop";
-    structPop.style.cssText = "position:fixed;display:none;z-index:1000;background:#12161D;" +
-      "border:2px solid #333D4A;padding:8px 10px;box-shadow:5px 5px 0 rgba(0,0,0,.5);pointer-events:none;";
+    structPop.style.cssText = "position:fixed;display:none;z-index:1000;background:#FFFFFF;" +
+      "border:3px solid #141210;padding:8px 10px;box-shadow:5px 5px 0 rgba(20,18,16,.28);pointer-events:none;";
     document.body.appendChild(structPop);
     document.addEventListener("mousemove", e => { structPop._x = e.clientX; structPop._y = e.clientY; });
   }
@@ -227,7 +283,7 @@ function attachStructures(div) {
     let nm = d.points && d.points[0] && d.points[0].customdata;
     if (Array.isArray(nm)) nm = nm[0];
     if (nm && S[nm]) {
-      structPop.innerHTML = `<div style="font:600 12px sans-serif;color:#EDF1F6;margin-bottom:3px">${nm}</div>` +
+      structPop.innerHTML = `<div style="font:800 12px sans-serif;color:#141210;margin-bottom:3px">${nm}</div>` +
         `<div style="background:#fff;padding:2px">${S[nm]}</div>`;
       structPop.style.display = "block";
       structPop.style.left = Math.min(structPop._x + 14, window.innerWidth - 260) + "px";

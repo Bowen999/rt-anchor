@@ -38,6 +38,11 @@ report = ["matplotlib>=3.5", "plotly>=5.0"]
 structures = ["rdkit>=2022.9"]   # optional: molecular-structure hover for the default panel
 test = ["pytest>=7.0", "openpyxl>=3.0"]
 
+[project.urls]
+Homepage = "https://github.com/Bowen999/rt-anchor"
+Repository = "https://github.com/Bowen999/rt-anchor"
+Issues = "https://github.com/Bowen999/rt-anchor/issues"
+
 [project.scripts]
 rt-anchor = "rt_anchor.cli:main"
 
