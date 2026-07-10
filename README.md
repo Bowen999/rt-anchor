@@ -1,7 +1,6 @@
 # RT Anchor
 
-Standard-panel **retention-index (iRT) calibration** for LC-MS lipidomics — a
-Python package ([`rt-anchor`](https://pypi.org/project/rt-anchor/)) and a macOS desktop app.
+Standard-panel **retention-index (iRT) calibration** for LC-MS lipidomics
 
 ![RT Anchor desktop app](docs/screenshot.png)
 
@@ -12,36 +11,27 @@ dimensionless, portable **retention index (RI / iRT)** anchored on a spiked
 standard panel, so retention is comparable across injections, batches, and
 instruments. The original table is never altered — calibration only appends columns.
 
-## How calibration works
-
-Retention time drifts between injections, batches, and instruments, which makes
-features hard to compare across runs. RT Anchor removes that drift by mapping each
-feature's retention time onto a dimensionless **retention index (RI)** — the same
-principle as a Kováts index in GC, adapted to reversed-phase LC with a spiked lipid
-standard panel.
-
-A panel of standards spanning the gradient is run alongside the samples. Each
-standard is located in the **standards run** by its *m/z* (and, where available,
-MS² and intensity), pairing its **observed** retention time with a **fixed reference
-index**. A shape-preserving **monotone spline (PCHIP)** is fitted through these
-anchor points and applied to every feature, converting retention time → retention
-index on a scale fixed by two reference times (making the index instrument-independent).
-Because the warp is monotone it preserves elution order and never fabricates values —
-features beyond the outermost anchors are flagged rather than extrapolated. Every
-feature is reported with its RI, a per-feature **uncertainty**, and a **reliability**
-tier; supplying per-injection tables additionally yields a run-to-run **spread**
-(repeatability QC).
-
 ## Download
 
-- **Python package:** `pip install rt-anchor` — [`rt-anchor` on PyPI](https://pypi.org/project/rt-anchor/) (`pip install "rt-anchor[report,structures]"` for the HTML/PDF report + structure hover).
+- **Python package:** `pip install rt-anchor` — [`rt-anchor` on PyPI](https://pypi.org/project/rt-anchor/)
 - **macOS desktop app:** download the `.dmg` from the [**latest release**](https://github.com/Bowen999/rt-anchor/releases/latest), open it, and drag **RT Anchor** to Applications. On first launch, right-click → **Open** (the app is signed but not yet notarized).
 
 ## Input
 
-Required: a **sample feature table** (MS-DIAL / MZmine / MassCube / LipidScreener,
-auto-detected; needs an *m/z* and a retention-time column), a **standards run** of
-the panel, and the **polarity** (`positive` / `negative`).
+Required:
+
+ * a **sample feature table**, needs an *m/z* and a retention-time column 
+ * a **standards run** of
+the panel, 
+ * the **polarity** (`positive` / `negative`).
+
+Support output of:
+
+
+  * [MZmine](https://mzio.io/mzmine-news/)
+  * [MS-DIAL](https://systemsomicslab.github.io/compms/msdial/main.html)
+  * [MassCube](https://huaxuyu.github.io/masscubedocs/)
+  * [Lipidscreener](https://tmiclinode.com/web-servers-software/)
 
 Optional: per-injection files (per-sample tier + repeatability QC), a custom
 manifest / reference baseline, and matching parameters (`mz_tol_ppm`,
@@ -60,11 +50,23 @@ manifest / reference baseline, and matching parameters (`mz_tol_ppm`,
 - [`examples/input/`](examples/input/) — example sample + standards tables.
 - [`examples/output/`](examples/output/) — the generated CSV, model, anchors, log, and HTML/PDF report.
 
-## Repository layout
+## How calibration works
 
-- [`rt_anchor/`](rt_anchor/) — the Python package (PyPI: **rt-anchor**).
-- [`RT Anchor Desktop/`](RT%20Anchor%20Desktop/) — the macOS desktop app (pywebview + PyInstaller).
+Retention time drifts between injections, batches, and instruments, which makes
+features hard to compare across runs. RT Anchor removes that drift by mapping each
+feature's retention time onto a dimensionless **retention index (RI)** — the similar
+principle as a Kováts index in GC, adapted to reversed-phase LC with a spiked lipid
+standard panel.
 
-## License
+A panel of standards spanning the gradient is run alongside the samples. Each
+standard is located in the **standards run** by its *m/z* (and, where available,
+MS² and intensity), pairing its **observed** retention time with a **fixed reference
+index**. A shape-preserving **monotone spline (PCHIP)** is fitted through these
+anchor points and applied to every feature, converting retention time → retention
+index on a scale fixed by two reference times (making the index instrument-independent).
 
-MIT
+Every feature is reported with its RI, a per-feature **uncertainty**, and a **reliability**
+tier; supplying per-injection tables additionally yields a run-to-run **spread**
+(repeatability QC).
+
+# Bug 

@@ -201,15 +201,22 @@ function panelInto(body, title) {
 
 function render(id) {
   const body = $("#main-body");
+  $$(".js-plotly-plot", body).forEach(d => { try { Plotly.purge(d); } catch (e) {} });
   CK.hideAll();
+  if (structPop) structPop.style.display = "none";
   body.innerHTML = "";
   if (id === "overview") return renderOverview(body);
   if (id === "table") return renderTable(body);
   if (id === "export") return renderExport(body);
-  // a custom SVG chart section
   const sec = SECTIONS.find(x => x.id === id);
   const { panel, host } = panelInto(body, sec ? sec.title : "");
-  CK.render(id, host, state.bundle);
+  if (id === "detection" || id === "profile") {
+    // reverted to the package's Plotly figures
+    drawPlot(host, state.bundle.figures[id]);
+    if (id === "detection") attachStructures(host);
+  } else {
+    CK.render(id, host, state.bundle);   // radar (via renderOverview) + warp + repeatability
+  }
   const note = state.bundle.notes && state.bundle.notes[id];
   if (note) {
     const n = document.createElement("div"); n.className = "fig-note"; n.innerHTML = note;
@@ -288,6 +295,36 @@ function renderTable(body) {
     "<b>RI</b> columns. The full table (all rows and every original column) is available under <b>Export</b>.";
   panel.appendChild(note);
   body.appendChild(panel);
+}
+
+/* ---- Plotly (detection + profile only, reverted to the package figures) ---- */
+function drawPlot(div, figStr) {
+  const f = typeof figStr === "string" ? JSON.parse(figStr) : figStr;
+  Plotly.newPlot(div, f.data, f.layout, { displaylogo: false, responsive: true,
+    modeBarButtonsToRemove: ["select2d", "lasso2d"], toImageButtonOptions: { format: "svg" } });
+}
+let structPop;
+function attachStructures(div) {
+  const S = state.bundle.structures; if (!S || !Object.keys(S).length) return;
+  if (!structPop) {
+    structPop = document.createElement("div"); structPop.id = "struct-pop";
+    structPop.style.cssText = "position:fixed;display:none;z-index:1000;background:#FFFFFF;" +
+      "border:3px solid #141210;padding:8px 10px;box-shadow:5px 5px 0 rgba(20,18,16,.28);pointer-events:none;";
+    document.body.appendChild(structPop);
+    document.addEventListener("mousemove", e => { structPop._x = e.clientX; structPop._y = e.clientY; });
+  }
+  div.on("plotly_hover", d => {
+    let nm = d.points && d.points[0] && d.points[0].customdata;
+    if (Array.isArray(nm)) nm = nm[0];
+    if (nm && S[nm]) {
+      structPop.innerHTML = `<div style="font:800 12px sans-serif;color:#141210;margin-bottom:3px">${nm}</div>` +
+        `<div style="background:#fff;padding:2px">${S[nm]}</div>`;
+      structPop.style.display = "block";
+      structPop.style.left = Math.min(structPop._x + 14, window.innerWidth - 260) + "px";
+      structPop.style.top = Math.min(structPop._y + 14, window.innerHeight - 200) + "px";
+    }
+  });
+  div.on("plotly_unhover", () => { if (structPop) structPop.style.display = "none"; });
 }
 
 /* preview mode: auto-open output if preview data is injected */

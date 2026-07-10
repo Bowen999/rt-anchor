@@ -268,9 +268,9 @@ def table_preview(result, n: int = 120) -> Dict:
 
 DETECTION_NOTE = (
     "Each row is a standard; its retention time is shown from three sources — "
-    "<b>hollow square</b> = reference baseline, <b>filled square</b> = standards run, "
-    "<b>diamond</b> = samples (the table being calibrated). The left chip colours the lipid "
-    "class. A shorter span means the observed RT agrees more closely with the reference."
+    "<b>hollow circle</b> = reference baseline, <b>blue square</b> = standards run, "
+    "<b>blue circle</b> = samples (the table being calibrated). A shorter span means the "
+    "observed RT agrees more closely with the reference."
 )
 
 
@@ -290,12 +290,19 @@ def build_viz(result) -> Dict:
         except Exception:
             struct = {}
 
+    # Detection + Profile are REVERTED to the package's Plotly figures (per user
+    # request); radar / warp / repeatability stay the custom SVG charts.
+    from rt_anchor.viz import metrics as _vm, tic as _vt
+    figures = {
+        "detection": _vm.figure_plotly(result).to_json(),
+        "profile": _vt.figure_plotly(result, "clean").to_json(),
+    }
+
     return {
         "kpis": kpis(result),
         "radar": radar(result),
-        "detection": detection(result),
+        "figures": figures,
         "warp": warp(result),
-        "profile": profile(result),
         "repeatability": rep,
         "table": table_preview(result),
         "structures": struct,
