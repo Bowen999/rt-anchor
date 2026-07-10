@@ -169,11 +169,13 @@ if (ghBtn) ghBtn.addEventListener("click", () => { if (api().open_github) api().
 function buildNav() {
   const nav = $("#nav"); nav.innerHTML = "";
   const hasRep = state.bundle.meta.has_repeatability;
+  const hasWarp = state.bundle.warp && !state.bundle.warp.empty;
   SECTIONS.forEach(s => {
     const b = document.createElement("button");
     b.className = "nav-item"; b.dataset.id = s.id;
     b.innerHTML = `<span class="idx">${s.idx}</span>${s.label}`;
-    if (s.id === "repeatability" && !hasRep) b.disabled = true;
+    const off = (s.id === "repeatability" && !hasRep) || (s.id === "warp" && !hasWarp);
+    if (off) b.disabled = true;
     else b.addEventListener("click", () => selectSection(s.id));
     nav.appendChild(b);
   });
@@ -187,27 +189,31 @@ function selectSection(id) {
   render(id);
 }
 
+/* build a light card with a black header strip; returns the plot host div */
+function panelInto(body, title) {
+  const panel = document.createElement("div"); panel.className = "panel";
+  const h = document.createElement("div"); h.className = "panel-h"; h.textContent = title;
+  panel.appendChild(h);
+  const host = document.createElement("div"); host.className = "plot"; panel.appendChild(host);
+  body.appendChild(panel);
+  return { panel, host };
+}
+
 function render(id) {
   const body = $("#main-body");
-  // tear down any existing plots (frees Plotly's window resize listeners) + the hover popup
-  $$(".js-plotly-plot", body).forEach(d => { try { Plotly.purge(d); } catch (e) {} });
-  if (structPop) structPop.style.display = "none";
+  CK.hideAll();
   body.innerHTML = "";
   if (id === "overview") return renderOverview(body);
   if (id === "table") return renderTable(body);
   if (id === "export") return renderExport(body);
-  // a single figure section
-  const fig = state.bundle.figures[id];
-  if (!fig) { body.innerHTML = `<div class="panel"><div class="panel-h">Not available</div></div>`; return; }
+  // a custom SVG chart section
   const sec = SECTIONS.find(x => x.id === id);
-  const div = plotInto(body, sec ? sec.title : "");
-  drawPlot(div, fig);
-  if (id === "detection" || id === "warp") attachStructures(div);
+  const { panel, host } = panelInto(body, sec ? sec.title : "");
+  CK.render(id, host, state.bundle);
   const note = state.bundle.notes && state.bundle.notes[id];
   if (note) {
-    const n = document.createElement("div");
-    n.className = "fig-note"; n.innerHTML = note;
-    div.parentElement.appendChild(n);   // inside the light card, under the plot
+    const n = document.createElement("div"); n.className = "fig-note"; n.innerHTML = note;
+    panel.appendChild(n);
   }
 }
 
@@ -218,11 +224,8 @@ function renderOverview(body) {
     `<div class="kpi"><div class="kpi-l">${t.label}</div><div class="kpi-v">${t.value}</div>` +
     `<div class="kpi-s">${t.sub}</div></div>`).join("");
   body.appendChild(grid);
-  const panel = document.createElement("div"); panel.className = "panel";
-  panel.innerHTML = `<div class="panel-h">Quality fingerprint — outward is better</div>`;
-  const div = document.createElement("div"); div.className = "plot"; panel.appendChild(div);
-  body.appendChild(panel);
-  drawPlot(div, state.bundle.radar);
+  const { host } = panelInto(body, "Quality fingerprint — outward is better");
+  CK.radar(host, state.bundle.radar);
 }
 
 function renderExport(body) {
@@ -285,47 +288,6 @@ function renderTable(body) {
     "<b>RI</b> columns. The full table (all rows and every original column) is available under <b>Export</b>.";
   panel.appendChild(note);
   body.appendChild(panel);
-}
-
-/* ---- plotly helpers ---- */
-function plotInto(body, title) {
-  const panel = document.createElement("div"); panel.className = "panel";
-  if (title) {
-    const h = document.createElement("div"); h.className = "panel-h"; h.textContent = title;
-    panel.appendChild(h);
-  }
-  const div = document.createElement("div"); div.className = "plot"; panel.appendChild(div);
-  body.appendChild(panel); return div;
-}
-function drawPlot(div, figStr) {
-  const f = typeof figStr === "string" ? JSON.parse(figStr) : figStr;
-  Plotly.newPlot(div, f.data, f.layout, { displaylogo: false, responsive: true,
-    modeBarButtonsToRemove: ["select2d", "lasso2d"], toImageButtonOptions: { format: "svg" } });
-}
-
-/* ---- molecular-structure hover ---- */
-let structPop;
-function attachStructures(div) {
-  const S = state.bundle.structures; if (!S || !Object.keys(S).length) return;
-  if (!structPop) {
-    structPop = document.createElement("div"); structPop.id = "struct-pop";
-    structPop.style.cssText = "position:fixed;display:none;z-index:1000;background:#FFFFFF;" +
-      "border:3px solid #141210;padding:8px 10px;box-shadow:5px 5px 0 rgba(20,18,16,.28);pointer-events:none;";
-    document.body.appendChild(structPop);
-    document.addEventListener("mousemove", e => { structPop._x = e.clientX; structPop._y = e.clientY; });
-  }
-  div.on("plotly_hover", d => {
-    let nm = d.points && d.points[0] && d.points[0].customdata;
-    if (Array.isArray(nm)) nm = nm[0];
-    if (nm && S[nm]) {
-      structPop.innerHTML = `<div style="font:800 12px sans-serif;color:#141210;margin-bottom:3px">${nm}</div>` +
-        `<div style="background:#fff;padding:2px">${S[nm]}</div>`;
-      structPop.style.display = "block";
-      structPop.style.left = Math.min(structPop._x + 14, window.innerWidth - 260) + "px";
-      structPop.style.top = Math.min(structPop._y + 14, window.innerHeight - 200) + "px";
-    }
-  });
-  div.on("plotly_unhover", () => { if (structPop) structPop.style.display = "none"; });
 }
 
 /* preview mode: auto-open output if preview data is injected */

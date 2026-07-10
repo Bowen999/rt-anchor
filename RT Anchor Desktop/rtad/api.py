@@ -80,7 +80,7 @@ class Api:
     def run_calibration(self, params: Dict) -> Dict:
         try:
             from rt_anchor import calibrate
-            from .darkfigures import build_bundle
+            from .appviz import build_viz
 
             samples = (params.get("samples") or "").strip()
             if not samples or not os.path.exists(samples):
@@ -101,7 +101,7 @@ class Api:
                             config=cfg, manifest=manifest)
             elapsed = time.time() - t0
             self.result = res
-            bundle = build_bundle(res)
+            bundle = build_viz(res)
 
             m = res.model
             self.run_info = _json_safe({

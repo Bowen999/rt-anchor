@@ -7,10 +7,13 @@
   --cream:#ECE7DB; --paper:#FCFBF8; --card:#FFFFFF;
   --ink:#141210; --ink-soft:#3A3632; --dim-d:#6E685C; --faint-d:#9A9384;
   --rule:#DAD4C6;                     /* thin table divider */
-  --accent:#2E86D6;                   /* cool-blue primary (replaces yellow) */
-  --accent-d:#1B5C99;                 /* deep blue for text on light */
+  /* cool-blue primary — unified with the chart kit (charts.js) */
+  --accent:#1668C0;                   /* PRIMARY cool blue (== chart --blue) */
+  --accent-d:#12507F;                 /* deep steel-blue for text on light */
   --accent-ink:#FFFFFF;               /* text on an accent block */
-  --ok:#2E9E6B; --ok-d:#1d6b47; --err:#C4552A; --err-bg:#F6E4DA;
+  --teal:#0E8F8A; --indigo:#4C63B6; --cyan:#17C9E6;   /* cool secondary system */
+  --ok:#0E8F8A; --ok-d:#0A5A56;       /* valid/filled = cool teal (was green) */
+  --err:#C4552A; --err-bg:#F6E4DA;    /* error red kept for genuine failures only */
   /* ---- dark / night (sidebar + modal chrome) ---- */
   --sb:#0D0F13; --sb-2:#151A20; --sb-line:#2A313B; --sb-strong:#3A434F;
   --sb-txt:#C8D2DE; --sb-dim:#7A828E; --sb-ink:#EDF1F6;
@@ -210,9 +213,30 @@ button{font-family:inherit;cursor:pointer;color:inherit;}
 .rel{font-family:var(--mono);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
   padding:2px 8px;border:2px solid;}
 .rel-high{color:var(--accent-d);border-color:var(--accent-d);}
-.rel-medium{color:#8A6D1F;border-color:#C7A63E;}
-.rel-low{color:var(--err);border-color:var(--err);}
+.rel-medium{color:var(--indigo);border-color:var(--indigo);}
+.rel-low{color:#5C6B77;border-color:#8B98A1;}
 .rel-none{color:var(--faint-d);border-color:var(--rule);}
+
+/* ---- chart-kit overlays (charts.js): tooltip + structure card ---- */
+.ck-tip{position:fixed;display:none;z-index:1000;background:var(--ink);border-top:2px solid var(--cyan);
+  box-shadow:3px 3px 0 var(--cyan);padding:8px 11px;font-family:var(--mono);pointer-events:none;min-width:132px;}
+.ck-tip-h{color:var(--cyan);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+  margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid #3A434F;display:flex;align-items:center;gap:7px;}
+.ck-sw{width:9px;height:9px;display:inline-block;border:1px solid rgba(255,255,255,.35);}
+.ck-tip-r{display:flex;justify-content:space-between;gap:18px;font-size:11px;line-height:16px;}
+.ck-tip-r span{color:var(--muted2,#A9B6BC);} .ck-tip-r b{color:var(--card);font-weight:700;}
+.ck-card{position:fixed;display:none;z-index:1001;background:var(--paper);border:3px solid var(--ink);
+  box-shadow:4px 4px 0 var(--cyan);pointer-events:none;width:186px;}
+.ck-card-h{background:var(--ink);color:var(--cyan);font-family:var(--mono);font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.05em;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.ck-chip{font-size:9px;border:1.5px solid;padding:1px 5px;white-space:nowrap;}
+.ck-card-b{background:#fff;padding:6px;}
+.ck-card-b svg{width:100%;height:auto;display:block;}
+.ck-card-mono{font-family:var(--mono);font-size:34px;font-weight:800;color:var(--accent-d);text-align:center;padding:22px;}
+.ck-card-f{font-family:var(--mono);font-size:11px;padding:6px 9px;border-top:2px solid var(--rule);color:var(--dim-d);}
+.ck-card-f b{color:var(--ink);}
+.ck-plate{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim-d);
+  border:3px dashed var(--muted2,#A9B6BC);padding:44px 20px;text-align:center;margin:8px;}
 
 /* ---- error modal (light) ---- */
 .modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;}

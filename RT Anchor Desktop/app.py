@@ -25,15 +25,14 @@ def _selftest() -> int:
     bundle has every (lazily-imported) dependency. Invoked with `--selftest`."""
     try:
         from rt_anchor import CalibrationConfig, calibrate  # noqa: F401
-        from rt_anchor.viz import (metrics, performance, report,  # noqa: F401
-                                   repeatability, structures, tic)
+        from rtad import appviz  # noqa: F401  (app-native viz-data extraction)
+        # report EXPORT still uses the package's plotly/matplotlib figure builders:
+        from rt_anchor.viz import report, structures  # noqa: F401
         import matplotlib
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
         from matplotlib.backends.backend_pdf import PdfPages  # noqa: F401
-        import plotly.graph_objects as go
-        from rtad.darkfigures import _dark
-        _dark(go.Figure())
+        import plotly.graph_objects as go  # noqa: F401  (report html)
         plt.close(plt.figure())
         n = len(structures.render_default_structures())
         print(f"SELFTEST_OK structures={n}")

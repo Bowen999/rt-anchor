@@ -43,7 +43,7 @@ the bundle ~650 MB / dmg ~270 MB. arm64‑only build.
 ```
 app.py                entry (pywebview window + Api bridge)
 rtad/api.py           JS-exposed API (file dialogs, run_calibration, export)
-rtad/darkfigures.py   dark-themed plotly figure/KPI bundling
-web/                  index.html · styles.css · app.js · vendor/plotly.min.js
-build/RTAnchor.spec   PyInstaller spec · icon.icns
+rtad/appviz.py        native chart-data extraction (no rt_anchor.viz / Plotly)
+web/                  index.html · styles.css · app.js · charts.js (hand-authored SVG)
+build/RTAnchor.spec   PyInstaller spec · icon.icns · example/ (bundled demo)
 ```
