@@ -2,7 +2,9 @@
 
 Standard-panel **retention-index (iRT) calibration** for LC-MS lipidomics
 
-![RT Anchor desktop app](docs/screenshot.png)
+![RT Anchor — overview](docs/overview.png)
+
+![RT Anchor — feature-intensity profile](docs/profile.png)
 
 ## Purpose
 
@@ -69,4 +71,5 @@ Every feature is reported with its RI, a per-feature **uncertainty**, and a **re
 tier; supplying per-injection tables additionally yields a run-to-run **spread**
 (repeatability QC).
 
-# Bug 
+# Bug Report
+If you have any questions or encounter any bugs, please contact Bowen Yang (by8@ualberta.ca).
