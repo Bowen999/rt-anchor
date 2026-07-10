@@ -13,7 +13,8 @@ const SECTIONS = [
   { id: "profile", label: "Profile", idx: "03", title: "Feature-intensity profile" },
   { id: "warp", label: "Warp", idx: "04", title: "Calibration warp" },
   { id: "repeatability", label: "Repeatability", idx: "05", title: "Injection repeatability" },
-  { id: "export", label: "Export", idx: "06", title: "Export" },
+  { id: "table", label: "Table", idx: "06", title: "Calibrated table" },
+  { id: "export", label: "Export", idx: "07", title: "Export" },
 ];
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -34,6 +35,7 @@ const PREVIEW_API = {
   export_report: async () => ({ ok: true, paths: {} }),
   export_run_info: async () => ({ ok: true, path: "(preview)/run_info.json" }),
   export_all: async () => ({ ok: true, dir: "(preview)/outputs", n_files: 7 }),
+  open_github: async () => ({ ok: true }),
 };
 
 /* ---- toast ---- */
@@ -161,6 +163,8 @@ function showError(raw) {
 function openOutput() { $("#view-input").classList.add("hidden"); $("#view-output").classList.remove("hidden"); }
 function openInput() { $("#view-output").classList.add("hidden"); $("#view-input").classList.remove("hidden"); }
 $("#new-run").addEventListener("click", openInput);
+const ghBtn = $("#sb-github");
+if (ghBtn) ghBtn.addEventListener("click", () => { if (api().open_github) api().open_github(); });
 
 function buildNav() {
   const nav = $("#nav"); nav.innerHTML = "";
@@ -190,6 +194,7 @@ function render(id) {
   if (structPop) structPop.style.display = "none";
   body.innerHTML = "";
   if (id === "overview") return renderOverview(body);
+  if (id === "table") return renderTable(body);
   if (id === "export") return renderExport(body);
   // a single figure section
   const fig = state.bundle.figures[id];
@@ -250,6 +255,36 @@ function renderExport(body) {
     () => api().export_report(), () => "Report written"));
   $("#exp-info").addEventListener("click", () => doExport(null,
     () => api().export_run_info(), r => "Saved: " + shortPath(r.path)));
+}
+
+/* ---- calibrated-table preview ---- */
+const esc = s => String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+const NUMERIC_COLS = new Set(["RT", "m/z", "RI", "RI_uncertainty", "RI_spread"]);
+function renderTable(body) {
+  const t = state.bundle.table;
+  if (!t || !t.columns || !t.rows.length) {
+    body.innerHTML = `<div class="panel"><div class="panel-h">No table available</div></div>`; return;
+  }
+  const panel = document.createElement("div"); panel.className = "panel";
+  const h = document.createElement("div"); h.className = "panel-h";
+  h.textContent = `Calibrated table · first ${t.n_shown} of ${Number(t.n_total).toLocaleString()} rows`;
+  panel.appendChild(h);
+  const head = "<thead><tr>" + t.columns.map(c => `<th>${esc(c)}</th>`).join("") + "</tr></thead>";
+  const bodyRows = t.rows.map(r => "<tr>" + r.map((v, i) => {
+    const col = t.columns[i];
+    if (v === null || v === undefined) return `<td class="num"><span class="na">—</span></td>`;
+    if (col === "RI_reliability") return `<td><span class="rel rel-${esc(v)}">${esc(v)}</span></td>`;
+    const cls = NUMERIC_COLS.has(col) ? "num" : "";
+    return `<td class="${cls}">${esc(v)}</td>`;
+  }).join("") + "</tr>").join("");
+  const wrap = document.createElement("div"); wrap.className = "table-wrap";
+  wrap.innerHTML = `<table class="data-table">${head}<tbody>${bodyRows}</tbody></table>`;
+  panel.appendChild(wrap);
+  const note = document.createElement("div"); note.className = "fig-note";
+  note.innerHTML = "Preview of the calibrated feature table — <b>RT</b> and <b>m/z</b> beside the appended " +
+    "<b>RI</b> columns. The full table (all rows and every original column) is available under <b>Export</b>.";
+  panel.appendChild(note);
+  body.appendChild(panel);
 }
 
 /* ---- plotly helpers ---- */

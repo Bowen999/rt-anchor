@@ -1,0 +1,5 @@
+loaded sample table: {'source_format': 'masscube', 'polarity': 'positive', 'n_features': 22314, 'mz_col': 'm/z', 'rt_col': 'RT', 'rt_unit': 'min', 'rt_min_minutes': 0.013, 'rt_max_minutes': 23.92, 'n_sample_columns': 0, 'sample_columns': [], 'n_total_columns': 2}
+panel: 15 targets in positive mode
+native template built from standards run: 15/15 anchors
+identified 13 anchors (dropped 0 non-monotone)
+fitted warp on 13 anchors, span 2.11-18.42 min

@@ -54,6 +54,12 @@ class Api:
             return {"ok": False, "error": "Example dataset not found in this build."}
         return {"ok": True, "samples": samples, "standards": standards, "polarity": "positive"}
 
+    # ---- open the project page in the system browser ----
+    def open_github(self) -> Dict:
+        import webbrowser
+        webbrowser.open("https://github.com/Bowen999/rt-anchor")
+        return {"ok": True}
+
     # ---- native file dialogs ----
     def pick_file(self, title: str = "Choose a file") -> Optional[str]:
         import webview

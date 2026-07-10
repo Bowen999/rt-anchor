@@ -87,6 +87,40 @@ def _remap_fill(c):
     return c
 
 
+def _table_preview(result, n: int = 120) -> Dict:
+    """A small, JSON-safe preview of the calibrated table for the in-app viewer:
+    RT + m/z next to the appended RI columns, first `n` rows."""
+    import math
+
+    import numpy as np
+    import pandas as pd
+
+    tbl = result.table
+    wanted = [(result.rt_col, "RT"), (result.mz_col, "m/z"),
+              (result.col("RI"), "RI"),
+              (result.col("RI_uncertainty"), "RI_uncertainty"),
+              (result.col("RI_reliability"), "RI_reliability"),
+              (result.col("RI_spread"), "RI_spread"),
+              (result.col("is_extrapolated"), "extrapolated")]
+    cols = [(c, disp) for c, disp in wanted if c and c in tbl.columns]
+    head = tbl[[c for c, _ in cols]].head(n)
+
+    def _cell(v):
+        if isinstance(v, (bool, np.bool_)):
+            return "yes" if bool(v) else "no"
+        if isinstance(v, (int, np.integer)):
+            return int(v)
+        if isinstance(v, (float, np.floating)):
+            return None if not math.isfinite(float(v)) else round(float(v), 4)
+        if pd.isna(v):
+            return None
+        return str(v)
+
+    rows = [[_cell(r[c]) for c, _ in cols] for _, r in head.iterrows()]
+    return {"columns": [disp for _, disp in cols], "rows": rows,
+            "n_total": int(len(tbl)), "n_shown": int(len(head))}
+
+
 def build_bundle(result) -> Dict:
     from rt_anchor.viz import metrics, performance, repeatability, structures, tic
 
@@ -108,6 +142,7 @@ def build_bundle(result) -> Dict:
         "radar": metrics.radar_plotly(result).to_json(),
         "figures": figures,
         "notes": {"detection": metrics.DETECTION_NOTE},
+        "table": _table_preview(result),
         "structures": struct,
         "meta": {
             "scope": m["scope"], "polarity": m["polarity"], "source_format": m["source_format"],

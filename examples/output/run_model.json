@@ -1,0 +1,221 @@
+{
+  "calibration_scope": "project",
+  "n_anchors_used": 13,
+  "n_anchors_dropped_nonmonotone": 0,
+  "anchor_span_min": [
+    2.112,
+    18.42
+  ],
+  "loo_residual_irt": {
+    "median": 0.3537167678681925,
+    "p90": 0.956218225751357,
+    "max": 1.7299964115417694
+  },
+  "confidence_counts": {
+    "high": 11193,
+    "medium": 6840,
+    "none": 4281
+  },
+  "n_features": 22314,
+  "n_features_extrapolated": 4281,
+  "scale_constants": {
+    "RT_lo_min": 1.0,
+    "RT_hi_min": 18.4
+  },
+  "config": {
+    "mz_tol_ppm": 15.0,
+    "mz_tol_min_da": 0.0,
+    "rt_window_min": 0.5,
+    "rt_window_seed_min": 2.0,
+    "scale_rt_lo_min": 1.0,
+    "scale_rt_hi_min": 18.4,
+    "min_anchors": 6,
+    "min_anchors_hard": 3,
+    "coverage_gap_min": 3.0,
+    "tie_epsilon_min": 0.005,
+    "max_drop_anchors": 3,
+    "extrapolate": false,
+    "max_extrapolation_min": 1.0,
+    "conf_high_irt": 0.6,
+    "conf_low_irt": 3.0,
+    "sigma_gap_factor": 0.1,
+    "min_gaussian_similarity": 0.0,
+    "asymmetry_range": [
+      0.0,
+      1000000000.0
+    ],
+    "rt_unit": null,
+    "verbose": true
+  },
+  "anchors": [
+    {
+      "name": "PC 9:0_9:0",
+      "class": "PC",
+      "adduct": "[M+H]+",
+      "mz": 538.3503314000001,
+      "rt_ref_min": 1.81,
+      "irt": 4.655172413793104,
+      "rt_obs_min": 2.112,
+      "intensity": null,
+      "n_candidates": 2,
+      "endogenous": false,
+      "void": true
+    },
+    {
+      "name": "PC 12:0_12:0",
+      "class": "PC",
+      "adduct": "[M+H]+",
+      "mz": 622.4442314,
+      "rt_ref_min": 3.6,
+      "irt": 14.942528735632186,
+      "rt_obs_min": 3.401,
+      "intensity": null,
+      "n_candidates": 1,
+      "endogenous": false,
+      "void": false
+    },
+    {
+      "name": "PC 13:0_13:0",
+      "class": "PC",
+      "adduct": "[M+H]+",
+      "mz": 650.4755324,
+      "rt_ref_min": 4.52,
+      "irt": 20.22988505747126,
+      "rt_obs_min": 4.531,
+      "intensity": null,
+      "n_candidates": 1,
+      "endogenous": false,
+      "void": false
+    },
+    {
+      "name": "PC 14:0_14:0",
+      "class": "PC",
+      "adduct": "[M+H]+",
+      "mz": 678.5068324,
+      "rt_ref_min": 5.63,
+      "irt": 26.60919540229885,
+      "rt_obs_min": 5.638,
+      "intensity": null,
+      "n_candidates": 1,
+      "endogenous": false,
+      "void": false
+    },
+    {
+      "name": "PC 16:0_18:3",
+      "class": "PC",
+      "adduct": "[M+H]+",
+      "mz": 756.5537824,
+      "rt_ref_min": 6.63,
+      "irt": 32.356321839080465,
+      "rt_obs_min": 6.465,
+      "intensity": null,
+      "n_candidates": 2,
+      "endogenous": true,
+      "void": false
+    },
+    {
+      "name": "PC 16:0_18:2",
+      "class": "PC",
+      "adduct": "[M+H]+",
+      "mz": 758.5694324,
+      "rt_ref_min": 7.37,
+      "irt": 36.60919540229885,
+      "rt_obs_min": 7.367,
+      "intensity": null,
+      "n_candidates": 2,
+      "endogenous": true,
+      "void": false
+    },
+    {
+      "name": "PC 16:0_18:1",
+      "class": "PC",
+      "adduct": "[M+H]+",
+      "mz": 760.5850824,
+      "rt_ref_min": 8.4,
+      "irt": 42.52873563218391,
+      "rt_obs_min": 8.407,
+      "intensity": null,
+      "n_candidates": 1,
+      "endogenous": true,
+      "void": false
+    },
+    {
+      "name": "PC 18:0_18:1",
+      "class": "PC",
+      "adduct": "[M+H]+",
+      "mz": 788.6163824,
+      "rt_ref_min": 9.79,
+      "irt": 50.51724137931034,
+      "rt_obs_min": 9.832,
+      "intensity": null,
+      "n_candidates": 1,
+      "endogenous": true,
+      "void": false
+    },
+    {
+      "name": "PC 18:0_18:0",
+      "class": "PC",
+      "adduct": "[M+H]+",
+      "mz": 790.6320324000001,
+      "rt_ref_min": 11.07,
+      "irt": 57.87356321839081,
+      "rt_obs_min": 11.071,
+      "intensity": null,
+      "n_candidates": 3,
+      "endogenous": true,
+      "void": false
+    },
+    {
+      "name": "DG 16:0_18:0",
+      "class": "DG",
+      "adduct": "[M+NH4]+",
+      "mz": 614.5718013999999,
+      "rt_ref_min": 12.65,
+      "irt": 66.95402298850576,
+      "rt_obs_min": 12.708,
+      "intensity": null,
+      "n_candidates": 1,
+      "endogenous": true,
+      "void": false
+    },
+    {
+      "name": "DG 18:0_18:0",
+      "class": "DG",
+      "adduct": "[M+NH4]+",
+      "mz": 642.6031013999999,
+      "rt_ref_min": 14.99,
+      "irt": 80.40229885057472,
+      "rt_obs_min": 15.011,
+      "intensity": null,
+      "n_candidates": 1,
+      "endogenous": true,
+      "void": false
+    },
+    {
+      "name": "CE 20:5",
+      "class": "CE",
+      "adduct": "[M+NH4]+",
+      "mz": 688.6027064,
+      "rt_ref_min": 17.37,
+      "irt": 94.08045977011496,
+      "rt_obs_min": 17.409,
+      "intensity": null,
+      "n_candidates": 1,
+      "endogenous": false,
+      "void": false
+    },
+    {
+      "name": "CE 18:1",
+      "class": "CE",
+      "adduct": "[M+NH4]+",
+      "mz": 668.6340064,
+      "rt_ref_min": 18.39,
+      "irt": 99.9425287356322,
+      "rt_obs_min": 18.42,
+      "intensity": null,
+      "n_candidates": 2,
+      "endogenous": false,
+      "void": false
+    }
+  ]
+}
