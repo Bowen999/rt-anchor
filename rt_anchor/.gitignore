@@ -1,0 +1,14 @@
+# --- Windows GUI build artifacts (build.bat / rt_anchor_gui.spec) ---
+/build/
+/dist/
+/build_venv/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# --- macOS metadata junk (harmless on Windows) ---
+.DS_Store
+._*

@@ -18,6 +18,31 @@ pip install rt-anchor
 pip install "rt-anchor[report,structures]"   # + HTML/PDF report and structure hover
 ```
 
+## Windows desktop client
+
+A native-window client (pywebview over WebView2) reproduces the report as a
+sectioned app — a sidebar (Overview · Detection · Profile · Warp · Repeatability
+· Table · Export), KPI tiles, and the **same interactive Plotly figures** the
+HTML report uses. **New calibration** browses for the sample table and standards
+run, picks the polarity, and runs; **Export** writes the CSV/JSON/report.
+
+```bash
+pip install "rt-anchor[app,report]"
+rt-anchor-gui          # or:  python -m rt_anchor.gui
+```
+
+**Standalone `.exe` (no Python needed).** From the repo root on Windows:
+
+```bat
+build.bat
+```
+
+This provisions a clean venv, installs the package with its `report` + `app`
+(pywebview) extras and PyInstaller, and produces a single **`dist\rt-anchor.exe`**
+(onefile, windowed). `rt_anchor_gui.spec` is the build recipe; the `rdkit`
+structure-hover extra is deliberately excluded to keep the exe small. The client
+uses the Edge **WebView2** runtime, preinstalled on Windows 11.
+
 ## Input
 
 Required:

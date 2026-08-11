@@ -37,6 +37,8 @@ excel = ["openpyxl>=3.0"]
 report = ["matplotlib>=3.5", "plotly>=5.0"]
 structures = ["rdkit>=2022.9"]   # optional: molecular-structure hover for the default panel
 test = ["pytest>=7.0", "openpyxl>=3.0"]
+app = ["pywebview>=5.0"]         # desktop client (rt-anchor-gui) — native window via WebView2
+build = ["pyinstaller>=6.3"]     # build the Windows GUI .exe (see build.bat / rt_anchor_gui.spec)
 
 [project.urls]
 Homepage = "https://github.com/Bowen999/rt-anchor"
@@ -46,8 +48,12 @@ Issues = "https://github.com/Bowen999/rt-anchor/issues"
 [project.scripts]
 rt-anchor = "rt_anchor.cli:main"
 
+[project.gui-scripts]
+# console-less launcher (Windows uses pythonw.exe for gui-scripts)
+rt-anchor-gui = "rt_anchor.gui:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-rt_anchor = ["py.typed"]
+rt_anchor = ["py.typed", "assets/*.ico", "assets/*.png", "webui/*.html", "webui/*.css", "webui/*.js"]

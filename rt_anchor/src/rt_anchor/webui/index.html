@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RT Anchor</title>
+<style>/*__CSS__*/</style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><span class="rt">RT</span><span class="an">ANCHOR</span></div>
+    <div class="brand-sub">IRT CALIBRATION</div>
+    <div class="divider"></div>
+    <nav id="nav">
+      <button class="nav" data-sec="overview"><span class="num">01</span><span class="lab">OVERVIEW</span></button>
+      <button class="nav" data-sec="detection"><span class="num">02</span><span class="lab">DETECTION</span></button>
+      <button class="nav" data-sec="profile"><span class="num">03</span><span class="lab">PROFILE</span></button>
+      <button class="nav" data-sec="warp"><span class="num">04</span><span class="lab">WARP</span></button>
+      <button class="nav" data-sec="repeatability"><span class="num">05</span><span class="lab">REPEATABILITY</span></button>
+      <button class="nav" data-sec="table"><span class="num">06</span><span class="lab">TABLE</span></button>
+      <button class="nav" data-sec="export"><span class="num">07</span><span class="lab">EXPORT</span></button>
+    </nav>
+    <div class="side-actions">
+      <button class="side-btn" id="btn-new">+&nbsp;&nbsp;NEW CALIBRATION</button>
+      <button class="side-btn" id="btn-github">◆&nbsp;&nbsp;GITHUB REPOSITORY&nbsp;↗</button>
+    </div>
+    <div class="engine">
+      <div class="lbl">ENGINE</div>
+      <div class="txt">RT Anchor · standard-panel anchor warp</div>
+    </div>
+  </aside>
+
+  <main class="content" id="content">
+    <!-- 01 OVERVIEW -->
+    <section class="view" data-view="overview">
+      <h1 class="page-title">Overview</h1><div class="title-rule"></div>
+      <div class="kpi-grid" id="kpis"></div>
+      <div class="card">
+        <div class="card-head"><span class="sq"></span>QUALITY FINGERPRINT — OUTWARD IS BETTER</div>
+        <div class="card-body"><div class="plot" id="fig-radar"></div></div>
+      </div>
+    </section>
+
+    <!-- 02 DETECTION -->
+    <section class="view" data-view="detection">
+      <h1 class="page-title">Standard detection</h1><div class="title-rule"></div>
+      <div class="card">
+        <div class="card-head"><span class="sq"></span>REFERENCE vs STANDARDS RUN vs SAMPLES</div>
+        <div class="card-body"><div class="plot" id="fig-detection"></div>
+          <p class="fignote" id="note-detection"></p></div>
+      </div>
+    </section>
+
+    <!-- 03 PROFILE -->
+    <section class="view" data-view="profile">
+      <h1 class="page-title">Feature-intensity profile</h1><div class="title-rule"></div>
+      <div class="card">
+        <div class="card-head"><span class="sq"></span>FEATURE-INTENSITY PROFILE — BEFORE vs AFTER</div>
+        <div class="card-body"><div class="plot" id="fig-profile"></div></div>
+      </div>
+    </section>
+
+    <!-- 04 WARP -->
+    <section class="view" data-view="warp">
+      <h1 class="page-title">Calibration warp</h1><div class="title-rule"></div>
+      <div class="card">
+        <div class="card-head"><span class="sq"></span>CALIBRATION WARP — RT → iRT</div>
+        <div class="card-body"><div class="plot" id="fig-warp"></div></div>
+      </div>
+    </section>
+
+    <!-- 05 REPEATABILITY -->
+    <section class="view" data-view="repeatability">
+      <h1 class="page-title">Injection repeatability</h1><div class="title-rule"></div>
+      <div class="card">
+        <div class="card-head"><span class="sq"></span>PER-SAMPLE RI SPREAD</div>
+        <div class="card-body"><div class="plot" id="fig-repeatability"></div></div>
+      </div>
+    </section>
+
+    <!-- 06 TABLE -->
+    <section class="view" data-view="table">
+      <h1 class="page-title">Calibrated table</h1><div class="title-rule"></div>
+      <div class="card">
+        <div class="card-head"><span class="sq"></span><span id="table-caption">CALIBRATED FEATURES + RI COLUMNS</span></div>
+        <div class="card-body"><div class="table-wrap" id="table-wrap"></div></div>
+      </div>
+    </section>
+
+    <!-- 07 EXPORT -->
+    <section class="view" data-view="export">
+      <h1 class="page-title">Export</h1><div class="title-rule"></div>
+      <div class="card">
+        <div class="card-head"><span class="sq"></span>WRITE OUTPUTS</div>
+        <div class="card-body">
+          <div class="form-row"><label>Output folder</label>
+            <input id="ex-dir" type="text" readonly><button class="btn" data-browse="ex-dir" data-kind="dir">Browse</button></div>
+          <div class="form-row"><label>Name prefix</label>
+            <input id="ex-prefix" type="text" value="calibrated"><span></span></div>
+          <div class="form-row"><label>Report</label>
+            <div class="checks">
+              <label class="chk"><input type="checkbox" id="ex-html" checked> HTML</label>
+              <label class="chk"><input type="checkbox" id="ex-pdf" checked> PDF</label>
+              <label class="chk"><select id="ex-tic"><option value="clean">clean</option><option value="realistic">realistic</option><option value="both">both</option></select> TIC style</label>
+            </div><span></span></div>
+          <div class="form-actions">
+            <button class="btn btn-accent" id="ex-run">WRITE OUTPUTS</button>
+            <button class="btn btn-primary" id="ex-report" disabled>OPEN REPORT</button>
+            <button class="btn" id="ex-folder" disabled>OPEN FOLDER</button>
+          </div>
+          <pre class="export-log" id="ex-log"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- empty state -->
+    <div class="empty" id="empty">
+      <div class="empty-box">
+        <div class="empty-title">NO CALIBRATION YET</div>
+        <div class="empty-sub">Load a sample feature table and a standard-panel run to compute retention indices.</div>
+        <button class="btn btn-accent" id="empty-new">+ NEW CALIBRATION</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- NEW CALIBRATION modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-head"><span class="sq"></span>NEW CALIBRATION<button class="modal-x" id="modal-x">✕</button></div>
+      <div class="modal-body">
+        <div class="form-row"><label>Sample table *</label>
+          <input id="f-sample" type="text" placeholder="feature table to calibrate"><button class="btn" data-browse="f-sample" data-kind="file">Browse</button></div>
+        <div class="form-row"><label>Standards run *</label>
+          <input id="f-standards" type="text" placeholder="standard-panel run (required)"><button class="btn" data-browse="f-standards" data-kind="file">Browse</button></div>
+        <div class="form-row"><label>Polarity</label>
+          <select id="f-polarity"><option value="positive">positive</option><option value="negative">negative</option></select><span></span></div>
+
+        <button class="disclosure" id="adv-toggle">▸ ADVANCED OPTIONS</button>
+        <div class="adv" id="adv" hidden>
+          <div class="form-row"><label>Preset</label>
+            <div class="checks"><button class="btn btn-sm" data-preset="qtof">QTOF</button><button class="btn btn-sm" data-preset="orbitrap">Orbitrap</button></div><span></span></div>
+          <div class="grid2">
+            <div class="form-row"><label>m/z tol (ppm)</label><input id="f-mz" type="text" value="15.0"><span></span></div>
+            <div class="form-row"><label>RT window (min)</label><input id="f-rtw" type="text" value="0.5"><span></span></div>
+            <div class="form-row"><label>Min anchors</label><input id="f-minanc" type="text" value="6"><span></span></div>
+            <div class="form-row"><label class="chk"><input type="checkbox" id="f-extrap"> Extrapolate</label><span></span><span></span></div>
+            <div class="form-row"><label>Source format</label>
+              <select id="f-fmt"><option>auto</option><option>masscube</option><option>lipidscreener</option><option>msdial</option><option>mzmine</option></select><span></span></div>
+            <div class="form-row"><label>RT unit</label>
+              <select id="f-unit"><option>auto</option><option>min</option><option>sec</option></select><span></span></div>
+          </div>
+          <div class="form-row"><label>Per-injection dir</label><input id="f-single" type="text" placeholder="optional · enables per-sample tier"><button class="btn" data-browse="f-single" data-kind="dir">Browse</button></div>
+          <div class="form-row"><label>Manifest CSV</label><input id="f-manifest" type="text" placeholder="optional"><button class="btn" data-browse="f-manifest" data-kind="file">Browse</button></div>
+          <div class="form-row"><label>Reference CSV</label><input id="f-reference" type="text" placeholder="optional"><button class="btn" data-browse="f-reference" data-kind="file">Browse</button></div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-accent" id="run-btn">CALIBRATE</button>
+        </div>
+        <pre class="run-log" id="run-log"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- loading -->
+  <div class="loading" id="loading"><div class="loading-box"><div class="bar"><span></span></div><div class="loading-txt" id="loading-txt">Working…</div></div></div>
+
+<script>/*__PLOTLYJS__*/</script>
+<script>/*__APPJS__*/</script>
+</body>
+</html>
