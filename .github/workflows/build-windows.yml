@@ -1,0 +1,61 @@
+name: Build Windows client
+
+# Builds the Windows desktop client (PyInstaller onedir) and, on a v* tag,
+# attaches the .zip to that tag's GitHub Release. Mirrors rt_anchor/build.bat.
+# Manual runs (workflow_dispatch) build + upload a workflow artifact only.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write          # required to upload assets to the Release
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: rt_anchor
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps + PyInstaller
+        run: |
+          python -m pip install --upgrade pip wheel setuptools
+          pip install ".[report,app]"
+          pip install "pyinstaller>=6.3"
+
+      - name: Build onedir exe
+        run: |
+          pyinstaller --noconfirm --clean rt_anchor_gui.spec
+          if (Test-Path packaging\rt-anchor.exe.config) {
+            Copy-Item packaging\rt-anchor.exe.config dist\rt-anchor\rt-anchor.exe.config
+          }
+
+      - name: Package zip
+        run: |
+          $ver = "${{ github.ref_name }}".TrimStart('v')
+          $name = "RT-Anchor-$ver-Windows-x64.zip"
+          Compress-Archive -Path dist\rt-anchor -DestinationPath $name -CompressionLevel Optimal
+          (Get-FileHash $name -Algorithm SHA256).Hash.ToLower() | Tee-Object "$name.sha256.txt"
+          "ASSET=rt_anchor/$name" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rt-anchor-windows
+          path: rt_anchor/RT-Anchor-*-Windows-x64.zip
+
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ASSET }}
+          fail_on_unmatched_files: true
