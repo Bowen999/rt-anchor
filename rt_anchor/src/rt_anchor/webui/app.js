@@ -119,6 +119,16 @@
     if (res.prefix) $("ex-prefix").value = res.prefix;
   }
 
+  async function runExample() {
+    const a = api(); if (!a) return;
+    showLoading("Running example dataset…");
+    const res = await a.run_example();
+    hideLoading();
+    if (!res.ok) { alert("Example failed:\n" + res.error); return; }
+    onResult(res);
+    showView("overview");
+  }
+
   // ---------------------------------------------------------------- export ---
   async function runExport() {
     const a = api(); if (!a) return;
@@ -156,6 +166,8 @@
     });
     $("btn-new").addEventListener("click", openModal);
     $("empty-new").addEventListener("click", openModal);
+    $("btn-example").addEventListener("click", runExample);
+    $("empty-example").addEventListener("click", runExample);
     $("modal-x").addEventListener("click", closeModal);
     $("btn-github").addEventListener("click", () => { const a = api(); if (a) a.open_url("https://github.com/Bowen999/rt-anchor"); });
     $("adv-toggle").addEventListener("click", () => {
@@ -182,7 +194,10 @@
   async function bootstrap() {
     const a = api(); if (!a) return;
     const st = await a.get_state();
+    if (st && !st.has_example) {
+      ["btn-example", "empty-example"].forEach(id => { const el = $(id); if (el) el.style.display = "none"; });
+    }
     if (st && st.has_result) { onResult(st); showView("overview"); }
-    else openModal();
+    // otherwise the empty state (RUN EXAMPLE / NEW CALIBRATION) stays visible
   }
 })();

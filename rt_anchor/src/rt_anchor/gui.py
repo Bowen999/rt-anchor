@@ -42,6 +42,15 @@ def _webui(name: str) -> str:
         return fh.read()
 
 
+def _example_dir() -> str:
+    """Directory holding the bundled example dataset (works source + frozen)."""
+    base = getattr(sys, "_MEIPASS", None)
+    if base:
+        p = os.path.join(base, "rt_anchor", "example")
+        return p if os.path.isdir(p) else os.path.join(base, "example")
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "example")
+
+
 def _build_html() -> str:
     from plotly.offline import get_plotlyjs
     html = _webui("index.html")
@@ -157,10 +166,20 @@ class Api:
         except Exception as e:  # FileNotFoundError etc.
             return {"ok": False, "error": f"{type(e).__name__}: {e}", "log": log}
 
+    def run_example(self) -> Dict:
+        """Calibrate the bundled example dataset (one-click quick test)."""
+        d = _example_dir()
+        return self.run_calibration({
+            "sample": os.path.join(d, "samples.txt"),
+            "standards": os.path.join(d, "standards.txt"),
+            "polarity": "positive",
+        })
+
     def get_state(self) -> Dict:
+        base = {"has_example": os.path.exists(os.path.join(_example_dir(), "samples.txt"))}
         if self._result is None:
-            return {"has_result": False}
-        return {"has_result": True, **self._state_payload()}
+            return {"has_result": False, **base}
+        return {"has_result": True, **base, **self._state_payload()}
 
     def _state_payload(self) -> Dict:
         from .viz import repeatability
@@ -269,6 +288,8 @@ def main() -> int:
     if demo_s and demo_std:
         api.run_calibration({"sample": demo_s, "standards": demo_std,
                              "polarity": os.environ.get("RT_ANCHOR_DEMO_POLARITY", "positive")})
+    elif os.environ.get("RT_ANCHOR_DEMO_EXAMPLE"):
+        api.run_example()
 
     # WebView2's NavigateToString caps HTML at ~2MB and our page inlines plotly.js
     # (~3.6MB), so serve it from a temp file loaded via file:// instead.

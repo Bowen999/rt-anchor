@@ -44,6 +44,8 @@ hiddenimports += ["scipy.interpolate",
 # ---- web UI assets + pywebview (WebView2 desktop shell) ---------------------
 # The HTML/CSS/JS live in rt_anchor/webui and are read at runtime from _MEIPASS.
 datas += [(os.path.join("src", "rt_anchor", "webui"), os.path.join("rt_anchor", "webui"))]
+# bundled example dataset for the "Run example" one-click quick test
+datas += [(os.path.join("src", "rt_anchor", "example"), os.path.join("rt_anchor", "example"))]
 # pywebview: its bundled JS + the WebView2 loader DLLs, plus the pythonnet-backed
 # WinForms backend. copy_metadata keeps importlib.metadata.version('pywebview') happy.
 datas += collect_data_files("webview")

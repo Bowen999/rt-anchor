@@ -21,6 +21,7 @@
       <button class="nav" data-sec="export"><span class="num">07</span><span class="lab">EXPORT</span></button>
     </nav>
     <div class="side-actions">
+      <button class="side-btn" id="btn-example">▶&nbsp;&nbsp;RUN EXAMPLE</button>
       <button class="side-btn" id="btn-new">+&nbsp;&nbsp;NEW CALIBRATION</button>
       <button class="side-btn" id="btn-github">◆&nbsp;&nbsp;GITHUB REPOSITORY&nbsp;↗</button>
     </div>
@@ -117,8 +118,11 @@
     <div class="empty" id="empty">
       <div class="empty-box">
         <div class="empty-title">NO CALIBRATION YET</div>
-        <div class="empty-sub">Load a sample feature table and a standard-panel run to compute retention indices.</div>
-        <button class="btn btn-accent" id="empty-new">+ NEW CALIBRATION</button>
+        <div class="empty-sub">Run the bundled example for a quick look, or load your own sample feature table and standard-panel run.</div>
+        <div class="empty-actions">
+          <button class="btn btn-accent" id="empty-example">▶ RUN EXAMPLE</button>
+          <button class="btn" id="empty-new">+ NEW CALIBRATION</button>
+        </div>
       </div>
     </div>
   </main>

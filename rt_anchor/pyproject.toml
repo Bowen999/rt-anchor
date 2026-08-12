@@ -56,4 +56,4 @@ rt-anchor-gui = "rt_anchor.gui:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-rt_anchor = ["py.typed", "assets/*.ico", "assets/*.png", "webui/*.html", "webui/*.css", "webui/*.js"]
+rt_anchor = ["py.typed", "assets/*.ico", "assets/*.png", "webui/*.html", "webui/*.css", "webui/*.js", "example/*.txt"]
