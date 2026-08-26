@@ -48,8 +48,9 @@ manifest / reference baseline, and matching parameters (`mz_tol_ppm`,
 
 ## Examples
 
-- [`examples/quickstart.ipynb`](examples/quickstart.ipynb) — a Jupyter notebook running the bundled example end-to-end.
-- [`examples/input/`](examples/input/) — example sample + standards tables.
+- [`examples/quickstart.ipynb`](examples/quickstart.ipynb) — a Jupyter notebook running the bundled Mix 15 example end-to-end.
+- [`examples/input_15_mixture/`](examples/input_15_mixture/) — example sample + standards tables for the **Mix 15** panel.
+- [`examples/input_21_mixture/`](examples/input_21_mixture/) — example sample + standards tables for the **Mix 21** panel.
 - [`examples/output/`](examples/output/) — the generated CSV, model, anchors, log, and HTML/PDF report.
 
 ## How calibration works
