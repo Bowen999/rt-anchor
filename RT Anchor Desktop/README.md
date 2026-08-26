@@ -13,10 +13,14 @@ Unsigned/ad‑hoc → on first open, right‑click the app → **Open** (or
 ## What it does
 - **Input screen** — the **Required** block: a sample feature table (MS‑DIAL /
   MZmine / MassCube / LipidScreener, auto‑detected), a **standards run** (builds
-  the native anchor template), and polarity. A collapsed **Advanced** block holds
-  optional per‑injection files and the matching parameters (m/z tolerance, RT
-  window, min anchors, extrapolation) — there is no "instrument type" to choose.
-  Then **Run calibration**.
+  the native anchor template), the **standard mixture** — an either/or choice
+  between the two bundled panels, **Mix 15** (the Caley lipid RT‑calibration
+  mix, Orbitrap reference RTs) and **Mix 21** (the extended Mix 4.4 panel,
+  Carly 35‑min approximate RTs), each with a scrollable per‑standard preview
+  (m/z per polarity · reference RT) to help pick the right one — and polarity.
+  A collapsed **Advanced** block holds optional per‑injection files and the
+  matching parameters (m/z tolerance, RT window, min anchors, extrapolation) —
+  there is no "instrument type" to choose. Then **Run calibration**.
 - **Output screen** — a left sidebar switches sections: **Overview** (KPI
   scorecard + quality radar), **Detection**, **Profile**, **Warp**,
   **Repeatability** (per‑sample only), **Export** (calibrated CSV / HTML+PDF report).
@@ -43,6 +47,7 @@ the bundle ~650 MB / dmg ~270 MB. arm64‑only build.
 ```
 app.py                entry (pywebview window + Api bridge)
 rtad/api.py           JS-exposed API (file dialogs, run_calibration, export)
+rtad/mixtures.py      the two bundled standard mixtures (Mix 15 / Mix 21) + previews
 rtad/appviz.py        native chart-data extraction (no rt_anchor.viz / Plotly)
 web/                  index.html · styles.css · app.js · charts.js (hand-authored SVG)
 build/RTAnchor.spec   PyInstaller spec · icon.icns · example/ (bundled demo)

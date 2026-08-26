@@ -40,7 +40,7 @@ class CalibrationResult:
     polarity: Optional[str] = None
     source_format: str = ""
     columns: Dict[str, str] = field(default_factory=dict)  # result-col -> actual name in table
-    panel: Dict = field(default_factory=dict)              # standards-run summary (RT range, detection, native RT)
+    panel: Dict = field(default_factory=dict)              # standards-run summary (RT range, detection, native RT, resolved targets, n_features)
     default_panel: bool = True                             # built-in 15-standard panel (enables structure hover)
 
     def to_model_json(self) -> Dict:
@@ -106,6 +106,8 @@ def calibrate(sample_table: str,
         "rt_range": [float(srt.min()), float(srt.max())],
         "n_detected": len(native), "n_panel": len(panel),
         "native_rt": {k: float(v) for k, v in native.items()},
+        "targets": panel.targets.copy(),
+        "n_features": int(std_ft.df.shape[0]),
     }
     return result
 

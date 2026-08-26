@@ -2,7 +2,7 @@
 "use strict";
 
 const state = {
-  params: { samples: "", standards: "", single_files: "", polarity: "positive", manifest: "" },
+  params: { samples: "", standards: "", single_files: "", polarity: "positive", mixture: "mix21" },
   bundle: null,
   section: "overview",
 };
@@ -29,7 +29,25 @@ const PREVIEW_API = {
   pick_file: async () => "/preview/example.txt",
   pick_folder: async () => "/preview/single_files",
   load_example: async () => ({ ok: true, samples: "/preview/example/samples.txt",
-    standards: "/preview/example/standards.txt", polarity: "positive" }),
+    standards: "/preview/example/standards.txt", polarity: "positive", mixture: "mix15" }),
+  mixture_previews: async () => ({ ok: true, default: "mix21", mixtures: [
+    { key: "mix15", label: "Mix 15",
+      rows: [{ name: "PC 6:0_6:0", mz_pos: 454.2569, mz_neg: 498.2474, rt_ref_min: 1.06 },
+             { name: "PC 12:0_12:0", mz_pos: 622.4448, mz_neg: 666.4362, rt_ref_min: 3.6 },
+             { name: "PC 14:0_14:0", mz_pos: 678.5069, mz_neg: 722.4983, rt_ref_min: 5.63 },
+             { name: "PC 16:0_18:1", mz_pos: 760.5856, mz_neg: 804.5766, rt_ref_min: 8.4 },
+             { name: "DG 16:0_18:0", mz_pos: 614.5723, mz_neg: 641.5367, rt_ref_min: 12.65 },
+             { name: "CE 18:1", mz_pos: 668.6345, mz_neg: null, rt_ref_min: 18.39 }] },
+    { key: "mix21", label: "Mix 21",
+      rows: [{ name: "PC 6:0_6:0", mz_pos: 454.2561, mz_neg: 498.2474, rt_ref_min: 1.5 },
+             { name: "PC 8:0_8:0", mz_pos: 510.319, mz_neg: 554.31, rt_ref_min: 3.2 },
+             { name: "PC 12:0_12:0", mz_pos: 622.444, mz_neg: 666.4352, rt_ref_min: 6.8 },
+             { name: "PC 14:0_16:0", mz_pos: 706.5381, mz_neg: 750.5291, rt_ref_min: 11.1 },
+             { name: "PC 16:0_18:1", mz_pos: 760.5846, mz_neg: 804.576, rt_ref_min: 12.9 },
+             { name: "DG 18:0_18:0", mz_pos: 642.6031, mz_neg: 669.5675, rt_ref_min: 18.0 },
+             { name: "CE 20:5", mz_pos: 688.6027, mz_neg: null, rt_ref_min: 20.5 },
+             { name: "TG 18:0_18:2_18:0", mz_pos: 904.8328, mz_neg: null, rt_ref_min: 21.8 }] },
+  ] }),
   run_calibration: async () => window.__PREVIEW__ || { ok: false, error: "no preview data" },
   export_csv: async () => ({ ok: true, path: "(preview)/calibrated.csv" }),
   export_report: async () => ({ ok: true, paths: {} }),
@@ -78,11 +96,56 @@ if (loadExBtn) loadExBtn.addEventListener("click", async () => {
   if (!r || !r.ok) { showError((r && r.error) || "Could not load the example dataset."); return; }
   markField("samples", r.samples);
   markField("standards", r.standards);
+  if (r.mixture) selectMixture(r.mixture);
   state.params.polarity = r.polarity || "positive";
   const seg = $('[data-seg="polarity"]');
   if (seg) $$("button", seg).forEach(b => b.classList.toggle("active", b.dataset.val === state.params.polarity));
   setStatus("Example dataset loaded — press Run calibration.", "ok");
 });
+
+/* ---- standard-mixture cards + preview (either/or choice) ---- */
+let MIXTURES = [];                       // payload of api().mixture_previews()
+let MIX_DEFAULT = "mix21";               // backend's pre-selected mixture
+function renderMixCards() {
+  const wrap = $("#mix-cards"); wrap.innerHTML = "";
+  MIXTURES.forEach(m => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "mix-card"; b.dataset.key = m.key;
+    if (state.params.mixture === m.key) b.classList.add("active");
+    b.textContent = m.label;
+    b.addEventListener("click", () => selectMixture(m.key));
+    wrap.appendChild(b);
+  });
+}
+function renderMixPreview() {
+  const tbl = $("#mix-table");
+  const m = MIXTURES.find(x => x.key === state.params.mixture);
+  if (!m) { tbl.innerHTML = ""; return; }
+  const thead = "<thead><tr><th>#</th><th>Standard</th><th>m/z (+)</th><th>m/z (−)</th><th>Ref RT <span class='unit'>min</span></th></tr></thead>";
+  const rows = m.rows.map((r, i) => "<tr>" +
+    `<td class="num">${i + 1}</td>` +
+    `<td>${esc(r.name)}</td>` +
+    `<td class="num">${r.mz_pos != null ? r.mz_pos.toFixed(4) : '<span class="na">—</span>'}</td>` +
+    `<td class="num">${r.mz_neg != null ? r.mz_neg.toFixed(4) : '<span class="na">ND</span>'}</td>` +
+    `<td class="num">${Number(r.rt_ref_min).toFixed(2)}</td></tr>`).join("");
+  tbl.innerHTML = thead + `<tbody>${rows}</tbody>`;
+}
+function selectMixture(key) {
+  state.params.mixture = key;
+  $$("#mix-cards .mix-card").forEach(c => c.classList.toggle("active", c.dataset.key === key));
+  renderMixPreview();
+}
+async function initMixtures() {
+  try {
+    const r = await api().mixture_previews();
+    if (r && r.ok && Array.isArray(r.mixtures)) {
+      MIXTURES = r.mixtures;
+      if (r.default) MIX_DEFAULT = r.default;
+      if (!MIXTURES.some(m => m.key === state.params.mixture)) state.params.mixture = MIX_DEFAULT;
+    }
+  } catch (e) { /* fall through: UI stays usable without previews */ }
+  renderMixCards(); renderMixPreview();
+}
 
 /* Advanced section collapse/expand */
 const advToggle = $("#adv-toggle");
@@ -104,7 +167,7 @@ function collectAdvanced() {
 $("#run").addEventListener("click", run);
 async function run() {
   if (!state.params.samples) { setStatus("Choose a sample feature table first.", "err"); return; }
-  if (!state.params.standards) { setStatus("Choose a standards run — it is required.", "err"); return; }
+  if (!state.params.standards) { setStatus("Choose a standards mixture table — it is required.", "err"); return; }
   collectAdvanced();
   const btn = $("#run"); btn.disabled = true;
   showProgress(true);
@@ -162,7 +225,34 @@ function showError(raw) {
 /* ===================== OUTPUT VIEW ===================== */
 function openOutput() { $("#view-input").classList.add("hidden"); $("#view-output").classList.remove("hidden"); }
 function openInput() { $("#view-output").classList.add("hidden"); $("#view-input").classList.remove("hidden"); }
-$("#new-run").addEventListener("click", openInput);
+/* + New calibration — reset to a completely fresh input screen */
+const FILE_FIELDS = [
+  ["samples", "no file selected"],
+  ["standards", "no file selected"],
+  ["single_files", "no folder selected"],
+];
+function resetInput() {
+  state.params = { samples: "", standards: "", single_files: "", polarity: "positive", mixture: MIX_DEFAULT };
+  if (MIXTURES.length) selectMixture(MIX_DEFAULT);
+  state.bundle = null;
+  FILE_FIELDS.forEach(([key, placeholder]) => {
+    const el = $("#path-" + key);
+    if (el) { el.textContent = placeholder; el.title = ""; el.classList.remove("set"); }
+    const field = document.querySelector(`.field[data-key="${key}"]`);
+    if (field) field.classList.remove("filled");
+  });
+  const seg = $('[data-seg="polarity"]');
+  if (seg) $$("button", seg).forEach(b => b.classList.toggle("active", b.dataset.val === "positive"));
+  $$("#adv-body input").forEach(inp => {                 // restore HTML defaults
+    if (inp.type === "checkbox") inp.checked = inp.defaultChecked;
+    else inp.value = inp.defaultValue;
+  });
+  const adv = $("#adv");
+  adv.classList.remove("open");
+  $("#adv-toggle").setAttribute("aria-expanded", "false");
+  setStatus("", ""); showProgress(false);
+}
+$("#new-run").addEventListener("click", () => { resetInput(); openInput(); });
 const ghBtn = $("#sb-github");
 if (ghBtn) ghBtn.addEventListener("click", () => { if (api().open_github) api().open_github(); });
 
@@ -225,12 +315,40 @@ function render(id) {
 }
 
 function renderOverview(body) {
-  const k = state.bundle.kpis;
-  const grid = document.createElement("div"); grid.className = "kpis";
-  grid.innerHTML = k.map(t =>
-    `<div class="kpi"><div class="kpi-l">${t.label}</div><div class="kpi-v">${t.value}</div>` +
-    `<div class="kpi-s">${t.sub}</div></div>`).join("");
-  body.appendChild(grid);
+  const k = state.bundle.kpis || [];
+  const rowTiles = k.filter(t => t.rows && t.rows.length);
+  const valTiles = k.filter(t => !(t.rows && t.rows.length));
+
+  /* shared-column table: one "sample" column + one "standards run" column */
+  if (rowTiles.length) {
+    const rows = rowTiles.map(t => {
+      const kv = {};
+      t.rows.forEach(r => { kv[r.k] = r.v; });
+      const v = key => (kv[key] !== undefined && kv[key] !== null) ? esc(kv[key]) : "<span class=\"na\">—</span>";
+      const sub = t.sub ? `<span class="kt-m-s">${esc(t.sub)}</span>` : "";
+      return `<tr><th class="kt-m"><span class="kt-m-l">${esc(t.label)}</span>${sub}</th>` +
+             `<td class="kt-v">${v("samples")}</td>` +
+             `<td class="kt-v">${v("standards run")}</td></tr>`;
+    }).join("");
+    const tbl = document.createElement("div"); tbl.className = "kpi-table";
+    tbl.innerHTML =
+      `<table class="kpi-metrics">
+         <thead><tr><th class="kt-m">Metric</th><th class="kt-v">Sample</th><th class="kt-v">Standards run</th></tr></thead>
+         <tbody>${rows}</tbody>
+       </table>`;
+    body.appendChild(tbl);
+  }
+
+  /* single-value metrics stay as bold tiles */
+  if (valTiles.length) {
+    const grid = document.createElement("div"); grid.className = "kpis";
+    grid.innerHTML = valTiles.map(t =>
+      `<div class="kpi"><div class="kpi-l">${esc(t.label)}</div><div class="kpi-v">${esc(t.value)}</div>` +
+      (t.sub ? `<div class="kpi-s">${esc(t.sub)}</div>` : "") + `</div>`
+    ).join("");
+    body.appendChild(grid);
+  }
+
   const { host } = panelInto(body, "Quality fingerprint — outward is better");
   CK.radar(host, state.bundle.radar);
 }
@@ -239,13 +357,13 @@ function renderExport(body) {
   body.innerHTML =
     `<div class="export-all">
        <button class="btn-exp big" id="exp-all"><div class="t">Export all outputs →</div>
-         <div class="d">Writes everything into one folder: calibrated CSV · model.json · anchors.csv · log.txt · report (HTML + PDF) · run_info.json</div></button>
+         <div class="d">Writes everything into one folder: calibrated CSV · model.json · anchors.csv · log.txt · interactive HTML report · run_info.json</div></button>
      </div>
      <div class="export-row">
        <button class="btn-exp" id="exp-csv"><div class="t">Calibrated table</div>
          <div class="d">CSV — original columns + RI, RI_uncertainty, RI_reliability, RI_spread, flags</div></button>
        <button class="btn-exp" id="exp-report"><div class="t">Report</div>
-         <div class="d">Interactive HTML + static PDF (detection, warp, repeatability)</div></button>
+         <div class="d">Interactive HTML — hover, zoom, pan (detection, warp, repeatability)</div></button>
        <button class="btn-exp" id="exp-info"><div class="t">Run info</div>
          <div class="d">JSON — parameters, run time, versions, and a result summary</div></button>
      </div>`;
@@ -329,6 +447,7 @@ function attachStructures(div) {
 
 /* preview mode: auto-open output if preview data is injected */
 window.addEventListener("load", () => {
+  initMixtures();
   if (!window.pywebview && window.__PREVIEW__ && window.__PREVIEW__.ok) {
     state.bundle = window.__PREVIEW__; buildNav(); openOutput(); selectSection("overview");
   }
