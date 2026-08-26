@@ -29,10 +29,20 @@
       </div>
 
       <div class="field req" data-key="standards">
-        <div class="field-head"><span class="lbl">Standards run</span><span class="req-tag">required</span></div>
+        <div class="field-head"><span class="lbl">Standards mixture table</span><span class="req-tag">required</span></div>
         <div class="picker"><button class="btn-file" data-pick="file" data-target="standards">Choose file</button>
           <div class="path" id="path-standards">no file selected</div></div>
-        <div class="hint">The standard-panel run — builds the native anchor template</div>
+        <div class="hint">The standards mixture run — builds the native anchor template</div>
+      </div>
+
+      <div class="field req" data-key="mixture">
+        <div class="field-head"><span class="lbl">Mixture panel</span><span class="req-tag">choose one</span></div>
+        <div class="mix-cards" id="mix-cards"></div>
+        <div class="mix-preview">
+          <div class="table-wrap mix-table-wrap">
+            <table class="data-table" id="mix-table"></table>
+          </div>
+        </div>
       </div>
 
       <div class="field req seg-field">

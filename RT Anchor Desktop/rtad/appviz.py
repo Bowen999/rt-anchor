@@ -46,6 +46,9 @@ def _intensity(result) -> np.ndarray:
 
 
 def _panel_targets(result):
+    stored = (result.panel or {}).get("targets")
+    if isinstance(stored, pd.DataFrame) and len(stored):
+        return stored.reset_index(drop=True)
     from rt_anchor.config import CalibrationConfig
     from rt_anchor.panel import build_panel
     cfg = CalibrationConfig.from_dict(result.model.get("config", {}))
@@ -74,26 +77,43 @@ def kpis(result) -> List[Dict]:
     n_panel = int(panel.get("n_panel", len(anc)))
     n_samp = int(anc["name"].nunique()) if len(anc) else 0
     n_panel_det = int(panel.get("n_detected", n_samp))
+    nf_std = panel.get("n_features")
     pr = panel.get("rt_range", [np.nan, np.nan])
     offs = (np.abs(anc["rt_obs_min"].to_numpy() - anc["rt_ref_min"].to_numpy())
             if len(anc) else np.array([]))
     off = _f(np.median(offs)) if offs.size else None
-    panel_rng = "—" if not (pr and math.isfinite(pr[0])) else f"{pr[0]:.1f}–{pr[1]:.1f}"
 
     def rng(a, b, d):
         a, b = _f(a), _f(b)
         return "—" if (a is None or b is None) else f"{a:.{d}f}–{b:.{d}f}"
 
-    def tile(label, value, sub):
-        return {"label": label, "value": value, "sub": sub}
+    def tile(label, rows=None, value=None, sub=None):
+        d = {"label": label}
+        if rows:
+            d["rows"] = [{"k": k, "v": v} for k, v in rows]
+        else:
+            d["value"] = value
+        if sub:
+            d["sub"] = sub
+        return d
 
     return [
-        tile("Features", f"{len(tbl):,}", "calibrated"),
-        tile("Standards", f"{n_samp}/{n_panel}", f"samples · panel {n_panel_det}/{n_panel}"),
-        tile("RT range", rng(rt.min(), rt.max(), 1), f"samples min · panel {panel_rng}"),
-        tile("iRT range", rng(ri.min(), ri.max(), 0), "dimensionless"),
-        tile("RT offset", "—" if off is None else f"{off:.2f}", "median |obs−ref| (min)"),
-        tile("Coverage", f"{ri.notna().mean() * 100:.0f}%", "features with an RI"),
+        tile("Features",
+             rows=[("samples", f"{len(tbl):,}"),
+                   ("standards run", f"{int(nf_std):,}" if nf_std is not None else "—")],
+             sub="feature rows in each table"),
+        tile("Panel detection",
+             rows=[("samples", f"{n_samp}/{n_panel}"),
+                   ("standards run", f"{n_panel_det}/{n_panel}")],
+             sub=f"detected · panel of {n_panel}"),
+        tile("RT range",
+             rows=[("samples", rng(rt.min(), rt.max(), 1)),
+                   ("standards run", rng(pr[0], pr[1], 1))],
+             sub="minutes"),
+        tile("iRT range", value=rng(ri.min(), ri.max(), 0), sub="dimensionless"),
+        tile("RT offset", value="—" if off is None else f"{off:.2f}",
+             sub="median |obs−ref| (min)"),
+        tile("Coverage", value=f"{ri.notna().mean() * 100:.0f}%", sub="features with an RI"),
     ]
 
 

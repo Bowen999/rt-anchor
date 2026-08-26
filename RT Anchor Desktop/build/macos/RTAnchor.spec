@@ -1,12 +1,14 @@
 # -*- mode: python ; coding: utf-8 -*-
-# PyInstaller spec for RT Anchor (pywebview + rt_anchor). Run from the app dir:
-#   pyinstaller build/RTAnchor.spec --distpath /private/tmp/rtad_dist --workpath /private/tmp/rtad_build --noconfirm
+# PyInstaller spec for RT Anchor (pywebview + rt_anchor), macOS arm64.
+# Location-independent — resolve the app root from this spec's own directory
+# (build/macos/) and the engine's editable src checkout from the sibling repo:
+#   pyinstaller build/macos/RTAnchor.spec --distpath /private/tmp/rtad_dist --workpath /private/tmp/rtad_build --noconfirm
 import os
 from PyInstaller.utils.hooks import collect_all, collect_submodules
 
-APP = "/Users/bowen/Desktop/Caley_RT/RT Anchor Desktop"
-RT_SRC = "/Users/bowen/Desktop/Caley_RT/rt_anchor/src"
-ICON = os.path.join(APP, "build", "icon.icns")
+APP = os.path.dirname(SPECPATH)     # build/macos/ -> app root
+RT_SRC = os.path.join(os.path.dirname(APP), "rt_anchor", "src")
+ICON = os.path.join(SPECPATH, "icon.icns")
 
 datas = [(os.path.join(APP, "web"), "web"),
          (os.path.join(APP, "example"), "example")]   # bundled demo dataset (Load example button)

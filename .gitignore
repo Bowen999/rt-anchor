@@ -38,3 +38,11 @@ plot/
 *.raw
 *.xlsx
 *.pkl
+
+# ---- macOS AppleDouble / zip-extraction junk ----
+._*
+__MACOSX/
+
+# ---- extracted source snapshots & PyInstaller intermediates ----
+rt-anchor-1.1.1/
+RT Anchor Desktop/build/*/work/

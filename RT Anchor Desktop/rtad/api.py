@@ -45,6 +45,12 @@ class Api:
         self.result = None
         self.run_info = None
 
+    # ---- bundled standard mixtures (either/or choice on the input screen) ----
+    def mixture_previews(self) -> Dict:
+        """Card meta + per-standard rows for both bundled mixtures (UI preview)."""
+        from .mixtures import DEFAULT_MIXTURE, preview_payload
+        return {"ok": True, "default": DEFAULT_MIXTURE, "mixtures": preview_payload()}
+
     # ---- bundled example dataset ----
     def load_example(self) -> Dict:
         """Resolve the bundled demo dataset so the user can try the app with one click."""
@@ -52,7 +58,8 @@ class Api:
         standards = _resource(os.path.join("example", "standards.txt"))
         if not (os.path.exists(samples) and os.path.exists(standards)):
             return {"ok": False, "error": "Example dataset not found in this build."}
-        return {"ok": True, "samples": samples, "standards": standards, "polarity": "positive"}
+        return {"ok": True, "samples": samples, "standards": standards, "polarity": "positive",
+                "mixture": "mix15"}   # the bundled demo run is the 15-standard mix
 
     # ---- open the project page in the system browser ----
     def open_github(self) -> Dict:
@@ -87,12 +94,20 @@ class Api:
                 return {"ok": False, "error": "Choose a valid sample feature table."}
             standards = (params.get("standards") or "").strip()
             if not standards or not os.path.exists(standards):
-                return {"ok": False, "error": "Choose a valid standards run — it is required."}
+                return {"ok": False, "error": "Choose a valid standards mixture table — it is required."}
             polarity = params.get("polarity") or "positive"
+
+            from . import mixtures
+            mix_key = params.get("mixture") or mixtures.DEFAULT_MIXTURE
+            try:
+                manifest = mixtures.get_manifest(mix_key)
+                mix_meta = mixtures.get_meta(mix_key)
+            except KeyError:
+                return {"ok": False,
+                        "error": f"Unknown mixture '{mix_key}'. Known: {mixtures.mixture_keys()}."}
             cfg = self._build_config(params)
 
             single = self._resolve_single(params.get("single_files"))
-            manifest = self._load_manifest(params.get("manifest"))
 
             import time
             from datetime import datetime
@@ -112,6 +127,8 @@ class Api:
                 "inputs": {
                     "samples": samples,
                     "standards": standards,
+                    "mixture": {"key": mix_key, "label": mix_meta["label"],
+                                "n_standards": int(len(manifest))},
                     "single_files": single or [],
                     "n_single_files": len(single) if single else 0,
                 },
@@ -153,7 +170,7 @@ class Api:
             return {"ok": False, "error": "cancelled"}
         prefix = r if isinstance(r, str) else r[0]
         from rt_anchor.viz.report import write_report
-        paths = write_report(self.result, prefix, formats=("html", "pdf"))
+        paths = write_report(self.result, prefix, formats=("html",))
         return {"ok": True, "paths": paths}
 
     def export_run_info(self) -> Dict:
@@ -181,7 +198,7 @@ class Api:
         folder = r[0] if isinstance(r, (list, tuple)) else r
         prefix = os.path.join(folder, "rt_anchor_run")
         from rt_anchor.helpers import write_results
-        paths = write_results(self.result, prefix, report=True, report_formats=("html", "pdf"))
+        paths = write_results(self.result, prefix, report=True, report_formats=("html",))
         if self.run_info is not None:
             info_path = prefix + "_run_info.json"
             with open(info_path, "w") as fh:
@@ -241,10 +258,3 @@ class Api:
         else:
             files = sorted(glob.glob(spec))
         return files or None
-
-    @staticmethod
-    def _load_manifest(path):
-        if not path:
-            return None
-        from rt_anchor.panel import load_manifest_csv
-        return load_manifest_csv(path)

@@ -128,6 +128,21 @@ button{font-family:inherit;cursor:pointer;color:inherit;}
 .adv-body{display:none;flex-direction:column;gap:16px;padding:16px 18px 18px;border-top:3px solid var(--ink);}
 .adv.open .adv-body{display:flex;}
 
+/* standard-mixture either/or cards + preview */
+.mix-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.mix-card{position:relative;background:var(--card);border:3px solid var(--ink);padding:15px 17px;
+  text-align:center;font-size:17px;font-weight:900;letter-spacing:-.01em;color:var(--ink);
+  transition:.1s;box-shadow:4px 4px 0 rgba(20,18,16,.14);}
+.mix-card:hover{border-color:var(--accent);}
+.mix-card.active{border-color:var(--accent);background:#E7EEF7;color:var(--accent-d);
+  box-shadow:5px 5px 0 rgba(46,134,214,.28);}
+.mix-card.active::after{content:"✓";position:absolute;top:-3px;right:-3px;background:var(--accent);
+  color:#fff;font-family:var(--mono);font-size:11px;font-weight:700;padding:2px 7px;}
+.mix-preview{margin-top:14px;border:3px solid var(--ink);background:var(--paper);}
+/* higher specificity than the generic .table-wrap rule below, so the preview
+   table keeps its own (smaller) cap and an always-on vertical scrollbar */
+.mix-preview .table-wrap{max-height:400px;overflow-y:scroll;overflow-x:auto;}
+
 /* =================== OUTPUT VIEW =================== */
 .view-output{display:grid;grid-template-columns:250px 1fr;}
 
@@ -170,6 +185,24 @@ button{font-family:inherit;cursor:pointer;color:inherit;}
   font-weight:700;color:var(--dim-d);}
 .kpi-v{font-size:32px;font-weight:900;color:var(--accent-d);letter-spacing:-.02em;margin-top:5px;font-family:var(--mono);}
 .kpi-s{font-size:12px;color:var(--faint-d);margin-top:3px;}
+
+/* KPI metric table — one card, aligned sample / standards-run columns */
+.kpi-table{margin-bottom:26px;background:var(--paper);border:3px solid var(--ink);box-shadow:var(--hard);}
+.kpi-metrics{width:100%;border-collapse:collapse;}
+.kpi-metrics th,.kpi-metrics td{padding:13px 20px;}
+.kpi-metrics thead th{background:var(--ink);color:var(--cream);font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.14em;text-transform:uppercase;font-weight:700;text-align:left;}
+.kpi-metrics thead th.kt-v{text-align:right;white-space:nowrap;}
+.kpi-metrics tbody th.kt-m{text-align:left;border-top:1px solid var(--rule);width:100%;}
+.kpi-metrics tbody tr:first-child th.kt-m{border-top:none;}
+.kpi-metrics tbody td{border-top:1px solid var(--rule);width:190px;}
+.kpi-metrics tbody tr:first-child td{border-top:none;}
+.kpi-metrics tbody td.kt-v{text-align:right;font-family:var(--mono);font-size:20px;font-weight:900;
+  letter-spacing:-.01em;color:var(--accent-d);white-space:nowrap;}
+.kpi-metrics .na{color:var(--faint-d);font-weight:700;}
+.kt-m-l{display:block;font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;
+  text-transform:uppercase;font-weight:800;color:var(--ink);}
+.kt-m-s{display:block;margin-top:4px;font-size:12px;color:var(--faint-d);}
 
 /* panels: black header strip + white body (MolProbe) */
 .panel{background:var(--card);border:3px solid var(--ink);box-shadow:var(--hard);padding:0;}
@@ -267,4 +300,5 @@ button{font-family:inherit;cursor:pointer;color:inherit;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast.err{border-color:var(--err);color:var(--err);}
 
-@media (max-width:820px){ .row2{grid-template-columns:1fr;} .kpis{grid-template-columns:1fr 1fr;} }
+@media (max-width:820px){ .row2{grid-template-columns:1fr;} .mix-cards{grid-template-columns:1fr;}
+  .kpis{grid-template-columns:1fr 1fr;} .kpi-metrics tbody td{width:130px;} }
