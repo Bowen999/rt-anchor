@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rt-anchor"
-version = "1.1.0"
+version = "1.1.1"
 description = "Standard-panel retention-index (iRT) calibration for LC-MS lipidomics feature tables (MS-DIAL / MZmine / MassCube / LipidScreener)"
 readme = "README.md"
 requires-python = ">=3.9"

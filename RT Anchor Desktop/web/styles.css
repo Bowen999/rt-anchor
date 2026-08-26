@@ -139,7 +139,9 @@ button{font-family:inherit;cursor:pointer;color:inherit;}
 .mix-card.active::after{content:"✓";position:absolute;top:-3px;right:-3px;background:var(--accent);
   color:#fff;font-family:var(--mono);font-size:11px;font-weight:700;padding:2px 7px;}
 .mix-preview{margin-top:14px;border:3px solid var(--ink);background:var(--paper);}
-.mix-table-wrap{max-height:380px;overscroll-behavior:contain;}
+/* higher specificity than the generic .table-wrap rule below, so the preview
+   table keeps its own (smaller) cap and an always-on vertical scrollbar */
+.mix-preview .table-wrap{max-height:400px;overflow-y:scroll;overflow-x:auto;}
 
 /* =================== OUTPUT VIEW =================== */
 .view-output{display:grid;grid-template-columns:250px 1fr;}

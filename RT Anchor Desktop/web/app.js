@@ -135,6 +135,17 @@ function selectMixture(key) {
   $$("#mix-cards .mix-card").forEach(c => c.classList.toggle("active", c.dataset.key === key));
   renderMixPreview();
 }
+/* wheel-scroll fallback: pywebview's WKWebView can swallow wheel events over
+   nested scroll areas — drive the preview table's scrollTop manually. */
+function initMixTableScroll() {
+  const wrap = $(".mix-table-wrap");
+  if (!wrap) return;
+  wrap.addEventListener("wheel", e => {
+    if (wrap.scrollHeight <= wrap.clientHeight + 1) return;
+    e.preventDefault();
+    wrap.scrollTop += e.deltaY;
+  }, { passive: false });
+}
 async function initMixtures() {
   try {
     const r = await api().mixture_previews();
@@ -145,6 +156,7 @@ async function initMixtures() {
     }
   } catch (e) { /* fall through: UI stays usable without previews */ }
   renderMixCards(); renderMixPreview();
+  initMixTableScroll();
 }
 
 /* Advanced section collapse/expand */

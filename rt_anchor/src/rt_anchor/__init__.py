@@ -31,7 +31,7 @@ from .io import FeatureTable, detect_format, load_feature_table
 from .panel import DEFAULT_MANIFEST, Panel, build_panel, load_manifest_csv, load_reference_csv
 from .pipeline import CalibrationResult, calibrate
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 
 __all__ = [
     "calibrate", "CalibrationResult", "CalibrationConfig",
