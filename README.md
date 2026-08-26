@@ -2,6 +2,8 @@
 
 Standard-panel **retention-index (iRT) calibration** for LC-MS lipidomics
 
+![RT Anchor — input](docs/input.png)
+
 ![RT Anchor — overview](docs/overview.png)
 
 ![RT Anchor — feature-intensity profile](docs/profile.png)
@@ -20,24 +22,22 @@ instruments. The original table is never altered — calibration only appends co
 
 ## Input
 
-Required:
+The desktop app asks for:
 
- * a **sample feature table**, needs an *m/z* and a retention-time column 
- * a **standards run** of
-the panel, 
+ * a **sample feature table** — needs an *m/z* and a retention-time column (MS-DIAL · MZmine · MassCube · LipidScreener, auto-detected)
+ * a **standards mixture table** — the run of your standard mixture, which builds the native anchor template
+ * a **mixture panel** — **Mix 15** or **Mix 21**, the two bundled standard panels; a per-standard preview table (m/z per polarity · reference RT) helps pick the right one
  * the **polarity** (`positive` / `negative`).
 
-Support output of:
+Optional: per-injection files (per-sample tier + repeatability QC) and matching
+parameters (`mz_tol_ppm`, `rt_window_min`, `min_anchors`, `extrapolate`). With
+the engine API, a custom manifest / reference baseline can still be passed to
+`calibrate()`.
 
-
-  * [MZmine](https://mzio.io/mzmine-news/)
-  * [MS-DIAL](https://systemsomicslab.github.io/compms/msdial/main.html)
-  * [MassCube](https://huaxuyu.github.io/masscubedocs/)
-  * [Lipidscreener](https://tmiclinode.com/web-servers-software/)
-
-Optional: per-injection files (per-sample tier + repeatability QC), a custom
-manifest / reference baseline, and matching parameters (`mz_tol_ppm`,
-`rt_window_min`, `min_anchors`, `extrapolate`).
+Supported feature-table formats: [MZmine](https://mzio.io/mzmine-news/) ·
+[MS-DIAL](https://systemsomicslab.github.io/compms/msdial/main.html) ·
+[MassCube](https://huaxuyu.github.io/masscubedocs/) ·
+[Lipidscreener](https://tmiclinode.com/web-servers-software/).
 
 ## Output
 
