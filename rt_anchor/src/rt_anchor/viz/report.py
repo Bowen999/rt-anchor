@@ -47,11 +47,20 @@ def build_html(result, tic_style: str = "clean") -> str:
     import plotly.io as pio
     from plotly.offline import get_plotlyjs
 
-    tiles = "".join(
-        f'<div class="kpi"><div class="kpi-l">{html.escape(l)}</div>'
-        f'<div class="kpi-v">{html.escape(str(v))}</div>'
-        f'<div class="kpi-s">{html.escape(s)}</div></div>'
-        for l, v, s in metrics.kpi_tiles(result))
+    def _tile(label, value, note):
+        if isinstance(value, str):
+            body = f'<div class="kpi-v">{html.escape(value)}</div>'
+        else:
+            rows = "".join(
+                f'<div class="kpi-r"><span class="kpi-k">{html.escape(k)}</span>'
+                f'<span class="kpi-n">{html.escape(v)}</span></div>'
+                for k, v in value)
+            body = f'<div class="kpi-rows">{rows}</div>'
+        n = f'<div class="kpi-s">{html.escape(note)}</div>' if note else ""
+        return (f'<div class="kpi"><div class="kpi-l">{html.escape(label)}</div>'
+                f'{body}{n}</div>')
+
+    tiles = "".join(_tile(l, v, s) for l, v, s in metrics.kpi_tiles(result))
 
     radar_div = pio.to_html(metrics.radar_plotly(result), full_html=False,
                             include_plotlyjs=False, div_id="fig_radar",
@@ -115,6 +124,12 @@ body {{ margin:0; background:var(--paper); color:var(--txt);
 .kpi-v {{ font-size:30px; font-weight:600; color:var(--primary); letter-spacing:-0.02em;
           line-height:1.05; font-variant-numeric:tabular-nums; }}
 .kpi-s {{ font-size:12.5px; color:var(--muted); }}
+.kpi-rows {{ display:flex; flex-direction:column; gap:6px; margin-top:3px; }}
+.kpi-r {{ display:flex; justify-content:space-between; align-items:baseline; gap:14px; }}
+.kpi-k {{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+          font-weight:600; color:var(--muted); white-space:nowrap; }}
+.kpi-n {{ font-size:17px; font-weight:600; color:var(--primary); letter-spacing:-0.01em;
+          line-height:1.1; font-variant-numeric:tabular-nums; }}
 .radar {{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r);
           box-shadow:var(--shadow); padding:20px 22px 10px; display:flex; flex-direction:column; }}
 
@@ -243,13 +258,22 @@ def _cover_page(result):
     fig = plt.figure(figsize=(11.5, 8.0))
     fig.text(0.06, 0.92, "Retention-index calibration report", fontsize=24,
              color=theme.TXT, weight="bold")
-    tiles = metrics.kpi_tiles(result)
-    for i, (lab, val, sub) in enumerate(tiles):
+    for i, (lab, val, sub) in enumerate(metrics.kpi_tiles(result)):
         r, c = divmod(i, 3)
-        x = 0.06 + c * 0.30; y = 0.78 - r * 0.15
-        fig.text(x, y, val, fontsize=21, color=theme.PRIMARY, weight="bold")
-        fig.text(x, y - 0.035, lab, fontsize=12.5, color=theme.TXT)
-        fig.text(x, y - 0.062, sub, fontsize=10.5, color=theme.TXT2)
+        x = 0.06 + c * 0.30
+        y = 0.78 - r * 0.15
+        fig.text(x, y, lab.upper(), fontsize=10.5, color=theme.TXT2, weight="bold")
+        y -= 0.036
+        if isinstance(val, str):
+            fig.text(x, y, val, fontsize=21, color=theme.PRIMARY, weight="bold")
+            y -= 0.034
+        else:
+            for k, v in val:
+                fig.text(x, y, k, fontsize=9.5, color=theme.TXT2)
+                fig.text(x + 0.12, y, v, fontsize=14.5, color=theme.PRIMARY, weight="bold")
+                y -= 0.030
+        if sub:
+            fig.text(x, y, sub, fontsize=10, color=theme.TXT2)
     # radar on the lower half
     fig.text(0.06, 0.48, "Quality fingerprint", fontsize=13.5, color=theme.TXT, weight="bold")
     axr = fig.add_axes([0.30, 0.04, 0.4, 0.34], polar=True)

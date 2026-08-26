@@ -27,6 +27,9 @@ DETECTION_NOTE = (
 
 
 def _panel_targets(result):
+    stored = (result.panel or {}).get("targets")
+    if isinstance(stored, pd.DataFrame) and len(stored):
+        return stored.reset_index(drop=True)
     from ..config import CalibrationConfig
     from ..panel import build_panel
     cfg = CalibrationConfig.from_dict(result.model.get("config", {}))
@@ -59,6 +62,7 @@ def compute_metrics(result) -> Dict:
         n_features=n, scope=result.model.get("calibration_scope", "project"),
         names=names, n_panel=n_panel, ref_rt=ref_rt, sample_rt=sample_rt, panel_rt=panel_rt,
         n_sample_detected=len(sample_rt), n_panel_detected=panel_info.get("n_detected", len(panel_rt)),
+        n_features_std=panel_info.get("n_features"),
         rt_range_samples=(float(rt.min()), float(rt.max())),
         rt_range_panel=tuple(panel_info.get("rt_range", (np.nan, np.nan))),
         iRT_range=(float(ri.min()), float(ri.max())),
@@ -76,18 +80,31 @@ def _as_bool(s):
     return pd.Series(s).astype(str).str.strip().str.lower().isin(("true", "1", "1.0", "yes"))
 
 
-def kpi_tiles(result) -> List[Tuple[str, str, str]]:
-    """Key data (6 tiles) — deliberately excludes calibration-scope and reliability."""
+def kpi_tiles(result) -> List[Tuple[str, object, str]]:
+    """Key data (6 tiles) — deliberately excludes calibration-scope and reliability.
+
+    A tile is ``(label, value, note)``. ``value`` is either a headline string or a
+    list of ``(caption, value)`` pairs rendered as stacked rows (used where the
+    samples table and the standards run are reported side by side).
+    """
     m = compute_metrics(result)
-    pr = m["rt_range_panel"]
-    panel_rng = "—" if (pr is None or np.isnan(pr[0])) else f"{pr[0]:.1f}–{pr[1]:.1f}"
+
+    def rng(r, d=1):
+        if r is None or (isinstance(r, tuple) and not np.isfinite(r[0])):
+            return "—"
+        return f"{r[0]:.{d}f}–{r[1]:.{d}f}"
+
     offset = "—" if m["offset_median"] is None else f"{m['offset_median']:.2f}"
+    nf_std = m.get("n_features_std")
     return [
-        ("Features", f"{m['n_features']:,}", "calibrated"),
-        ("Standards", f"{m['n_sample_detected']}/{m['n_panel']}",
-         f"samples · panel {m['n_panel_detected']}/{m['n_panel']}"),
-        ("RT range", f"{m['rt_range_samples'][0]:.1f}–{m['rt_range_samples'][1]:.1f}",
-         f"samples min · panel {panel_rng}"),
+        ("Features", [("samples", f"{m['n_features']:,}"),
+                      ("standards run", f"{nf_std:,}" if nf_std is not None else "—")],
+         "feature rows in each table"),
+        ("Standards", [("samples", f"{m['n_sample_detected']}/{m['n_panel']}"),
+                       ("standards run", f"{m['n_panel_detected']}/{m['n_panel']}")],
+         f"detected · panel of {m['n_panel']}"),
+        ("RT range", [("samples", rng(m["rt_range_samples"])),
+                      ("standards run", rng(m["rt_range_panel"]))], "minutes"),
         ("iRT range", f"{m['iRT_range'][0]:.0f}–{m['iRT_range'][1]:.0f}", "dimensionless"),
         ("RT offset", offset, "median |obs−ref| (min)"),
         ("Coverage", f"{m['coverage']*100:.0f}%", "features with an RI"),
@@ -217,9 +234,10 @@ def figure_plotly(result):
                           customdata=[nm], hovertemplate=f"{nm}<br>samples %{{x:.2f}} min<extra></extra>"))
     fig.update_layout(theme.plotly_template())
     fig.update_layout(height=520, showlegend=True, title=None,
+                      margin=dict(l=70, r=24, t=36, b=48),
                       yaxis=dict(tickmode="array", tickvals=list(range(len(names))), ticktext=names,
-                                 showgrid=False),
-                      xaxis=dict(title=dict(text="Retention time (min)")))
+                                 showgrid=False, automargin=True),
+                      xaxis=dict(title=dict(text="Retention time (min)"), automargin=True))
     return fig
 
 
