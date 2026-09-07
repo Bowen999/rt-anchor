@@ -1,24 +1,26 @@
-/* RT Anchor — chartkit: hand-authored brutalist SVG charts (no Plotly).
-   Cool-only palette; source→shape, class→colour; cyan is reserved for
-   hover/active. One shared renderer, two charts:
+/* RT Anchor — chartkit: hand-authored minimal SVG charts (no Plotly).
+   Slate-blue data palette mirroring the engine theme; source→shape,
+   class→colour; clay is reserved for hover/active. One shared renderer:
      radar · cross-column curve.
    (Detection and Profile are the engine's own Plotly figures — see app.js.) */
 "use strict";
 const CK = (() => {
   const NS = "http://www.w3.org/2000/svg";
+  /* palette mirrors the engine theme (rt_anchor.viz.theme) / plot-nature blue
+     system: structure in soft grays, slate-blue data, clay for interaction */
   const C = {
-    ink: "#141210", well: "#FFFFFF", card: "#FCFBF8", band: "#F1EDE4",
-    grid: "#CED8DC", gridMajor: "#A7B4BE", muted: "#6B7C88", muted2: "#A9B6BC",
-    blue: "#1668C0", navy: "#0B2E4F", teal: "#0E8F8A", indigo: "#4C63B6", cyan: "#17C9E6",
-    steel: "#3D7CA8", violet: "#7A4E9E", moss: "#2A6E52", pale: "#9FC4E3",
+    ink: "#2B2B2B", sub: "#4D4D4D", well: "#FFFFFF", card: "#FCFBF9",
+    grid: "#E6E6E6", axis: "#7A7A7A", muted: "#7A7A7A", muted2: "#B0B0B0",
+    blue: "#2B5D7D", navy: "#1B4A6B", teal: "#3E7C73", brick: "#A63D40", hot: "#C08552",
+    steel: "#3D7CA8", pale: "#9CC3D5",
   };
   const MONO = '"JetBrains Mono","IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace';
   /* Lipid classes -> colour. The stage-2 anchors are endogenous plasma lipids,
      so the palette has to cover more than the mixture's PC/DG/CE; the ordering
      keeps classes that neighbour each other in RT visually apart. */
   const CLASS_COLORS = {
-    LPC: C.navy, PC: C.blue, PE: C.indigo, SM: C.teal, DG: C.steel,
-    CE: C.violet, TG: C.moss, LPE: "#5A7D9A", CER: "#1F7A8C",
+    LPC: "#1B4A6B", PC: "#2B5D7D", SM: "#4E8FA6", DG: "#7FB2C4",
+    CE: "#C08552", TG: "#8A5223", PE: "#A63D40", LPE: "#5A7D9A", CER: "#1F7A8C",
   };
   const classColor = c => CLASS_COLORS[String(c || "").toUpperCase()] || C.muted;
   const fmt = (v, d = 2) => (v == null || !isFinite(v)) ? "—" : (+v).toFixed(d);
@@ -60,34 +62,27 @@ const CK = (() => {
   const line = (x1, y1, x2, y2, stroke, sw = 1, dash = null) =>
     el("line", { x1, y1, x2, y2, stroke, "stroke-width": sw, "stroke-dasharray": dash, "shape-rendering": "crispEdges" });
 
-  /* --- plot well: white rect + 3px ink frame + double baseline + corner Ls --- */
+  /* --- plot area: open frame — left + bottom spines only, soft gray --- */
   function well(g, x, y, w, h) {
-    g.appendChild(el("rect", { x, y, width: w, height: h, fill: C.well, stroke: C.ink, "stroke-width": 3, "shape-rendering": "crispEdges" }));
-    g.appendChild(line(x + 4, y + 4, x + 4, y + h - 4, C.ink, 3));          // inner left
-    g.appendChild(line(x + 4, y + h - 4, x + w - 4, y + h - 4, C.ink, 3));  // inner bottom
-    const L = 8;
-    [[x, y, 1, 1], [x + w, y, -1, 1], [x, y + h, 1, -1], [x + w, y + h, -1, -1]].forEach(([cx, cy, sx, sy]) => {
-      g.appendChild(line(cx, cy, cx + sx * L, cy, C.ink, 2));
-      g.appendChild(line(cx, cy, cx, cy + sy * L, C.ink, 2));
-    });
+    g.appendChild(el("rect", { x, y, width: w, height: h, fill: C.well }));
+    g.appendChild(line(x, y, x, y + h, C.axis, 1.2));
+    g.appendChild(line(x, y + h, x + w, y + h, C.axis, 1.2));
   }
   function xAxis(g, sx, y0, ticks, dp, title) {
     ticks.forEach(t => { const x = sx(t);
-      g.appendChild(line(x, y0, x, y0 + 6, C.ink, 2));
-      g.appendChild(txt(x, y0 + 18, fmt(t, dp), { size: 10 })); });
-    if (title) g.appendChild(txt((sx.x0 + sx.x1) / 2, y0 + 34, title, { size: 11, w: 700, ls: ".08em" }));
+      g.appendChild(line(x, y0, x, y0 + 5, C.axis, 1.2));
+      g.appendChild(txt(x, y0 + 17, fmt(t, dp), { size: 10, fill: C.axis })); });
+    if (title) g.appendChild(txt((sx.x0 + sx.x1) / 2, y0 + 33, title, { size: 11, w: 600, ls: ".02em", fill: C.sub }));
   }
   function yAxis(g, sy, x0, ticks, dp, title) {
     ticks.forEach(t => { const y = sy(t);
-      g.appendChild(line(x0 - 6, y, x0, y, C.ink, 2));
-      g.appendChild(txt(x0 - 10, y + 3.5, fmt(t, dp), { size: 10, anchor: "end" })); });
-    if (title) g.appendChild(txt(x0 - 44, (sy.y0 + sy.y1) / 2, title, { size: 11, w: 700, ls: ".08em", rot: -90 }));
+      g.appendChild(line(x0 - 5, y, x0, y, C.axis, 1.2));
+      g.appendChild(txt(x0 - 9, y + 3.5, fmt(t, dp), { size: 10, anchor: "end", fill: C.axis })); });
+    if (title) g.appendChild(txt(x0 - 42, (sy.y0 + sy.y1) / 2, title, { size: 11, w: 600, ls: ".02em", fill: C.sub, rot: -90 }));
   }
+  /* whisper gridlines — horizontal only (verticals are chartjunk here) */
   function gridY(g, sy, x0, x1, ticks) {
     ticks.forEach(t => g.appendChild(line(x0, sy(t), x1, sy(t), C.grid, 1)));
-  }
-  function gridX(g, sx, y0, y1, ticks) {
-    ticks.forEach(t => g.appendChild(line(sx(t), y0, sx(t), y1, C.grid, 1)));
   }
   const svgRoot = (w, h) => el("svg", { viewBox: `0 0 ${w} ${h}`, width: "100%",
     style: "display:block", preserveAspectRatio: "xMidYMid meet" });
@@ -160,19 +155,19 @@ const CK = (() => {
     const pt = (i, r) => [cx + Math.cos(ang(i)) * R * r, cy + Math.sin(ang(i)) * R * r];
     [0.25, 0.5, 0.75, 1].forEach(rr => {
       const p = data.map((_, i) => pt(i, rr).join(",")).join(" ");
-      g.appendChild(el("polygon", { points: p, fill: "none", stroke: rr === 1 ? C.ink : C.grid, "stroke-width": rr === 1 ? 2 : 1 }));
+      g.appendChild(el("polygon", { points: p, fill: "none", stroke: rr === 1 ? C.muted2 : C.grid, "stroke-width": rr === 1 ? 1.2 : 1 }));
     });
     data.forEach((_, i) => { const [x, y] = pt(i, 1); g.appendChild(line(cx, cy, x, y, C.grid, 1)); });
     const poly = data.map((d, i) => pt(i, Math.max(0.02, d.value)).join(",")).join(" ");
-    g.appendChild(el("polygon", { points: poly, fill: C.blue, "fill-opacity": .18, stroke: C.blue, "stroke-width": 3 }));
+    g.appendChild(el("polygon", { points: poly, fill: C.blue, "fill-opacity": .12, stroke: C.blue, "stroke-width": 2.2 }));
     g.appendChild(square(cx, cy, 6, C.ink));
     data.forEach((d, i) => {
       const [vx, vy] = pt(i, Math.max(0.02, d.value)), sq = square(vx, vy, 9, C.blue);
       const [lx, ly] = pt(i, 1.16);
-      g.appendChild(txt(lx, ly, d.axis.toUpperCase(), { size: 10, w: 700 }));
+      g.appendChild(txt(lx, ly, d.axis.toUpperCase(), { size: 10, w: 600, fill: C.sub }));
       g.appendChild(txt(lx, ly + 13, fmt(d.value, 2), { size: 9, fill: C.muted }));
       sq.style.cursor = "pointer";
-      sq.addEventListener("mousemove", e => { sq.setAttribute("fill", C.cyan);
+      sq.addEventListener("mousemove", e => { sq.setAttribute("fill", C.hot);
         showTip(d.axis.toUpperCase(), null, [["value", fmt(d.value, 2)]], e.clientX, e.clientY); });
       sq.addEventListener("mouseleave", () => { sq.setAttribute("fill", C.blue); hideTip(); });
       g.appendChild(sq);
@@ -191,7 +186,7 @@ const CK = (() => {
       { label: "sample pairs", glyph: "diamond", color: C.ink, fill: C.pale },
       { label: "stage-1 curve", glyph: "line", color: C.navy },
     ].concat(data.refined ? [{ label: "anchor-refined", glyph: "dash", color: C.teal }] : [])
-     .concat(data.anchors && data.anchors.length ? [{ label: "stage-2 anchors", glyph: "ring", color: C.indigo }] : []));
+     .concat(data.anchors && data.anchors.length ? [{ label: "stage-2 anchors", glyph: "ring", color: C.brick }] : []));
 
     const W = 680, L = 66, R = 26, T = 20, mainH = 272, gap = 20, resH = 96, B = 46;
     const H = T + mainH + gap + resH + B;
@@ -206,8 +201,8 @@ const CK = (() => {
     const sy = scale(ylo - ypad, yhi + ypad, T + mainH, T); sy.y0 = T; sy.y1 = T + mainH;
     well(g, L, T, W - R - L, mainH);
     const xt = niceTicks(xlo, xhi, 6), yt = niceTicks(ylo, yhi, 5);
-    gridY(g, sy, L, W - R, yt); gridX(g, sx, T, T + mainH, xt);
-    yAxis(g, sy, L, yt, 1, "RT ON THE REFERENCE COLUMN / MIN");
+    gridY(g, sy, L, W - R, yt);
+    yAxis(g, sy, L, yt, 1, "RT on the reference column (min)");
 
     // matched pairs — MAD-trimmed pairs are excluded from the figure
     const gStd = el("g"), gSamp = el("g");
@@ -236,17 +231,17 @@ const CK = (() => {
       if (a.x == null || a.y == null) return;
       const px = sx(a.x), py = sy(a.y);
       g.appendChild(ring(px, py, 7, "#FFFFFF", 5));
-      const r = ring(px, py, 7, C.indigo, 2.4); r.style.cursor = "pointer";
+      const r = ring(px, py, 7, C.brick, 2.4); r.style.cursor = "pointer";
       g.appendChild(r);
       const hit = el("circle", { cx: px, cy: py, r: 10, fill: "transparent", style: "cursor:pointer" });
       hit.addEventListener("mousemove", e => {
-        r.setAttribute("stroke", C.cyan);
+        r.setAttribute("stroke", C.hot);
         showTip(a.label || "anchor", a.class,
           [["your RT", fmt(a.x, 2)], ["reference RT", fmt(a.y, 2)],
            ["resid vs curve", fmt(a.resid, 3)], ["leave-one-out", fmt(a.loo, 3)]],
           e.clientX, e.clientY);
       });
-      hit.addEventListener("mouseleave", () => { r.setAttribute("stroke", C.indigo); hideAll(); });
+      hit.addEventListener("mouseleave", () => { r.setAttribute("stroke", C.brick); hideAll(); });
       g.appendChild(hit);
     });
 
@@ -259,8 +254,8 @@ const CK = (() => {
       const t = (rt - gx[i - 1]) / ((gx[i] - gx[i - 1]) || 1); return gy[i - 1] + t * (gy[i] - gy[i - 1]);
     };
     const cross = el("g", { style: "display:none", "pointer-events": "none" });
-    const vg = line(0, T, 0, T + mainH, C.cyan, 1.5, "4 3"), hg = line(L, 0, W - R, 0, C.cyan, 1.5, "4 3");
-    const dot = square(0, 0, 9, C.cyan, C.ink, 1.5);
+    const vg = line(0, T, 0, T + mainH, C.hot, 1.5, "4 3"), hg = line(L, 0, W - R, 0, C.hot, 1.5, "4 3");
+    const dot = square(0, 0, 9, C.hot, C.ink, 1.5);
     const cxr = el("rect", { fill: C.ink, "shape-rendering": "crispEdges" }), cxt = txt(0, 0, "", { size: 9, w: 700, fill: C.card });
     const cyr = el("rect", { fill: C.ink, "shape-rendering": "crispEdges" }), cyt = txt(0, 0, "", { size: 9, w: 700, fill: C.card, anchor: "end" });
     [vg, hg, dot, cxr, cxt, cyr, cyt].forEach(n => cross.appendChild(n));
@@ -295,8 +290,8 @@ const CK = (() => {
     const sr = scale(-rlim, rlim, ry0 + resH - 5, ry0 + 5); sr.y0 = ry0; sr.y1 = ry0 + resH;
     const rt2 = niceTicks(-rlim, rlim, 4);
     rt2.forEach(t => g.appendChild(line(L, sr(t), W - R, sr(t), C.grid, 1)));
-    g.appendChild(line(L, sr(0), W - R, sr(0), C.ink, 2));
-    yAxis(g, sr, L, rt2, 2, "RESID / MIN");
+    g.appendChild(line(L, sr(0), W - R, sr(0), C.axis, 1.2));
+    yAxis(g, sr, L, rt2, 2, "Resid (min)");
     const gr1 = el("g"), gr2 = el("g");
     for (let i = 0; i < P.x.length; i++) {
       const x = P.x[i]; if (x == null || !P.kept[i]) continue;
@@ -319,7 +314,7 @@ const CK = (() => {
     g.appendChild(gr1); g.appendChild(gr2);
     g.appendChild(txt(W - R - 6, ry0 + 13, P.rr ? "GREY = STAGE 1 · BLUE = REFINED" : "STAGE-1 RESIDUALS",
       { size: 8.5, w: 700, anchor: "end", fill: C.muted, ls: ".06em" }));
-    xAxis(g, sx, ry0 + resH, xt, 1, "RT ON YOUR COLUMN / MIN");
+    xAxis(g, sx, ry0 + resH, xt, 1, "RT on your column (min)");
     host.appendChild(s);
   }
 

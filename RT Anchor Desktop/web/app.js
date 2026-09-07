@@ -281,11 +281,11 @@ async function run() {
   }
   collectAdvanced();
   const btn = $("#run"); btn.disabled = true;
+  setStatus("", "");
   showProgress(true);
   /* warm Plotly while the engine calibrates, so it is ready the moment
      the results need it */
   window._ensurePlotly().catch(() => {});
-  setStatus("Calibrating — matching features, fitting the cross-column curve…", "busy");
   let res;
   try { res = await api().run_calibration(state.params); }
   catch (e) { res = { ok: false, error: String(e) }; }
@@ -297,7 +297,50 @@ async function run() {
      The UI stays responsive — __onCalibrationDone() will fire when ready. */
 }
 function setStatus(msg, cls) { const s = $("#status"); s.textContent = msg; s.className = "status" + (cls ? " " + cls : ""); }
-function showProgress(on) { $("#progress").classList.toggle("hidden", !on); }
+
+/* ---- staged run progress ------------------------------------------------
+   The engine reports no intermediate progress, so the bar eases toward
+   staged caps on a timer (always moving, never claiming to be done) and only
+   completes when the result actually arrives. */
+const RUN_STAGES = [
+  { at: 0.0, cap: 0.10 },   // reading & validating inputs
+  { at: 1.2, cap: 0.38 },   // matching features
+  { at: 6.0, cap: 0.72 },   // fitting the curve
+  { at: 14.0, cap: 0.95 },  // rendering results
+];
+let _runTimer = null;
+function showProgress(on) {
+  const card = $("#runcard");
+  clearInterval(_runTimer); _runTimer = null;
+  if (!on) { card.classList.add("hidden"); return; }
+  card.classList.remove("hidden");
+  $$("#rc-stages li").forEach(li => { li.className = ""; });
+  const fill = $("#rc-fill"), t0 = performance.now();
+  let cur = 0, stage = -1;
+  fill.style.width = "0%";
+  _runTimer = setInterval(() => {
+    const t = (performance.now() - t0) / 1000;
+    $("#rc-elapsed").textContent = t.toFixed(1) + "s";
+    let s = 0;
+    RUN_STAGES.forEach((st, i) => { if (t >= st.at) s = i; });
+    if (s !== stage) {
+      stage = s;
+      $$("#rc-stages li").forEach((li, i) => {
+        li.classList.toggle("done", i < stage);
+        li.classList.toggle("active", i === stage);
+      });
+    }
+    cur += (RUN_STAGES[stage].cap * 100 - cur) * 0.055;   // asymptotic crawl
+    fill.style.width = cur.toFixed(1) + "%";
+  }, 90);
+}
+/* result arrived: run the bar to 100%, tick every stage, then hand over */
+function finishProgress(cb) {
+  clearInterval(_runTimer); _runTimer = null;
+  $$("#rc-stages li").forEach(li => { li.classList.add("done"); li.classList.remove("active"); });
+  $("#rc-fill").style.width = "100%";
+  setTimeout(cb, 420);
+}
 
 /* ---- error modal (clearer than an inline line) ---- */
 function showModal(tag, title, message, detail) {
@@ -360,8 +403,17 @@ function showError(raw) {
 }
 
 /* ===================== OUTPUT VIEW ===================== */
-function openOutput() { $("#view-input").classList.add("hidden"); $("#view-output").classList.remove("hidden"); }
-function openInput() { $("#view-output").classList.add("hidden"); $("#view-input").classList.remove("hidden"); }
+/* cross-fade + slight rise between views, so a finished run never "snaps" */
+function _switchView(show, hide) {
+  hide.classList.add("pre");
+  setTimeout(() => { hide.classList.add("hidden"); hide.classList.remove("pre"); }, 300);
+  show.classList.remove("hidden");
+  show.classList.add("pre");
+  void show.offsetHeight;
+  show.classList.remove("pre");
+}
+function openOutput() { _switchView($("#view-output"), $("#view-input")); }
+function openInput() { _switchView($("#view-input"), $("#view-output")); }
 /* + New calibration — reset to a completely fresh input screen */
 function resetInput() {
   state.params = { samples: "", standards: "", polarity: "positive",
@@ -667,7 +719,8 @@ function attachStructures(div) {
   if (!structPop) {
     structPop = document.createElement("div"); structPop.id = "struct-pop";
     structPop.style.cssText = "position:fixed;display:none;z-index:1000;background:#FFFFFF;" +
-      "border:3px solid #141210;padding:8px 10px;box-shadow:5px 5px 0 rgba(20,18,16,.28);pointer-events:none;";
+      "border:1px solid #EAE8E2;border-radius:10px;padding:9px 11px;" +
+      "box-shadow:0 1px 2px rgba(43,43,43,.05),0 12px 32px -8px rgba(43,43,43,.13);pointer-events:none;";
     document.body.appendChild(structPop);
     document.addEventListener("mousemove", e => { structPop._x = e.clientX; structPop._y = e.clientY; });
   }
@@ -675,8 +728,8 @@ function attachStructures(div) {
     let nm = d.points && d.points[0] && d.points[0].customdata;
     if (Array.isArray(nm)) nm = nm[0];
     if (nm && S[nm]) {
-      structPop.innerHTML = `<div style="font:800 12px sans-serif;color:#141210;margin-bottom:3px">${nm}</div>` +
-        `<div style="background:#fff;padding:2px">${S[nm]}</div>`;
+      structPop.innerHTML = `<div style="font:650 12px Inter,sans-serif;color:#2B2B2B;margin-bottom:4px">${nm}</div>` +
+        `<div style="background:#fff">${S[nm]}</div>`;
       structPop.style.display = "block";
       structPop.style.left = Math.min(structPop._x + 14, window.innerWidth - 260) + "px";
       structPop.style.top = Math.min(structPop._y + 14, window.innerHeight - 200) + "px";
@@ -699,8 +752,8 @@ window.__onCalibrationDone = async function() {
         try { figs[k] = JSON.parse(figs[k]); } catch (e) {}
       }
     });
-    setStatus(""); showProgress(false);
-    showResults(res);
+    setStatus("");
+    finishProgress(() => showResults(res));
   } catch (e) {
     var btn = $("#run");
     if (btn) btn.disabled = false;

@@ -150,7 +150,16 @@
       </div>
 
       <button id="run" class="btn-run">Run calibration <span class="arw">→</span></button>
-      <div id="progress" class="progress hidden"><div class="progress-bar"></div></div>
+      <div id="runcard" class="runcard hidden" aria-live="polite">
+        <div class="rc-head"><span class="rc-title">Calibrating</span><span class="rc-elapsed" id="rc-elapsed">0.0s</span></div>
+        <div class="rc-bar"><div class="rc-fill" id="rc-fill"></div></div>
+        <ul class="rc-stages" id="rc-stages">
+          <li data-st="0"><span class="rc-dot"></span>Reading &amp; validating inputs</li>
+          <li data-st="1"><span class="rc-dot"></span>Matching features across runs</li>
+          <li data-st="2"><span class="rc-dot"></span>Fitting the cross-column curve</li>
+          <li data-st="3"><span class="rc-dot"></span>Rendering results</li>
+        </ul>
+      </div>
       <div id="status" class="status"></div>
     </div>
   </div>
