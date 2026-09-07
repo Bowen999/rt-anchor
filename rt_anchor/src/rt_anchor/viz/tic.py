@@ -101,9 +101,12 @@ def tie_points(result) -> pd.DataFrame:
     pairs = result.pairs
     if pairs is None or not len(pairs):
         return pd.DataFrame(columns=cols)
+    # the exported pair frame renames the raw column pair (pipeline._pair_frame)
+    rt_a = "rt_a" if "rt_a" in pairs.columns else "rt_src"
+    rt_b = "rt_b" if "rt_b" in pairs.columns else "rt_ref"
     if "kept" in pairs.columns:
         pairs = pairs[pairs["kept"].astype(bool)]
-    pairs = pairs.sort_values("rt_a")
+    pairs = pairs.sort_values(rt_a)
     if not len(pairs):
         return pd.DataFrame(columns=cols)
     idx = np.unique(np.linspace(0, len(pairs) - 1, min(MAX_PAIR_TIES, len(pairs)))
@@ -111,8 +114,8 @@ def tie_points(result) -> pd.DataFrame:
     sub = pairs.iloc[idx]
     return pd.DataFrame({
         "name": [""] * len(sub),
-        "rt": sub["rt_a"].to_numpy(dtype=float),
-        "irt": result.irt.to_irt(sub["rt_b"].to_numpy(dtype=float)),
+        "rt": sub[rt_a].to_numpy(dtype=float),
+        "irt": result.irt.to_irt(sub[rt_b].to_numpy(dtype=float)),
         "kind": "pair",
     })
 
