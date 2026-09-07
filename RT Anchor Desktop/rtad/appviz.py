@@ -1,15 +1,26 @@
-"""App-native visualization data.
+"""App-native visualization data (v2 cross-column method).
 
-Extracts the raw + lightly-derived numeric arrays each in-app chart needs, straight
-from a ``CalibrationResult`` — deliberately WITHOUT importing ``rt_anchor.viz`` (the
-package's Plotly/matplotlib figure builders). The desktop front-end draws everything
-itself as hand-authored SVG. Only the calibration engine (``rt_anchor.panel`` /
-``.config`` / the result object) is used here.
+Extracts the numeric arrays each in-app chart needs from a ``CalibrationResult``
+and hands them to the front-end, which draws them as hand-authored SVG
+(``web/charts.js``). **Detection** is the package's own Plotly figure; the
+**Profile** section is two app-built Plotly mirror pseudo-TICs (before/after
+calibration, and calibrated input vs. reference).
+
+Where a number also appears in the exported report, it is taken from the same
+engine helper the report uses rather than recomputed here:
+
+* KPI tiles and the radar   -> ``rt_anchor.viz.metrics.kpi_tiles`` / ``radar_axes``
+* the cross-column curve    -> ``rt_anchor.viz.performance.compute_curve``
+
+That is deliberate: the app and the PDF a reviewer receives must not be able to
+disagree about what the run did. The *drawing* is the app's own (brutalist SVG,
+cool-blue palette); only the arithmetic is shared.
 """
 
 from __future__ import annotations
 
 import math
+import os
 from typing import Dict, List
 
 import numpy as np
@@ -31,6 +42,14 @@ def _arr(a) -> List:
     return [_f(x) for x in np.asarray(a, dtype=float).ravel()]
 
 
+def _bools(a) -> List[bool]:
+    return [bool(x) for x in np.asarray(a).ravel()]
+
+
+def _s(v) -> str:
+    return "" if v is None else str(v)
+
+
 # --------------------------------------------------------------- shared bits ---
 
 def _intensity(result) -> np.ndarray:
@@ -45,228 +64,261 @@ def _intensity(result) -> np.ndarray:
     return np.ones(len(df), dtype=float)
 
 
-def _panel_targets(result):
-    stored = (result.panel or {}).get("targets")
-    if isinstance(stored, pd.DataFrame) and len(stored):
-        return stored.reset_index(drop=True)
-    from rt_anchor.config import CalibrationConfig
-    from rt_anchor.panel import build_panel
-    cfg = CalibrationConfig.from_dict(result.model.get("config", {}))
-    return build_panel(result.polarity or "positive", cfg).targets
+def _tile(label, value, note) -> Dict:
+    """Engine KPI tuple -> the front-end's tile shape.
 
-
-def _anchor_lookup(result):
-    a = result.anchors
-    if not len(a):
-        return {}
-    a = a.drop_duplicates("name")
-    out = {}
-    for _, r in a.iterrows():
-        out[r["name"]] = (float(r["rt_obs_min"]), r.get("class", ""))
-    return out
+    ``value`` is either a headline string or a list of ``(caption, value)``
+    pairs; the two render differently (bold tile vs. a captioned metric row), so
+    the distinction is carried through rather than flattened.
+    """
+    d = {"label": str(label), "sub": _s(note)}
+    if isinstance(value, (list, tuple)):
+        d["rows"] = [{"k": str(k), "v": str(v)} for k, v in value]
+    else:
+        d["value"] = str(value)
+    return d
 
 
 # --------------------------------------------------------------- KPIs ----------
 
+#: Engine KPI tiles that the app deliberately does not show.
+_REMOVED_TILES = {"Matched pairs", "Anchor gate", "iRT landmarks"}
+
+
 def kpis(result) -> List[Dict]:
-    tbl = result.table
-    ri = pd.to_numeric(tbl[result.col("RI")], errors="coerce")
-    rt = result.rt_minutes()
-    panel = result.panel or {}
-    anc = result.anchors.drop_duplicates("name") if len(result.anchors) else result.anchors
-    n_panel = int(panel.get("n_panel", len(anc)))
-    n_samp = int(anc["name"].nunique()) if len(anc) else 0
-    n_panel_det = int(panel.get("n_detected", n_samp))
-    nf_std = panel.get("n_features")
-    pr = panel.get("rt_range", [np.nan, np.nan])
-    offs = (np.abs(anc["rt_obs_min"].to_numpy() - anc["rt_ref_min"].to_numpy())
-            if len(anc) else np.array([]))
-    off = _f(np.median(offs)) if offs.size else None
+    """The v2 KPI tiles, straight from the engine's own tile builder.
 
-    def rng(a, b, d):
-        a, b = _f(a), _f(b)
-        return "—" if (a is None or b is None) else f"{a:.{d}f}–{b:.{d}f}"
+    A few tiles are dropped in the app: the pair census, the stage-2 gate and
+    the iRT landmark count are evidence-level details the results screen no
+    longer surfaces.
+    """
+    from rt_anchor.viz import metrics as _vm
+    return [_tile(label, value, note) for label, value, note in _vm.kpi_tiles(result)
+            if str(label) not in _REMOVED_TILES]
 
-    def tile(label, rows=None, value=None, sub=None):
-        d = {"label": label}
-        if rows:
-            d["rows"] = [{"k": k, "v": v} for k, v in rows]
-        else:
-            d["value"] = value
-        if sub:
-            d["sub"] = sub
-        return d
-
-    return [
-        tile("Features",
-             rows=[("samples", f"{len(tbl):,}"),
-                   ("standards run", f"{int(nf_std):,}" if nf_std is not None else "—")],
-             sub="feature rows in each table"),
-        tile("Panel detection",
-             rows=[("samples", f"{n_samp}/{n_panel}"),
-                   ("standards run", f"{n_panel_det}/{n_panel}")],
-             sub=f"detected · panel of {n_panel}"),
-        tile("RT range",
-             rows=[("samples", rng(rt.min(), rt.max(), 1)),
-                   ("standards run", rng(pr[0], pr[1], 1))],
-             sub="minutes"),
-        tile("iRT range", value=rng(ri.min(), ri.max(), 0), sub="dimensionless"),
-        tile("RT offset", value="—" if off is None else f"{off:.2f}",
-             sub="median |obs−ref| (min)"),
-        tile("Coverage", value=f"{ri.notna().mean() * 100:.0f}%", sub="features with an RI"),
-    ]
-
-
-# --------------------------------------------------------------- radar ---------
 
 def radar(result) -> List[Dict]:
-    tbl = result.table
-    ri = pd.to_numeric(tbl[result.col("RI")], errors="coerce")
-    panel = result.panel or {}
-    anc = result.anchors.drop_duplicates("name") if len(result.anchors) else result.anchors
-    n_panel = max(int(panel.get("n_panel", len(anc))), 1)
-    detection = (anc["name"].nunique() / n_panel) if len(anc) else 0.0
-    coverage = float(ri.notna().mean()) if len(tbl) else 0.0
-    if len(anc):
-        span = (float(anc["irt"].max() - anc["irt"].min()) / 100.0)
-    else:
-        span = 0.0
-    loo = (result.model.get("loo_residual_irt", {}) or {}).get("median")
-    interp = 1.0 - min((loo or 0.0) / 3.0, 1.0)
-
-    if result.model.get("calibration_scope") == "sample":
-        sp = pd.to_numeric(tbl[result.col("RI_spread")], errors="coerce")
-        nc = pd.to_numeric(tbl[result.col("n_contributing")], errors="coerce")
-        sp = sp[nc >= 2]                       # exclude single-injection (structural spread 0)
-        med = float(sp.median()) if sp.notna().any() else 1.0
-        last = ("Repeatability", 1.0 - min(med, 1.0))
-    else:
-        native = panel.get("native_rt", {})
-        alu = _anchor_lookup(result)
-        diffs = [abs(native[n] - alu[n][0]) for n in alu if n in native]
-        med = float(np.median(diffs)) if diffs else 0.0
-        last = ("Panel match", 1.0 - min(med / 0.5, 1.0))
-
-    axes = [("Detection", detection), ("Coverage", coverage), ("Anchor span", min(span, 1.0)),
-            ("Interpolation", interp), last]
-    return [{"axis": a, "value": max(0.0, min(1.0, _f(v) or 0.0))} for a, v in axes]
+    """Normalised quality axes (outward = better), from the engine."""
+    from rt_anchor.viz import metrics as _vm
+    return [{"axis": a, "value": max(0.0, min(1.0, _f(v) or 0.0))}
+            for a, v in _vm.radar_axes(result)]
 
 
-# --------------------------------------------------------------- detection -----
+# --------------------------------------------------------------- curve ---------
 
-def detection(result) -> Dict:
-    targets = _panel_targets(result)
-    native = (result.panel or {}).get("native_rt", {})
-    alu = _anchor_lookup(result)
-    rows = []
-    for _, t in targets.iterrows():
-        nm = t["name"]
-        rows.append({
-            "name": nm, "class": t.get("class", ""),
-            "ref": _f(t["rt_ref_min"]), "std": _f(native.get(nm)),
-            "samp": _f(alu[nm][0]) if nm in alu else None, "irt": _f(t["irt"]),
-        })
-    xs = [v for r in rows for v in (r["ref"], r["std"], r["samp"]) if v is not None]
-    rng = [min(xs), max(xs)] if xs else [0.0, 1.0]
-    return {"rows": rows, "rt_range": rng}
+def curve(result, ngrid: int = 240) -> Dict:
+    """Stage-1 cross-column curve + its residuals (spec §12, the Warp section).
 
+    Mirrors ``rt_calibration_diagnostics.png``: the matched pairs with the two
+    sources drawn differently, the MAD-rejected pairs kept visible as
+    *excluded*, the anchor-free fit, the anchor-refined fit when the gate
+    engaged, the stage-2 anchors as rings, and the residual strip below.
+    """
+    from rt_anchor.viz import performance as _vp
+    d = _vp.compute_curve(result, ngrid=ngrid)
+    if d.get("empty"):
+        return {"empty": True, "reason": _s(d.get("reason"))}
 
-# --------------------------------------------------------------- warp ----------
+    rt_src = np.asarray(d["rt_src"], dtype=float)
+    rt_ref = np.asarray(d["rt_ref"], dtype=float)
+    is_std = np.asarray(d["is_std"], dtype=bool)
+    kept = np.asarray(d["kept"], dtype=bool)
+    r_curve = np.asarray(d["r_curve"], dtype=float)
+    r_ref = d.get("r_refined")
+    r_ref = None if r_ref is None else np.asarray(r_ref, dtype=float)
 
-def warp(result) -> Dict:
-    w = result.warp
-    if w is None:
-        return {"empty": True}
-    grid = np.linspace(w.rt_min, w.rt_max, 220)
-    curve = w.predict(grid, extrapolate=False)
-    # label fitted anchors by iRT (exact & unique per standard; w.irt carries it
-    # verbatim) — matching by rt_obs breaks in per-sample mode where w.rt is the
-    # per-standard MEDIAN but pooled anchors keep the first injection's rt_obs.
-    look = {}
-    adf = result.anchors.drop_duplicates("name") if len(result.anchors) else result.anchors
-    for _, r in adf.iterrows():
-        look[round(float(r["irt"]), 6)] = (r["name"], r.get("class", ""))
+    anc = d.get("anchors")
     anchors = []
-    loo = getattr(w, "loo_resid", np.full(w.rt.shape, np.nan))
-    for x, y, lo in zip(w.rt, w.irt, loo):
-        nm, cl = look.get(round(float(y), 6), (None, None))
-        anchors.append({"x": _f(x), "y": _f(y), "loo": _f(lo), "name": nm, "class": cl})
-    return {"empty": False, "curve": {"x": _arr(grid), "y": _arr(curve)},
-            "anchors": anchors, "rt_span": [_f(w.rt_min), _f(w.rt_max)], "irt_range": [0.0, 100.0]}
+    if anc is not None and len(anc):
+        for _, r in anc.iterrows():
+            anchors.append({"x": _f(r.get("rt_src")), "y": _f(r.get("rt_ref")),
+                            "label": _s(r.get("label")), "class": _s(r.get("lipid_class")),
+                            "resid": _f(r.get("residual_min")),
+                            "loo": _f(r.get("loo_residual_min"))})
+
+    span_src = [_f(np.nanmin(rt_src)), _f(np.nanmax(rt_src))]
+    span_ref = [_f(np.nanmin(rt_ref)), _f(np.nanmax(rt_ref))]
+    return {
+        "empty": False,
+        "fit": {"x": _arr(d["grid"]), "y": _arr(d["fit"])},
+        "refined": (None if d.get("refined") is None
+                    else {"x": _arr(d["grid"]), "y": _arr(d["refined"])}),
+        "pairs": {"x": _arr(rt_src), "y": _arr(rt_ref),
+                  "std": _bools(is_std), "kept": _bools(kept),
+                  "r": _arr(r_curve),
+                  "rr": (None if r_ref is None else _arr(r_ref))},
+        "anchors": anchors,
+        "rt_span": span_src, "ref_span": span_ref,
+        "engaged": bool(d["engaged"]),
+        "lam_g": _f(d["lam_g"]), "lam_c": _f(d["lam_c"]),
+        "class_aware": bool(d["class_aware"]),
+        "gate_reduction": _f(d["gate_reduction"]),
+        "gate_threshold": _f(d["gate_threshold"]),
+        "gate_reason": _s(d["gate_reason"]),
+        "legend": {"fit": _vp.fit_legend_label(d) if d["engaged"] else "",
+                   "anchors": _vp.anchor_legend_label(d)},
+        "counts": {"n_pairs": int(rt_src.size), "n_kept": int(kept.sum()),
+                   "n_standards": int(is_std.sum()), "n_sample": int((~is_std).sum())},
+        "labels": {"src": _s(d.get("source_label")), "ref": _s(d.get("ref_label"))},
+    }
 
 
 # --------------------------------------------------------------- profile -------
 
-def profile(result, nbins: int = 120) -> Dict:
-    rt = result.rt_minutes().to_numpy()
-    ri = pd.to_numeric(result.table[result.col("RI")], errors="coerce").to_numpy()
+def _pseudo_tic(x, inten):
+    """Binned, lightly smoothed pseudo-chromatogram of (x, intensity) rows.
+
+    Feature tables carry no scan-level signal, so a TIC-like profile is
+    *reconstructed* by binning feature apex intensities — the same binning the
+    engine's own TIC figure uses, so the app and the report agree.
+    """
+    x = np.asarray(x, dtype=float)
+    inten = np.asarray(inten, dtype=float)
+    ok = np.isfinite(x) & np.isfinite(inten)
+    if not ok.any():
+        return None
+    lo, hi = float(x[ok].min()), float(x[ok].max())
+    from rt_anchor.viz import tic as _vt
+    c, h = _vt._reconstruct(x[ok], inten[ok], lo, hi, "clean")
+    return c, h
+
+
+def _reference_tic(result):
+    """``(rt_min, intensity)`` of the reference *sample* run.
+
+    The reference run's feature table is not stored on the result, so it is
+    re-loaded from the recorded path (bundled or user-supplied). ``None`` when
+    it cannot be loaded — the calibrated-comparison figure then shows the input
+    alone.
+    """
+    ref = result.reference or {}
+    path = ref.get("sample")
+    if not path or not os.path.isfile(path):
+        return None
+    try:
+        from rt_anchor.io.loader import load_feature_table
+        ft = load_feature_table(path, polarity=result.polarity)
+        rt = ft.rt_minutes().to_numpy(dtype=float)
+        inten = pd.to_numeric(ft.intensity(), errors="coerce").fillna(0.0).to_numpy()
+    except Exception:
+        return None
+    return _pseudo_tic(rt, inten)
+
+
+def _ticks(lo, hi, step):
+    start = math.ceil(lo / step) * step
+    return [float(v) for v in np.arange(start, hi + 1e-9, step)]
+
+
+def _tic_figure(top_c, top_h, top_title, top_color,
+                bot_c, bot_h, bot_title, bot_color, x_title, height=440):
+    """Mirror pseudo-TIC on ONE shared time axis, with a visible Y axis.
+
+    Top trace points up, bottom trace points down, and both are drawn against
+    the same X coordinate system (retention time, min) so the two profiles are
+    directly comparable. The Y axis is normalised intensity (±1).
+    """
+    import plotly.graph_objects as go
+    from rt_anchor.viz import theme
+
+    top_c = np.asarray(top_c, dtype=float)
+    bot_c = np.asarray(bot_c, dtype=float)
+    top_h = np.asarray(top_h, dtype=float) / (float(np.max(top_h)) or 1.0)
+    bot_h = np.asarray(bot_h, dtype=float) / (float(np.max(bot_h)) or 1.0)
+
+    lo = float(min(top_c[0], bot_c[0]))
+    hi = float(max(top_c[-1], bot_c[-1]))
+    pad = 0.03 * (hi - lo) if hi > lo else 0.5
+    x0, x1 = lo - pad, hi + pad
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=np.r_[top_c, top_c[::-1]], y=np.r_[top_h, np.zeros_like(top_h)],
+                  fill="toself", fillcolor=theme.rgba(top_color, 0.85), line=dict(width=0),
+                  name=top_title, hoverinfo="skip"))
+    fig.add_trace(go.Scatter(x=np.r_[bot_c, bot_c[::-1]], y=np.r_[-bot_h, np.zeros_like(bot_h)],
+                  fill="toself", fillcolor=theme.rgba(bot_color, 0.85), line=dict(width=0),
+                  name=bot_title, hoverinfo="skip"))
+    fig.add_hline(y=0, line=dict(color=theme.AXIS, width=0.8))
+
+    step = 10.0 if hi - lo > 60 else 5.0
+    xt = _ticks(x0, x1, step)
+    fig.update_layout(theme.plotly_template())
+    fig.update_layout(
+        title=None, height=height, showlegend=True,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0),
+        xaxis=dict(range=[x0, x1], showgrid=False, tickvals=xt,
+                   title=dict(text=x_title)),
+        yaxis=dict(range=[-1.2, 1.2], tickvals=[-1.0, -0.5, 0.0, 0.5, 1.0],
+                   ticktext=["−1", "−0.5", "0", "0.5", "1"],
+                   title=dict(text="normalized intensity"), zeroline=False))
+    return fig
+
+
+def profile_figures(result) -> Dict[str, str]:
+    """The Profile section's two Plotly figures.
+
+    * ``profile_before_after`` — the input run before (raw RT) and after
+      (Cal_RT) calibration, mirror-style on one shared RT axis.
+    * ``profile_calibrated`` — the calibrated input on top, the reference
+      sample run below, both on the same reference-column RT axis.
+    """
+    from rt_anchor.viz import theme
+
+    rt = result.rt_minutes().to_numpy(dtype=float)
+    cal = result.values("Cal_RT_min").to_numpy(dtype=float)
     inten = _intensity(result)
 
-    okb = np.isfinite(rt) & np.isfinite(inten)
-    rt_lo, rt_hi = (float(np.nanmin(rt[okb])), float(np.nanmax(rt[okb]))) if okb.any() else (0.0, 1.0)
-    eb = np.linspace(rt_lo, rt_hi, nbins + 1)
-    hb = np.histogram(rt[okb], bins=eb, weights=inten[okb])[0].astype(float)
+    before = _pseudo_tic(rt, inten)
+    after = _pseudo_tic(cal, inten)
+    ref = _reference_tic(result)
 
-    oka = np.isfinite(ri) & np.isfinite(inten)
-    ea = np.linspace(0.0, 100.0, nbins + 1)
-    ha = np.histogram(ri[oka], bins=ea, weights=inten[oka])[0].astype(float)
-
-    def _norm(h):
-        m = h.max()
-        return (h / m) if m > 0 else h
-
-    cb = (eb[:-1] + eb[1:]) / 2.0
-    ca = (ea[:-1] + ea[1:]) / 2.0
-    stds = []
-    for nm, (rtobs, cl) in _anchor_lookup(result).items():
-        stds.append({"name": nm, "class": cl, "rt": _f(rtobs)})
-    # attach each standard's iRT from the panel
-    irt_by_name = {t["name"]: _f(t["irt"]) for _, t in _panel_targets(result).iterrows()}
-    for s in stds:
-        s["irt"] = irt_by_name.get(s["name"])
-    return {"before": {"c": _arr(cb), "h": _arr(_norm(hb))},
-            "after": {"c": _arr(ca), "h": _arr(_norm(ha))},
-            "rt_range": [rt_lo, rt_hi], "irt_range": [0.0, 100.0], "standards": stds}
-
-
-# --------------------------------------------------------------- repeatability -
-
-def repeatability(result) -> Dict:
-    scope = result.model.get("calibration_scope")
-    sp = pd.to_numeric(result.table[result.col("RI_spread")], errors="coerce").to_numpy()
-    ri = pd.to_numeric(result.table[result.col("RI")], errors="coerce").to_numpy()
-    nc = pd.to_numeric(result.table[result.col("n_contributing")], errors="coerce").to_numpy()
-    ok = np.isfinite(sp) & (nc >= 2)           # a spread needs >=2 contributing injections
-    if scope != "sample" or ok.sum() < 5:
-        return {"applicable": False}
-    s = sp[ok]
-    hi = float(np.percentile(s, 98)) or float(s.max()) or 1.0
-    counts, edges = np.histogram(np.clip(s, 0, hi), bins=40)
-
-    okj = np.isfinite(sp) & np.isfinite(ri) & (nc >= 2)
-    sj, rj = sp[okj], ri[okj]
-    ebins = np.linspace(0.0, 100.0, 21)
-    c, med, q1, q3 = [], [], [], []
-    for i in range(len(ebins) - 1):
-        m = (rj >= ebins[i]) & (rj < ebins[i + 1])
-        if m.sum() >= 3:
-            c.append((ebins[i] + ebins[i + 1]) / 2.0)
-            med.append(float(np.median(sj[m]))); q1.append(float(np.percentile(sj[m], 25)))
-            q3.append(float(np.percentile(sj[m], 75)))
-    return {"applicable": True,
-            "hist": {"edges": _arr(edges), "counts": [int(x) for x in counts]},
-            "binned": {"c": _arr(c), "med": _arr(med), "q1": _arr(q1), "q3": _arr(q3)},
-            "stats": {"median": _f(np.median(s)), "p90": _f(np.percentile(s, 90))}}
+    figs = {}
+    if before is not None and after is not None:
+        figs["profile_before_after"] = _tic_figure(
+            before[0], before[1], "before · raw RT", theme.ACCENT,
+            after[0], after[1], "after · Cal_RT", theme.PRIMARY,
+            "RT (min)").to_json()
+    if after is not None:
+        if ref is not None:
+            figs["profile_calibrated"] = _tic_figure(
+                after[0], after[1], "input · Cal_RT", theme.PRIMARY,
+                ref[0], ref[1], "reference", theme.PRIMARY_LT,
+                "RT on the reference column (min)").to_json()
+        else:
+            fig = _tic_figure(
+                after[0], after[1], "input · Cal_RT", theme.PRIMARY,
+                after[0], after[1], "reference", theme.PRIMARY_LT,
+                "RT on the reference column (min)")
+            fig.update_layout(annotations=[dict(
+                text="reference profile unavailable for this run",
+                showarrow=False, x=0.5, y=0.5, xref="paper", yref="paper",
+                font=dict(size=14, color=theme.TXT2))])
+            figs["profile_calibrated"] = fig.to_json()
+    return figs
 
 
 # --------------------------------------------------------------- table preview -
 
+#: Result columns shown in the preview, in order, with their display names.
+PREVIEW_COLUMNS = [
+    ("Cal_RT_min", "Cal_RT (min)"),
+    ("Cal_RT_uncertainty_min", "Cal_RT ± (min)"),
+    ("iRT", "iRT"),
+    ("iRT_uncertainty", "iRT ±"),
+    ("iRT_reliability", "reliability"),
+    ("RI_spread", "iRT spread"),
+    ("is_extrapolated", "extrapolated"),
+]
+
+
 def table_preview(result, n: int = 120) -> Dict:
     tbl = result.table
-    wanted = [(result.rt_col, "RT"), (result.mz_col, "m/z"),
-              (result.col("RI"), "RI"), (result.col("RI_uncertainty"), "RI_uncertainty"),
-              (result.col("RI_reliability"), "RI_reliability"),
-              (result.col("RI_spread"), "RI_spread"), (result.col("is_extrapolated"), "extrapolated")]
+    # RI_spread is structurally NaN outside the per-injection tier — a column of
+    # dashes is noise, not information, so it only appears when it has values.
+    per_sample = result.model.get("calibration_scope") == "sample"
+    wanted = [(result.rt_col, "RT"), (result.mz_col, "m/z")]
+    wanted += [(result.col(key), disp) for key, disp in PREVIEW_COLUMNS
+               if per_sample or key != "RI_spread"]
     cols = [(c, d) for c, d in wanted if c and c in tbl.columns]
     head = tbl[[c for c, _ in cols]].head(n)
 
@@ -286,53 +338,74 @@ def table_preview(result, n: int = 120) -> Dict:
 
 # --------------------------------------------------------------- bundle --------
 
-DETECTION_NOTE = (
-    "Each row is a standard; its retention time is shown from three sources — "
-    "<b>hollow circle</b> = reference baseline, <b>blue square</b> = standards run, "
-    "<b>blue circle</b> = samples (the table being calibrated). A shorter span means the "
-    "observed RT agrees more closely with the reference."
-)
+def _notes(result) -> Dict:
+    from rt_anchor.viz import metrics as _vm
+    return {
+        "detection": _vm.DETECTION_NOTE,
+        "curve": (
+            "The stage-1 curve maps <b>your column's RT</b> onto the "
+            "<b>reference column's RT</b>. Every point is an anonymous "
+            "m/z-matched feature pair — <b>squares</b> from the two standards "
+            "runs, <b>diamonds</b> from the two sample runs (serum covers the "
+            "sparse early and late ends the mixture cannot). Rings are the "
+            "stage-2 plasma-lipid anchors. The strip below is each pair's "
+            "residual about the fit."
+        ),
+        "profile": (
+            "Reconstructed from the feature table by binning feature intensities "
+            "— a pseudo-chromatogram, not a scan-level TIC. Each panel draws two "
+            "profiles on one shared RT axis, with intensity normalized per "
+            "profile. <b>Top panel</b>: your run before (raw RT) and after "
+            "calibration. <b>Bottom panel</b>: your calibrated run against the "
+            "reference sample run."
+        ),
+    }
 
 
 def build_viz(result) -> Dict:
     m = result.model
     n = len(result.table)
-    ri = pd.to_numeric(result.table[result.col("RI")], errors="coerce")
-    panel = result.panel or {}
-    anc = result.anchors.drop_duplicates("name") if len(result.anchors) else result.anchors
-    rep = repeatability(result)
+    curve_d = curve(result)
+    qc = (m.get("detection_qc", {}) or {}).get("user_standards_run", {}) or {}
+    irt = m.get("irt", {}) or {}
 
     struct = {}
-    if result.default_panel:
+    # `default_panel` is True for panel="none" too (the engine treats "no
+    # manifest" as the built-in one), but a user who told us they have no panel
+    # has no standards to hover — and the depictions cost ~340 KB in the bundle.
+    if result.default_panel and result.panel_key != "none":
         try:
             from rt_anchor.viz import structures  # molecular depiction only (not a chart)
             struct = structures.render_default_structures()
         except Exception:
             struct = {}
 
-    # Detection + Profile are REVERTED to the package's Plotly figures (per user
-    # request); radar / warp / repeatability stay the custom SVG charts.
-    from rt_anchor.viz import metrics as _vm, tic as _vt
-    figures = {
-        "detection": _vm.figure_plotly(result).to_json(),
-        "profile": _vt.figure_plotly(result, "clean").to_json(),
-    }
+    # Detection and the two Profile panels are Plotly figures; radar and the
+    # curve are the app's own SVG charts.
+    from rt_anchor.viz import metrics as _vm
+    figures = {"detection": _vm.figure_plotly(result).to_json()}
+    figures.update(profile_figures(result))
 
+    ref = m.get("reference", {}) or result.reference or {}
     return {
         "kpis": kpis(result),
         "radar": radar(result),
         "figures": figures,
-        "warp": warp(result),
-        "repeatability": rep,
+        "curve": curve_d,
         "table": table_preview(result),
         "structures": struct,
-        "notes": {"detection": DETECTION_NOTE},
+        "notes": _notes(result),
         "meta": {
+            "method": m.get("method", "cross-column-v2"),
             "scope": m.get("calibration_scope", "project"),
             "polarity": result.polarity, "source_format": result.source_format,
             "n_features": int(n),
-            "n_detected": int(anc["name"].nunique()) if len(anc) else 0,
-            "n_panel": int(panel.get("n_panel", len(anc))),
-            "has_repeatability": bool(rep.get("applicable")),
+            "panel": result.panel_key,
+            "reference_label": _s(ref.get("label")),
+            "reference_default": bool(ref.get("is_default", False)),
+            "n_detected": int(qc.get("n_detected", 0) or 0),
+            "n_panel": int(qc.get("n_panel", 0) or 0),
+            "n_landmarks": int(irt.get("n_landmarks", 0) or 0),
+            "has_curve": bool(not curve_d.get("empty")),
         },
     }

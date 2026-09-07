@@ -1,0 +1,37 @@
+{
+  "key": "col35",
+  "label": "Column 25",
+  "column_id": "25",
+  "gradient_minutes": 35,
+  "matrix": "human serum",
+  "instrument": "QTOF (MS-DIAL alignment export)",
+  "polarity": "positive",
+  "mixture_run": "P Carly RT Mix 4p4 2Xdil (Mix 4.4 = the 21-standard panel)",
+  "note": "Reference dataset defining the Cal_RT time axis and the iRT ruler. Only the two bulky spectrum columns were removed; every row and every other column is byte-identical to the source MS-DIAL export.",
+  "files": {
+    "sample": {
+      "bundled_file": "reference_sample.csv",
+      "source_path": "v2/5 chroms/data/25/25_serum.csv",
+      "source_sha256_16": "710554140bb9e9c5",
+      "source_bytes": 304293,
+      "bundled_bytes": 270931,
+      "dropped_columns": [
+        "MS1 isotopic spectrum",
+        "MS/MS spectrum"
+      ],
+      "n_features": 610
+    },
+    "standards": {
+      "bundled_file": "reference_standards.csv",
+      "source_path": "v2/5 chroms/data/25/25_standards.csv",
+      "source_sha256_16": "f0b613524d75b8c2",
+      "source_bytes": 186242,
+      "bundled_bytes": 165216,
+      "dropped_columns": [
+        "MS1 isotopic spectrum",
+        "MS/MS spectrum"
+      ],
+      "n_features": 383
+    }
+  }
+}

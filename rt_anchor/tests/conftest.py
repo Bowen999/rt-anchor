@@ -13,11 +13,15 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pytest
 
 from rt_anchor.config import CalibrationConfig
+from rt_anchor.io.schema import FeatureTable
 from rt_anchor.panel import build_panel
+from rt_anchor.plasma_lipids import plasma_lipid_candidates
+from rt_anchor.reference import resolve_reference
 
 HERE = Path(__file__).resolve().parent
 PKG_ROOT = HERE.parent                      # .../rt_anchor
@@ -196,4 +200,66 @@ def make_masscube(tmp_path, pos_targets):
             row += [extra_cols[c] for c in extra_cols]
             rows.append(row)
         return _write(tmp_path / name, header, rows, delim="\t")
+    return _build
+
+
+# ------------------------------------------------------- v2: the reference ----
+
+@pytest.fixture(scope="session")
+def bundled_reference():
+    """The bundled 35-min reference pair (the default second axis)."""
+    return resolve_reference()
+
+
+@pytest.fixture(scope="session")
+def non_plasma_table(tmp_path_factory, bundled_reference) -> str:
+    """A run whose matrix contains none of the 17 stage-2 plasma lipids.
+
+    Built from the bundled reference *standards* run so stage 1 still has plenty
+    of m/z pairs to match — then every feature within the anonymous m/z window of
+    a plasma-lipid candidate is deleted, so stage 2 can find no anchor at all.
+    This is the archaeal-lipid case of spec §2: the engine must fall back to the
+    stage-1 curve and say so, never fail.
+    """
+    from rt_anchor.io.loader import load_feature_table
+
+    ft = load_feature_table(bundled_reference.standards_path, polarity="positive")
+    mz = ft.mz().to_numpy(dtype=float)
+    rt = ft.rt_minutes().to_numpy(dtype=float)
+    cand = plasma_lipid_candidates()["precursor_mz"].to_numpy()
+    hit = (abs(mz[:, None] - cand[None, :]) < 0.05).any(axis=1)
+    keep = ~hit & pd.notna(mz) & pd.notna(rt)
+    path = tmp_path_factory.mktemp("nonplasma") / "archaea.txt"
+    lines = ["m/z\tRT"] + [f"{m:.4f}\t{r:.4f}" for m, r in zip(mz[keep], rt[keep])]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return str(path)
+
+
+# ------------------------------------------------- v2: synthetic run builders --
+
+def make_table(mz, rt, sn=None, name="t") -> FeatureTable:
+    """A FeatureTable straight from arrays — no file, no format detection."""
+    df = pd.DataFrame({"m/z": np.asarray(mz, dtype=float),
+                       "RT": np.asarray(rt, dtype=float)})
+    if sn is not None:
+        df["S/N average"] = np.asarray(sn, dtype=float)
+    return FeatureTable(df=df, mz_col="m/z", rt_col="RT", rt_unit="min",
+                        source_format="synthetic", polarity="positive")
+
+
+@pytest.fixture
+def synth_pair():
+    """Two runs of the same 200 features under a known monotone RT distortion.
+
+    ``rt_ref = 1.6 * rt_src ** 1.15`` — nonlinear enough that a straight line
+    cannot fit it, monotone so the isotonic step is not doing the work.
+    """
+    def _build(n=200, noise=0.01, seed=0, distort=lambda x: 1.6 * x ** 1.15):
+        rng = np.random.default_rng(seed)
+        mz = np.round(np.linspace(300.0, 900.0, n) + rng.normal(0, 0.3, n), 4)
+        rt_src = np.sort(rng.uniform(1.0, 20.0, n))
+        rt_ref = distort(rt_src) + rng.normal(0, noise, n)
+        sn = rng.uniform(10, 1000, n)
+        return (make_table(mz, rt_src, sn), make_table(mz, rt_ref, sn),
+                rt_src, rt_ref)
     return _build

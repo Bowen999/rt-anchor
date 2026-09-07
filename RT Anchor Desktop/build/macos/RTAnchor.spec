@@ -6,21 +6,40 @@
 import os
 from PyInstaller.utils.hooks import collect_all, collect_submodules
 
-APP = os.path.dirname(SPECPATH)     # build/macos/ -> app root
+APP = os.path.dirname(os.path.dirname(SPECPATH))   # build/macos/ -> app root, two up
 RT_SRC = os.path.join(os.path.dirname(APP), "rt_anchor", "src")
 ICON = os.path.join(SPECPATH, "icon.icns")
 
 datas = [(os.path.join(APP, "web"), "web"),
          (os.path.join(APP, "example"), "example")]   # bundled demo dataset (Load example button)
+
+# The v2 method calibrates onto a REFERENCE COLUMN, and the bundled reference
+# pair is package *data* — PyInstaller will not pick it up from the package on
+# its own, and without it every calibration fails at resolve_reference() with
+# "Bundled reference 'col35' is incomplete". Ship the whole tree, keeping the
+# rt_anchor/reference_data/... layout that reference.reference_root() looks for
+# first under sys._MEIPASS.
+REF_DATA = os.path.join(RT_SRC, "rt_anchor", "reference_data")
+if not os.path.isdir(REF_DATA):
+    raise SystemExit(f"reference_data not found at {REF_DATA} — the frozen app "
+                     f"cannot calibrate without it")
+datas += [(REF_DATA, os.path.join("rt_anchor", "reference_data"))]
+
 binaries = []
 hiddenimports = [
     "bottle", "proxy_tools",
     "webview.platforms.cocoa", "objc", "Foundation", "AppKit", "WebKit", "Quartz",
     "scipy.interpolate", "scipy.optimize", "scipy.ndimage",
+    # stage 1 of the v2 curve: statsmodels LOWESS -> sklearn isotonic -> pchip.
+    # Both are lazily imported inside crosscolumn.py, so the analysis cannot see
+    # them without help.
+    "statsmodels.api", "statsmodels.nonparametric.smoothers_lowess",
+    "sklearn.isotonic",
 ]
 
-# pywebview (cocoa backend) + rdkit (structure hover) + plotly (figure JSON)
-for pkg in ("webview", "rdkit", "plotly"):
+# pywebview (cocoa backend) + rdkit (structure hover) + plotly (figure JSON) +
+# the two fitting libraries the cross-column curve is built from
+for pkg in ("webview", "rdkit", "plotly", "statsmodels", "sklearn"):
     d, b, h = collect_all(pkg)
     datas += d; binaries += b; hiddenimports += h
 
@@ -39,12 +58,15 @@ a = Analysis(
         # dev/notebook
         "IPython", "notebook", "jupyter", "pytest", "sphinx", "black", "mypy",
         # heavy ML / unrelated libraries pulled from anaconda base (NOT used by rt_anchor)
+        # NOTE: sklearn and statsmodels used to be excluded here. They are now
+        # REQUIRED — the v2 stage-1 curve is statsmodels LOWESS -> sklearn
+        # IsotonicRegression -> scipy PchipInterpolator. Do not re-add them.
         "tensorflow", "tensorboard", "tensorflow_probability", "keras", "torch",
         "torchvision", "torchaudio", "onnxruntime", "onnx", "jax", "jaxlib", "flax",
-        "numba", "llvmlite", "bokeh", "transformers", "datasets", "sklearn",
-        "scikit_learn", "sympy", "cv2", "gensim", "spacy", "xgboost", "lightgbm",
+        "numba", "llvmlite", "bokeh", "transformers", "datasets",
+        "sympy", "cv2", "gensim", "spacy", "xgboost", "lightgbm",
         "grpc", "google", "dask", "distributed", "streamlit", "gradio", "seaborn",
-        "statsmodels", "numexpr",
+        "numexpr",
         # holoviz / viz stack (unused)
         "panel", "vtk", "vtkmodules", "holoviews", "hvplot", "datashader",
         "param", "pyviz_comms", "colorcet", "pyct", "bqplot", "ipywidgets",
@@ -81,7 +103,7 @@ app = BUNDLE(
         "LSMinimumSystemVersion": "11.0",
         "CFBundleName": "RT Anchor",
         "CFBundleDisplayName": "RT Anchor",
-        "CFBundleShortVersionString": "1.1.1",
-        "CFBundleVersion": "1.1.1",
+        "CFBundleShortVersionString": "0.2.0",
+        "CFBundleVersion": "0.2.0",
     },
 )

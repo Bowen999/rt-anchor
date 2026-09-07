@@ -1,5 +1,9 @@
-"""Calibration correctness: monotone warp, extrapolation, two tiers,
-uncertainty, model json, config presets, and the monotonicity guard."""
+"""Pipeline behaviour: the two tiers, the output columns, the model JSON, the
+panel choices, the extrapolation flags, and the two ways stage 2 can be absent.
+
+Engine-level units live in ``test_crosscolumn.py``; reference-set and panel
+resolution in ``test_reference.py``.
+"""
 
 from __future__ import annotations
 
@@ -8,13 +12,29 @@ import pandas as pd
 import pytest
 
 from rt_anchor import calibrate
-from rt_anchor.calibrate import apply_warp, fit_warp
-from rt_anchor.config import CalibrationConfig
-from rt_anchor.errors import CalibrationError
+from rt_anchor.config import REMOVED_FIELDS, CalibrationConfig
+from rt_anchor.errors import ConfigError
 from rt_anchor.identify import _drop_nonmonotone, _longest_increasing
+from rt_anchor.io.schema import RESULT_COLUMNS
+
+RELIABILITY = {"high", "medium", "low", "none"}
+
+
+@pytest.fixture(scope="module")
+def proj_result(orbitrap_samples, orbitrap_standards):
+    """A real per-project calibration against the bundled 35-min reference."""
+    return calibrate(orbitrap_samples, "positive", standards_table=orbitrap_standards,
+                     panel="mix15", config=CalibrationConfig.orbitrap())
+
+
+@pytest.fixture(scope="module")
+def sample_result(qtof_full_samples, qtof_full_standards, qtof_full_single_files):
+    return calibrate(qtof_full_samples, "positive", standards_table=qtof_full_standards,
+                     panel="mix15", single_files=list(qtof_full_single_files))
 
 
 # ------------------------------------------------------- longest-increasing ---
+# (still used by the detection-QC / landmark path)
 
 @pytest.mark.parametrize("vals,expected_len", [
     ([1, 2, 3, 4, 5], 5),
@@ -26,14 +46,12 @@ from rt_anchor.identify import _drop_nonmonotone, _longest_increasing
 def test_longest_increasing_length(vals, expected_len):
     idx = _longest_increasing(vals)
     assert len(idx) == expected_len
-    # returned indices must be increasing and select a strictly increasing seq
     assert idx == sorted(idx)
     picked = [vals[i] for i in idx]
     assert all(b > a for a, b in zip(picked, picked[1:]))
 
 
 def test_drop_nonmonotone_flags_count():
-    # rt_ref ascending; rt_obs has one out-of-order point that must be dropped
     df = pd.DataFrame({
         "name": list("abcde"),
         "rt_ref_min": [1, 2, 3, 4, 5],
@@ -41,166 +59,253 @@ def test_drop_nonmonotone_flags_count():
     })
     out = _drop_nonmonotone(df, CalibrationConfig())
     assert out.attrs["n_dropped_nonmonotone"] == 1
-    assert "c" not in set(out["name"])            # the 9.0 anchor (name 'c')
+    assert "c" not in set(out["name"])
     assert list(out["rt_obs_min"]) == [1.0, 2.0, 3.0, 4.0]
 
 
-# ----------------------------------------------------- per-project baseline ---
+# ------------------------------------------------------------ the outputs ----
 
-def test_per_project_monotone_and_extrapolation(make_masscube):
-    # anchors at their reference RTs + in-span probes + two beyond-span probes
-    extra = [(100.0, 0.2), (100.0, 25.0), (100.0, 6.0), (100.0, 9.0)]
-    p = make_masscube(extra_rows=extra)
-    res = calibrate(p, "positive", standards_table=p)
-    t = res.table.copy()
-    t["RTn"] = pd.to_numeric(t["RT"])
-    lo, hi = res.model["anchor_span_min"]
-
-    # in-span RI increases monotonically with RT
-    inspan = t[(t["RTn"] >= lo) & (t["RTn"] <= hi)].sort_values("RTn")
-    ri = pd.to_numeric(inspan["RI"]).to_numpy()
-    ri = ri[np.isfinite(ri)]
-    assert np.all(np.diff(ri) >= -1e-9)
-
-    # beyond span -> NaN RI (never fabricated) + is_extrapolated True
-    beyond = t[(t["RTn"] < lo) | (t["RTn"] > hi)]
-    assert pd.to_numeric(beyond["RI"]).isna().all()
-    assert beyond["is_extrapolated"].astype(bool).all()
-
-    # within span -> not extrapolated
-    assert (~inspan["is_extrapolated"].astype(bool)).all()
-
-    # scope + spread columns for per-project
-    assert (t["calibration_scope"] == "project").all()
-    assert pd.to_numeric(t["RI_spread"]).isna().all()
-    assert (pd.to_numeric(t["n_contributing"]) == 1).all()
+def test_appends_exactly_the_spec_columns(proj_result):
+    for c in RESULT_COLUMNS:
+        assert proj_result.col(c) in proj_result.table.columns
+    assert RESULT_COLUMNS[:3] == ["Cal_RT_min", "Cal_RT_uncertainty_min", "iRT"]
 
 
-def test_uncertainty_and_reliability_populated(orbitrap_samples, orbitrap_standards):
-    res = calibrate(orbitrap_samples, "positive",
-                    standards_table=orbitrap_standards,
-                    config=CalibrationConfig.orbitrap())
-    t = res.table
-    ri = pd.to_numeric(t["RI"])
-    rt = pd.to_numeric(t["RT"], errors="coerce")
-    unc = pd.to_numeric(t["RI_uncertainty"])
-    # uncertainty is populated wherever RI is finite (the meaningful guarantee)
-    assert unc[ri.notna()].notna().all()
-    # uncertainty is NaN wherever RT itself is NaN (no basis for an estimate)
-    if rt.isna().any():
-        assert unc[rt.isna()].isna().all()
-    # reliability tier vocabulary; high present for the PC-dense core
-    rel = set(t["RI_reliability"].astype(str))
-    assert rel <= {"high", "medium", "low", "none"}
-    assert "high" in rel
+def test_cal_rt_is_monotone_in_rt_and_lands_on_the_reference_axis(proj_result):
+    rt = proj_result.rt_minutes().to_numpy()
+    # the stage-1 curve itself is the monotone object; a gated-on anchor
+    # correction may bend it locally, so monotonicity is asserted on the curve.
+    ok = np.isfinite(rt)
+    pred = proj_result.curve.predict(np.sort(rt[ok]))
+    assert np.all(np.diff(pred) >= -1e-9)
+    cal = proj_result.values("Cal_RT_min")
+    # the reference column runs ~1.4-24 min: the calibrated RTs must live there,
+    # not on the source column's own axis
+    assert 0.0 < np.nanmedian(cal) < 30.0
 
 
-def test_extrapolate_flag_fills_beyond_span(make_masscube):
-    extra = [(100.0, 25.0)]     # beyond max anchor
-    p = make_masscube(extra_rows=extra)
-    off = calibrate(p, "positive", standards_table=p, config=CalibrationConfig(extrapolate=False))
-    on = calibrate(p, "positive", standards_table=p,
-                   config=CalibrationConfig(extrapolate=True, max_extrapolation_min=1.0))
-    t_off, t_on = off.table.copy(), on.table.copy()
-    t_off["RTn"] = pd.to_numeric(t_off["RT"])
-    t_on["RTn"] = pd.to_numeric(t_on["RT"])
-    hi = off.model["anchor_span_min"][1]
-    row_off = t_off[t_off["RTn"] > hi]
-    row_on = t_on[t_on["RTn"] > hi]
-    assert pd.to_numeric(row_off["RI"]).isna().all()
-    assert pd.to_numeric(row_on["RI"]).notna().all()   # capped extrapolation fills it
+def test_irt_tracks_cal_rt_affinely(proj_result):
+    cal = proj_result.values("Cal_RT_min").to_numpy()
+    irt = proj_result.values("iRT").to_numpy()
+    ok = np.isfinite(cal) & np.isfinite(irt)
+    m = proj_result.irt
+    assert m is not None
+    assert np.allclose(irt[ok], m.to_irt(cal[ok]))
+    # affine: a straight line through the landmark endpoints reproduces it
+    lo, hi = m.rt_span
+    straight = 1.0 + 99.0 * (cal[ok] - lo) / (hi - lo)
+    assert np.max(np.abs(irt[ok] - straight)) < 1e-9
 
 
-# ------------------------------------------------------- model json sanity ----
+def test_uncertainty_and_reliability_populated(proj_result):
+    t = proj_result.table
+    cal = proj_result.values("Cal_RT_min")
+    unc = proj_result.values("Cal_RT_uncertainty_min")
+    iunc = proj_result.values("iRT_uncertainty")
+    assert unc[cal.notna()].notna().all()
+    assert (unc.dropna() >= 0).all()
+    # iRT sigma is the RT sigma carried through the (constant) scale slope
+    slope = 99.0 / (proj_result.irt.rt_span[1] - proj_result.irt.rt_span[0])
+    ok = cal.notna()
+    assert np.allclose(iunc[ok], unc[ok] * slope)
+    rel = set(t[proj_result.col("iRT_reliability")].astype(str))
+    assert rel <= RELIABILITY
 
-def test_model_json_structure(orbitrap_samples, orbitrap_standards):
-    res = calibrate(orbitrap_samples, "positive",
-                    standards_table=orbitrap_standards,
-                    config=CalibrationConfig.orbitrap())
-    m = res.model
-    assert m["calibration_scope"] == "project"
-    assert m["n_anchors_used"] >= 6
-    lo, hi = m["anchor_span_min"]
-    assert lo < hi
-    assert m["loo_residual_irt"]["median"] is not None
-    assert m["scale_constants"] == {"RT_lo_min": 1.0, "RT_hi_min": 18.4}
-    # anchors present + sorted by reference RT
-    anchors = pd.DataFrame(m["anchors"])
-    assert (anchors["rt_ref_min"].to_numpy() ==
-            np.sort(anchors["rt_ref_min"].to_numpy())).all()
+
+def test_extrapolation_is_flagged_and_still_valued(qtof_samples, qtof_standards):
+    res = calibrate(qtof_samples, "positive", standards_table=qtof_standards,
+                    panel="mix15")
+    ex = res.table[res.col("is_extrapolated")].astype(bool).to_numpy()
+    cal = res.values("Cal_RT_min").to_numpy()
+    rt = res.rt_minutes().to_numpy()
+    x0, x1 = res.curve.x0, res.curve.x1
+    assert ex.sum() > 0, "the example run must reach outside the matched-pair span"
+    # the flag says exactly "outside the pair span" (NaN RT is not out-of-span)
+    assert np.array_equal(ex, ((rt < x0) | (rt > x1)) & np.isfinite(rt))
+    # v2 assigns a value anyway (extrapolate defaults to True) ...
+    assert np.isfinite(cal[ex]).all()
+    # ... and never calls it reliable
+    rel = res.table[res.col("iRT_reliability")].to_numpy()[ex]
+    assert set(rel) <= {"low", "none"}
+
+
+def test_per_project_scope_and_qc_columns(proj_result):
+    t = proj_result.table
+    assert (t[proj_result.col("calibration_scope")] == "project").all()
+    assert proj_result.values("RI_spread").isna().all()
+    assert (proj_result.values("n_contributing") == 1).all()
+    assert set(t[proj_result.col("warp_source")]) <= {"curve", "curve+anchors"}
 
 
 # --------------------------------------------------------------- two tiers ----
 
-def test_per_sample_tier(qtof_full_samples, qtof_full_standards,
-                         qtof_full_single_files):
-    res = calibrate(qtof_full_samples, "positive",
-                    standards_table=qtof_full_standards,
-                    single_files=qtof_full_single_files)
-    t = res.table
-    assert res.model["calibration_scope"] == "sample"
-    assert (t["calibration_scope"] == "sample").all()
-    # per-sample QC columns populated
-    assert pd.to_numeric(t["RI_spread"]).notna().any()
-    n_contrib = pd.to_numeric(t["n_contributing"])
-    assert n_contrib.max() > 1
-    assert res.model.get("n_injections_used", 0) >= 2
+def test_per_sample_tier(sample_result):
+    t = sample_result.table
+    assert sample_result.model["calibration_scope"] == "sample"
+    assert (t[sample_result.col("calibration_scope")] == "sample").all()
+    assert sample_result.values("RI_spread").notna().any()
+    assert sample_result.values("n_contributing").max() > 1
+    assert sample_result.model.get("n_injections_used", 0) >= 2
 
 
 def test_project_tier_when_no_single_files(qtof_full_samples, qtof_full_standards):
-    res = calibrate(qtof_full_samples, "positive",
-                    standards_table=qtof_full_standards)
+    res = calibrate(qtof_full_samples, "positive", standards_table=qtof_full_standards,
+                    panel="mix15")
     assert res.model["calibration_scope"] == "project"
-    assert pd.to_numeric(res.table["RI_spread"]).isna().all()
+    assert res.values("RI_spread").isna().all()
 
 
-# --------------------------------------------------------- warp unit tests ----
+# --------------------------------------------------------- model json (§5.1) --
 
-def test_fit_warp_extrapolate_false_gives_nan():
-    rt = np.linspace(1, 10, 8)
-    irt = np.linspace(0, 100, 8)
-    cfg = CalibrationConfig()
-    w = fit_warp(rt, irt, cfg)
-    out = w.predict(np.array([0.5, 5.0, 50.0]), extrapolate=False)
-    assert np.isnan(out[0]) and np.isnan(out[2])   # outside span
-    assert np.isfinite(out[1])
+def test_model_json_structure(proj_result):
+    m = proj_result.model
+    assert m["method"] == "cross-column-v2"
+    assert m["calibration_scope"] == "project"
+    for key in ("reference", "panel", "curve", "anchors", "irt", "detection_qc",
+                "n_features", "n_features_extrapolated", "confidence_counts", "config"):
+        assert key in m, f"model.json is missing '{key}'"
+    assert m["reference"]["key"] == "col35" and m["reference"]["is_default"]
+    c = m["curve"]
+    assert c["n_pairs"] == c["n_pairs_standards"] + c["n_pairs_sample"]
+    assert 0 < c["n_pairs_kept"] <= c["n_pairs"]
+    assert c["rt_span_src_min"][0] < c["rt_span_src_min"][1]
+    assert c["residual_min"]["median_abs"] <= c["residual_min"]["p90_abs"]
+    a = m["anchors"]
+    assert a["gate_threshold"] == 0.2 and isinstance(a["table"], list)
+    assert m["irt"]["definition"] == "affine on the reference-column RT axis"
+    qc = m["detection_qc"]["user_standards_run"]
+    assert qc["n_detected"] <= qc["n_panel"] == 15
+    assert "does not drive the calibration" in qc["note"]
+    assert sum(m["confidence_counts"].values()) == m["n_features"]
 
 
-def test_fit_warp_rejects_degenerate_anchors():
-    # all-tied RT -> collapses below hard minimum -> CalibrationError
-    rt = np.array([3.0, 3.0, 3.0])
-    irt = np.array([10.0, 20.0, 30.0])
-    with pytest.raises(CalibrationError):
-        fit_warp(rt, irt, CalibrationConfig())
+def test_model_records_the_gate_decision(proj_result):
+    a = proj_result.model["anchors"]
+    assert a["engaged"] == proj_result.anchors_used
+    assert a["gate_reason"]
+    if a["engaged"]:
+        assert a["gate_mse_reduction"] >= a["gate_threshold"]
 
 
-def test_fit_warp_rejects_nonincreasing_irt():
-    rt = np.array([1.0, 2.0, 3.0, 4.0])
-    irt = np.array([0.0, 50.0, 40.0, 100.0])   # not strictly increasing
-    with pytest.raises(CalibrationError):
-        fit_warp(rt, irt, CalibrationConfig())
+def test_companion_frames_have_their_spec_columns(proj_result):
+    assert list(proj_result.pairs.columns) == ["mz_src", "rt_src", "rt_ref",
+                                               "source", "kept"]
+    assert set(proj_result.pairs["source"]) <= {"standards", "sample"}
+    assert set(proj_result.landmarks.columns) >= {"name", "class", "mz",
+                                                  "rt_ref_run_min", "iRT"}
+    assert set(proj_result.anchors.columns) >= {
+        "label", "lipid_class", "rt_src", "rt_ref", "residual_min",
+        "n_isomer_candidates", "isomer_rts", "pick_refined",
+        "dropped_by_sanity_filter"}
+
+
+# ------------------------------------------------------------ panel choices ---
+
+def test_panel_none_still_calibrates_and_falls_back_for_irt(
+        orbitrap_samples, orbitrap_standards):
+    res = calibrate(orbitrap_samples, "positive", standards_table=orbitrap_standards,
+                    panel="none", config=CalibrationConfig.orbitrap())
+    assert res.panel_key == "none"
+    # calibration itself is unaffected — stage 1 claims no identities
+    assert res.values("Cal_RT_min").notna().any()
+    # the ruler falls back to irt_landmark_panel, and says so
+    assert "fallback" in res.model["irt"]["panel_used"]
+    assert res.values("iRT").notna().any()
+    # detection QC is skipped, not faked
+    assert res.model["detection_qc"]["user_standards_run"]["n_panel"] == 0
+
+
+def test_panel_choice_moves_the_irt_scale(orbitrap_samples, orbitrap_standards):
+    cfg = CalibrationConfig.orbitrap()
+    a = calibrate(orbitrap_samples, "positive", standards_table=orbitrap_standards,
+                  panel="mix15", config=cfg)
+    b = calibrate(orbitrap_samples, "positive", standards_table=orbitrap_standards,
+                  panel="mix21", config=cfg)
+    assert a.irt.rt_span != b.irt.rt_span, (
+        "mix15 and mix21 have different landmark endpoints on the reference run, "
+        "so iRT is comparable within a panel choice only (spec §10.2)")
+
+
+def test_unknown_panel_raises_config_error(orbitrap_samples, orbitrap_standards):
+    with pytest.raises(ConfigError) as ei:
+        calibrate(orbitrap_samples, "positive", standards_table=orbitrap_standards,
+                  panel="mix99")
+    assert "mix99" in str(ei.value)
+
+
+# ------------------------------------------ stage 2 absent, on purpose --------
+
+def test_non_plasma_matrix_falls_back_to_stage_one_cleanly(non_plasma_table):
+    """The archaeal-lipid case: no anchors is a result, not an error (spec §2)."""
+    res = calibrate(non_plasma_table, "positive", standards_table=non_plasma_table,
+                    panel="mix21")
+    assert res.values("Cal_RT_min").notna().any()
+    assert not res.anchors_used
+    assert (res.table[res.col("warp_source")] == "curve").all()
+    assert res.model["anchors"]["engaged"] is False
+    assert res.model["anchors"]["gate_reason"]
+    assert any("stage 2" in line for line in res.log)
+
+
+def test_use_sample_anchors_false_skips_stage_two(orbitrap_samples, orbitrap_standards):
+    cfg = CalibrationConfig.orbitrap(use_sample_anchors=False)
+    res = calibrate(orbitrap_samples, "positive", standards_table=orbitrap_standards,
+                    panel="mix15", config=cfg)
+    assert not res.anchors_used
+    assert res.model["anchors"]["gate_reason"] == "anchors disabled"
+
+
+def test_use_sample_pairs_false_shrinks_the_curve_evidence(
+        orbitrap_samples, orbitrap_standards):
+    cfg = CalibrationConfig.orbitrap(use_sample_pairs=False)
+    res = calibrate(orbitrap_samples, "positive", standards_table=orbitrap_standards,
+                    panel="mix15", config=cfg)
+    assert res.model["curve"]["n_pairs_sample"] == 0
+    assert res.model["curve"]["n_pairs_standards"] == res.model["curve"]["n_pairs"]
 
 
 # ----------------------------------------------------------- config presets ---
 
 def test_config_presets_differ():
-    q = CalibrationConfig.qtof()
-    o = CalibrationConfig.orbitrap()
-    assert q.mz_tol_ppm == 15.0
-    assert o.mz_tol_ppm == 8.0
-    assert q.rt_window_min == 0.5
-    assert o.rt_window_min == 0.3
+    q, o = CalibrationConfig.qtof(), CalibrationConfig.orbitrap()
+    assert q.mz_tol_ppm == 15.0 and o.mz_tol_ppm == 8.0
+    assert q.rt_window_min == 0.5 and o.rt_window_min == 0.3
+    # the anonymous window is a method constant, not an instrument setting
+    assert q.match_mz_tol_da == o.match_mz_tol_da == 0.008
+
+
+def test_config_defaults_are_the_validated_ones():
+    c = CalibrationConfig()
+    assert c.curve_frac == 0.1 and c.curve_iter == 3 and c.curve_mad_k == 3.0
+    assert c.anchor_gate_min_mse_reduction == 0.2 and c.min_anchors == 3
+    assert c.extrapolate is True and c.extrapolate_mode == "linear"
+    assert c.irt_landmark_panel == "mix21"
 
 
 def test_config_from_dict_rejects_unknown_key():
-    with pytest.raises(Exception) as ei:
+    with pytest.raises(ConfigError) as ei:
         CalibrationConfig.from_dict({"mz_tol_ppm": 5.0, "bogus_key": 1})
     assert "bogus_key" in str(ei.value)
 
 
+@pytest.mark.parametrize("removed", sorted(REMOVED_FIELDS))
+def test_config_from_dict_names_the_v2_replacement(removed):
+    with pytest.raises(ConfigError) as ei:
+        CalibrationConfig.from_dict({removed: 1.0})
+    msg = str(ei.value)
+    assert removed in msg and len(msg) > len(removed) + 40, (
+        "a removed key must be refused with the sentence saying what replaced it")
+
+
+def test_config_roundtrips_through_dict():
+    c = CalibrationConfig.orbitrap(curve_frac=0.2, use_sample_anchors=False)
+    back = CalibrationConfig.from_dict(c.to_dict())
+    assert back == c
+
+
 def test_config_overrides_propagate_into_model(orbitrap_samples, orbitrap_standards):
-    cfg = CalibrationConfig.orbitrap(mz_tol_ppm=6.0, extrapolate=True)
-    res = calibrate(orbitrap_samples, "positive",
-                    standards_table=orbitrap_standards, config=cfg)
+    cfg = CalibrationConfig.orbitrap(mz_tol_ppm=6.0, curve_frac=0.2)
+    res = calibrate(orbitrap_samples, "positive", standards_table=orbitrap_standards,
+                    panel="mix15", config=cfg)
     assert res.model["config"]["mz_tol_ppm"] == 6.0
-    assert res.model["config"]["extrapolate"] is True
+    assert res.model["config"]["curve_frac"] == 0.2

@@ -26,6 +26,23 @@ ACCENT = "#C08552"     # muted clay/ochre — CVD-safe partner to blue
 ACCENT_DK = "#8A5223"
 PRIMARY = "#2B5D7D"    # deep slate blue (single-series highlight)
 PRIMARY_DK = "#1B4A6B"
+PRIMARY_LT = "#7FB2C4" # pale slate blue (the secondary of a two-series pair)
+
+# The cross-column diagnostic needs four things distinguishable at once — the
+# anchor-free fit, the anchor-refined fit, the matched pairs and the stage-2
+# anchors themselves. Blue and clay carry the first three; the anchors get a
+# muted brick that reads as "look here" without shouting, and stays separable
+# from both under deuteranopia (it is the only hue with no blue channel to
+# speak of).
+RING = "#A63D40"       # stage-2 anchor rings
+REJECT = "#C3C7C9"     # MAD-trimmed pairs — present, but visibly not evidence
+
+#: Lipid classes -> colour, for the stage-2 anchor panels. Ordered so the
+#: neighbouring classes in RT (LPC -> PC -> SM -> CE/TG) do not collide.
+CLASS_COLORS = {
+    "LPC": "#1B4A6B", "PC": "#2B5D7D", "SM": "#4E8FA6", "DG": "#7FB2C4",
+    "CE": "#C08552", "TG": "#8A5223", "PE": "#A63D40",
+}
 
 # sequential blue ramp (dark -> light); sample traces sample this
 _BLUE_RAMP = ["#132C39", "#1B4A6B", "#2B5D7D", "#3D7CA8", "#4E8FA6", "#7FB2C4", "#A9CDD8"]
@@ -62,6 +79,40 @@ def darker(hex_color: str, f: float = 0.6) -> str:
     h = hex_color.lstrip("#")
     r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
     return f"#{int(r*f):02X}{int(g*f):02X}{int(b*f):02X}"
+
+
+def rgba(hex_color: str, a: float) -> str:
+    """``#RRGGBB`` -> ``rgba(r,g,b,a)`` (Plotly wants the latter for fills)."""
+    h = hex_color.lstrip("#")
+    r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
+    return f"rgba({r},{g},{b},{a})"
+
+
+# Glyphs the PDF font stack (Helvetica/Arial) does not carry. The HTML report
+# renders them fine, so the substitution happens at the matplotlib call sites
+# rather than in the strings themselves.
+_MPL_GLYPH_SUBS = {
+    "\u2192": "->", "\u2190": "<-", "\u2264": "<=", "\u2265": ">=",
+    "\u2013": "-", "\u2014": " - ",      # en / em dash
+    # the two-char forms first — dict order is substitution order, so "lam_g"
+    # wins over a bare "lam" + "g"
+    "\u03bbg": "lam_g", "\u03bbc": "lam_c",
+    "\u03bb": "lam", "\u03c3": "sigma",  # lambda / sigma
+    "\u00b1": "+/-",
+}
+
+
+def mpl_safe(text: str) -> str:
+    """Text with PDF-unsafe glyphs swapped for ASCII equivalents."""
+    out = str(text)
+    for bad, good in _MPL_GLYPH_SUBS.items():
+        out = out.replace(bad, good)
+    return out
+
+
+def class_color(name: str) -> str:
+    """Colour for a lipid class, falling back to the neutral for unknown ones."""
+    return CLASS_COLORS.get(str(name).strip().upper(), NEUTRAL)
 
 
 # ---- matplotlib ----

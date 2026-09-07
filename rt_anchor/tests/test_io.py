@@ -12,6 +12,7 @@ import pytest
 from rt_anchor import calibrate, describe_input, load_feature_table, which_format
 from rt_anchor.errors import ColumnResolutionError, InputFormatError, RTUnitError
 from rt_anchor.io import detect_format
+from rt_anchor.io.schema import RESULT_COLUMNS
 
 
 # --------------------------------------------------------- format detection ---
@@ -162,7 +163,7 @@ def test_describe_input_masscube(orbitrap_samples):
 def test_calibrate_only_appends_columns(qtof_full_samples, qtof_full_standards):
     orig = pd.read_csv(qtof_full_samples, sep="\t", low_memory=False)
     res = calibrate(qtof_full_samples, "positive",
-                    standards_table=qtof_full_standards)
+                    standards_table=qtof_full_standards, panel="mix15")
     out = res.table
     # every original column present with identical values, same order preserved
     assert list(out.columns[:len(orig.columns)]) == list(orig.columns)
@@ -172,19 +173,18 @@ def test_calibrate_only_appends_columns(qtof_full_samples, qtof_full_standards):
             out[c].reset_index(drop=True), orig[c].reset_index(drop=True),
             check_names=False)
     appended = [c for c in out.columns if c not in orig.columns]
-    assert set(appended) == {"RI", "RI_uncertainty", "RI_reliability", "RI_spread",
-                             "n_contributing", "is_extrapolated",
-                             "calibration_scope", "warp_source"}
+    assert set(appended) == set(RESULT_COLUMNS)
 
 
-def test_collision_rename_preserves_existing_RI(make_masscube):
-    # input already carries an 'RI' column -> package must keep it and append
-    # its own result under 'rtanchor_RI'.
-    p = make_masscube(extra_cols={"RI": 42})
-    res = calibrate(p, "positive", standards_table=p)
+def test_collision_rename_preserves_existing_column(make_masscube):
+    # input already carries an 'iRT' column -> the package must keep it and
+    # append its own result under 'rtanchor_iRT'.
+    p = make_masscube(extra_cols={"iRT": 42})
+    res = calibrate(p, "positive", standards_table=p, panel="mix15")
     out = res.table
-    assert "RI" in out.columns and "rtanchor_RI" in out.columns
-    # original RI values untouched
-    assert set(pd.to_numeric(out["RI"]).unique()) == {42}
+    assert "iRT" in out.columns and "rtanchor_iRT" in out.columns
+    assert res.col("iRT") == "rtanchor_iRT"
+    # original values untouched
+    assert set(pd.to_numeric(out["iRT"]).unique()) == {42}
     # the computed iRT lives under the renamed column and differs from 42
-    assert not np.allclose(pd.to_numeric(out["rtanchor_RI"]).dropna().to_numpy(), 42)
+    assert not np.allclose(pd.to_numeric(out["rtanchor_iRT"]).dropna().to_numpy(), 42)

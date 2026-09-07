@@ -1,20 +1,22 @@
 /* RT Anchor desktop — front-end logic (pywebview bridge + browser preview) */
 "use strict";
 
+const REF_PLACEHOLDER = "bundled Column 25";
+
 const state = {
-  params: { samples: "", standards: "", single_files: "", polarity: "positive", mixture: "mix21" },
+  params: { samples: "", standards: "", polarity: "positive", mixture: "mix21",
+            reference_sample: "", reference_standards: "" },
   bundle: null,
   section: "overview",
 };
 
 const SECTIONS = [
   { id: "overview", label: "Overview", idx: "01", title: "Overview" },
-  { id: "detection", label: "Detection", idx: "02", title: "Standard detection" },
+  { id: "detection", label: "Detection", idx: "02", title: "Standard detection (QC)" },
   { id: "profile", label: "Profile", idx: "03", title: "Feature-intensity profile" },
-  { id: "warp", label: "Warp", idx: "04", title: "Calibration warp" },
-  { id: "repeatability", label: "Repeatability", idx: "05", title: "Injection repeatability" },
-  { id: "table", label: "Table", idx: "06", title: "Calibrated table" },
-  { id: "export", label: "Export", idx: "07", title: "Export" },
+  { id: "curve", label: "Curve", idx: "04", title: "Cross-column calibration curve" },
+  { id: "table", label: "Table", idx: "05", title: "Calibrated table" },
+  { id: "export", label: "Export", idx: "06", title: "Export" },
 ];
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -30,29 +32,44 @@ const PREVIEW_API = {
   pick_folder: async () => "/preview/single_files",
   load_example: async () => ({ ok: true, samples: "/preview/example/samples.txt",
     standards: "/preview/example/standards.txt", polarity: "positive", mixture: "mix15" }),
+  reference_info: async () => ({ ok: true, default_key: "col35", placeholder: REF_PLACEHOLDER,
+    references: [{ key: "col35", label: "Column 25",
+      sub: "Human serum + Mix 4.4 standards, QTOF positive",
+      sample: "reference_sample.csv", standards: "reference_standards.csv", available: true }] }),
+  reset_reference: async () => ({ ok: true, reference_sample: "", reference_standards: "",
+    placeholder: REF_PLACEHOLDER }),
   mixture_previews: async () => ({ ok: true, default: "mix21", mixtures: [
-    { key: "mix15", label: "Mix 15",
-      rows: [{ name: "PC 6:0_6:0", mz_pos: 454.2569, mz_neg: 498.2474, rt_ref_min: 1.06 },
-             { name: "PC 12:0_12:0", mz_pos: 622.4448, mz_neg: 666.4362, rt_ref_min: 3.6 },
-             { name: "PC 14:0_14:0", mz_pos: 678.5069, mz_neg: 722.4983, rt_ref_min: 5.63 },
-             { name: "PC 16:0_18:1", mz_pos: 760.5856, mz_neg: 804.5766, rt_ref_min: 8.4 },
-             { name: "DG 16:0_18:0", mz_pos: 614.5723, mz_neg: 641.5367, rt_ref_min: 12.65 },
-             { name: "CE 18:1", mz_pos: 668.6345, mz_neg: null, rt_ref_min: 18.39 }] },
-    { key: "mix21", label: "Mix 21",
-      rows: [{ name: "PC 6:0_6:0", mz_pos: 454.2561, mz_neg: 498.2474, rt_ref_min: 1.5 },
-             { name: "PC 8:0_8:0", mz_pos: 510.319, mz_neg: 554.31, rt_ref_min: 3.2 },
-             { name: "PC 12:0_12:0", mz_pos: 622.444, mz_neg: 666.4352, rt_ref_min: 6.8 },
-             { name: "PC 14:0_16:0", mz_pos: 706.5381, mz_neg: 750.5291, rt_ref_min: 11.1 },
-             { name: "PC 16:0_18:1", mz_pos: 760.5846, mz_neg: 804.576, rt_ref_min: 12.9 },
-             { name: "DG 18:0_18:0", mz_pos: 642.6031, mz_neg: 669.5675, rt_ref_min: 18.0 },
-             { name: "CE 20:5", mz_pos: 688.6027, mz_neg: null, rt_ref_min: 20.5 },
-             { name: "TG 18:0_18:2_18:0", mz_pos: 904.8328, mz_neg: null, rt_ref_min: 21.8 }] },
+    { key: "mix15", label: "15", sub: "Li lab 15 lipids mixture", n_standards: 15,
+      rows: [{ name: "PC 6:0_6:0", class: "PC", mz_pos: 454.2569, mz_neg: 498.2474, rt_ref_min: 1.06 },
+             { name: "PC 12:0_12:0", class: "PC", mz_pos: 622.4448, mz_neg: 666.4362, rt_ref_min: 3.6 },
+             { name: "PC 14:0_14:0", class: "PC", mz_pos: 678.5069, mz_neg: 722.4983, rt_ref_min: 5.63 },
+             { name: "PC 16:0_18:1", class: "PC", mz_pos: 760.5856, mz_neg: 804.5766, rt_ref_min: 8.4 },
+             { name: "DG 16:0_18:0", class: "DG", mz_pos: 614.5723, mz_neg: 641.5367, rt_ref_min: 12.65 },
+             { name: "CE 18:1", class: "CE", mz_pos: 668.6345, mz_neg: null, rt_ref_min: 18.39 }] },
+    { key: "mix21", label: "21", sub: "Li lab 21 lipids mixture", n_standards: 21,
+      rows: [{ name: "PC 6:0_6:0", class: "PC", mz_pos: 454.2561, mz_neg: 498.2474, rt_ref_min: 1.5 },
+             { name: "PC 8:0_8:0", class: "PC", mz_pos: 510.319, mz_neg: 554.31, rt_ref_min: 3.2 },
+             { name: "PC 12:0_12:0", class: "PC", mz_pos: 622.444, mz_neg: 666.4352, rt_ref_min: 6.8 },
+             { name: "PC 14:0_16:0", class: "PC", mz_pos: 706.5381, mz_neg: 750.5291, rt_ref_min: 11.1 },
+             { name: "PC 16:0_18:1", class: "PC", mz_pos: 760.5846, mz_neg: 804.576, rt_ref_min: 12.9 },
+             { name: "DG 18:0_18:0", class: "DG", mz_pos: 642.6031, mz_neg: 669.5675, rt_ref_min: 18.0 },
+             { name: "CE 20:5", class: "CE", mz_pos: 688.6027, mz_neg: null, rt_ref_min: 20.5 },
+             { name: "TG 18:0_18:2_18:0", class: "TG", mz_pos: 904.8328, mz_neg: null, rt_ref_min: 21.8 }] },
+    { key: "none", label: "Others", sub: "other mixtures", n_standards: 0, rows: [] },
   ] }),
   run_calibration: async () => window.__PREVIEW__ || { ok: false, error: "no preview data" },
   export_csv: async () => ({ ok: true, path: "(preview)/calibrated.csv" }),
   export_report: async () => ({ ok: true, paths: {} }),
   export_run_info: async () => ({ ok: true, path: "(preview)/run_info.json" }),
-  export_all: async () => ({ ok: true, dir: "(preview)/outputs", n_files: 7 }),
+  export_all: async () => ({ ok: true, dir: "(preview)/outputs", n_files: 9, report: true,
+    files: [{ kind: "calibrated_csv", label: "calibrated table", name: "rt_anchor_run_calibrated.csv" },
+            { kind: "model_json", label: "model.json", name: "rt_anchor_run_model.json" },
+            { kind: "anchors_csv", label: "stage-2 anchors", name: "rt_anchor_run_anchors.csv" },
+            { kind: "pairs_csv", label: "stage-1 matched pairs", name: "rt_anchor_run_pairs.csv" },
+            { kind: "landmarks_csv", label: "iRT landmarks", name: "rt_anchor_run_landmarks.csv" },
+            { kind: "log_txt", label: "run log", name: "rt_anchor_run_log.txt" },
+            { kind: "report_html", label: "HTML report", name: "rt_anchor_run_report.html" },
+            { kind: "run_info_json", label: "run info", name: "rt_anchor_run_run_info.json" }] }),
   open_github: async () => ({ ok: true }),
 };
 
@@ -67,13 +84,29 @@ function hideToast() { const t = $("#toast"); clearTimeout(toastT); t.className 
 /* ===================== INPUT VIEW ===================== */
 function shortPath(p) { return p ? p.split("/").slice(-2).join("/") : ""; }
 
-/* set a file/folder field + flip it to the "filled" (green) state */
+/* file/folder fields, and what their empty state says */
+const FILE_FIELDS = [
+  ["samples", "no file selected"],
+  ["standards", "no file selected"],
+  ["reference_sample", REF_PLACEHOLDER],
+  ["reference_standards", REF_PLACEHOLDER],
+];
+const PLACEHOLDER = Object.fromEntries(FILE_FIELDS);
+
+/* set a file/folder field + flip it to the "filled" state */
 function markField(target, path) {
   state.params[target] = path;
   const el = $("#path-" + target);
-  el.textContent = shortPath(path); el.title = path; el.classList.add("set");
+  if (el) { el.textContent = shortPath(path); el.title = path; el.classList.add("set"); }
   const field = document.querySelector(`.field[data-key="${target}"]`);
   if (field) field.classList.add("filled");
+}
+function clearField(target) {
+  state.params[target] = "";
+  const el = $("#path-" + target);
+  if (el) { el.textContent = PLACEHOLDER[target] || ""; el.title = ""; el.classList.remove("set"); }
+  const field = document.querySelector(`.field[data-key="${target}"]`);
+  if (field) field.classList.remove("filled");
 }
 
 $$(".btn-file").forEach(btn => btn.addEventListener("click", async () => {
@@ -81,7 +114,37 @@ $$(".btn-file").forEach(btn => btn.addEventListener("click", async () => {
   const path = kind === "folder" ? await api().pick_folder() : await api().pick_file();
   if (!path) return;
   markField(target, path);
+  if (target.startsWith("reference_")) refHint();
 }));
+
+/* the reference pair is both-or-neither — say so the moment one is set */
+function refHint() {
+  const s = !!state.params.reference_sample, t = !!state.params.reference_standards;
+  const el = $("#ref-hint");
+  if (!el) return;
+  el.classList.toggle("warn", s !== t);
+  if (s !== t) {
+    el.innerHTML = "<b>Both reference runs are needed.</b> A run calibrated against one lab's " +
+      "serum and another lab's standards produces plausible-looking nonsense, so a half-set " +
+      "reference is refused. Choose the other run, or reset to the bundled reference.";
+  } else if (s && t) {
+    el.innerHTML = "<b>Custom reference pair.</b> Results will be on <i>this</i> column's time " +
+      "axis and are not comparable with default-reference runs. Both runs must come from the " +
+      "same column and gradient.";
+  } else {
+    el.innerHTML = "Results are expressed on this column's time axis. Leave both on the bundled " +
+      "Column 25 unless you want everything on a different column — substituting your own " +
+      "pair moves the axis, so those numbers are no longer comparable with default-reference " +
+      "runs. Both runs must be supplied together.";
+  }
+}
+const refResetBtn = $("#ref-reset");
+if (refResetBtn) refResetBtn.addEventListener("click", async () => {
+  try { await api().reset_reference(); } catch (e) { /* local reset is the real one */ }
+  clearField("reference_sample"); clearField("reference_standards");
+  refHint();
+  toast("Reference reset to the bundled Column 25");
+});
 
 $$(".seg").forEach(seg => seg.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
@@ -103,16 +166,17 @@ if (loadExBtn) loadExBtn.addEventListener("click", async () => {
   setStatus("Example dataset loaded — press Run calibration.", "ok");
 });
 
-/* ---- standard-mixture cards + preview (either/or choice) ---- */
+/* ---- standards-panel cards + preview (either/or choice) ---- */
 let MIXTURES = [];                       // payload of api().mixture_previews()
-let MIX_DEFAULT = "mix21";               // backend's pre-selected mixture
+let MIX_DEFAULT = "mix21";               // backend's pre-selected panel
 function renderMixCards() {
   const wrap = $("#mix-cards"); wrap.innerHTML = "";
   MIXTURES.forEach(m => {
     const b = document.createElement("button");
     b.type = "button"; b.className = "mix-card"; b.dataset.key = m.key;
     if (state.params.mixture === m.key) b.classList.add("active");
-    b.textContent = m.label;
+    b.innerHTML = `<span class="mc-l">${esc(m.label)}</span>` +
+      `<span class="mc-s">${esc(m.sub || "")}</span>`;
     b.addEventListener("click", () => selectMixture(m.key));
     wrap.appendChild(b);
   });
@@ -121,6 +185,12 @@ function renderMixPreview() {
   const tbl = $("#mix-table");
   const m = MIXTURES.find(x => x.key === state.params.mixture);
   if (!m) { tbl.innerHTML = ""; return; }
+  if (!m.rows || !m.rows.length) {
+    tbl.innerHTML = `<tbody><tr><td class="mix-empty">` +
+      `No panel identity is claimed for your mixture. The calibration is unaffected` +
+      `</td></tr></tbody>`;
+    return;
+  }
   const thead = "<thead><tr><th>#</th><th>Standard</th><th>m/z (+)</th><th>m/z (−)</th><th>Ref RT <span class='unit'>min</span></th></tr></thead>";
   const rows = m.rows.map((r, i) => "<tr>" +
     `<td class="num">${i + 1}</td>` +
@@ -158,6 +228,21 @@ async function initMixtures() {
   renderMixCards(); renderMixPreview();
   initMixTableScroll();
 }
+async function initReference() {
+  try {
+    const r = await api().reference_info();
+    if (r && r.references && r.references.length) {
+      const d = r.references.find(x => x.key === r.default_key) || r.references[0];
+      const label = d.label ? `bundled — ${d.label}` : (r.placeholder || REF_PLACEHOLDER);
+      ["reference_sample", "reference_standards"].forEach(k => {
+        PLACEHOLDER[k] = label;
+        const el = $("#path-" + k);
+        if (el && !state.params[k]) el.textContent = label;
+      });
+    }
+  } catch (e) { /* the pickers keep their static placeholder */ }
+  refHint();
+}
 
 /* Advanced section collapse/expand */
 const advToggle = $("#adv-toggle");
@@ -166,32 +251,50 @@ if (advToggle) advToggle.addEventListener("click", () => {
   advToggle.setAttribute("aria-expanded", open ? "true" : "false");
 });
 
-/* pull the Advanced matching parameters into params (blank -> package default) */
+/* pull the Advanced parameters into params (blank -> package default) */
 function collectAdvanced() {
   const v = id => { const el = $(id); return el ? el.value.trim() : ""; };
+  const chk = (id, dflt) => { const el = $(id); return el ? el.checked : dflt; };
+  state.params.match_mz_tol_ppm = v("#adv-mzppm");
   state.params.mz_tol_ppm = v("#adv-mz");
+  state.params.curve_frac = v("#adv-curvefrac");
   state.params.rt_window_min = v("#adv-rtw");
   state.params.min_anchors = v("#adv-minanchors");
-  const ex = $("#adv-extrapolate");
-  state.params.extrapolate = ex ? ex.checked : false;
+  state.params.use_sample_pairs = chk("#adv-samplepairs", true);
+  state.params.use_sample_anchors = chk("#adv-sampleanchors", true);
+  state.params.extrapolate = chk("#adv-extrapolate", true);
+  const em = $("#adv-extramode");
+  state.params.extrapolate_mode = em ? em.value : "linear";
 }
 
 $("#run").addEventListener("click", run);
 async function run() {
   if (!state.params.samples) { setStatus("Choose a sample feature table first.", "err"); return; }
   if (!state.params.standards) { setStatus("Choose a standards mixture table — it is required.", "err"); return; }
+  const s = !!state.params.reference_sample, t = !!state.params.reference_standards;
+  if (s !== t) {
+    $("#adv").classList.add("open");
+    $("#adv-toggle").setAttribute("aria-expanded", "true");
+    refHint();
+    setStatus("A custom reference needs both runs — see Advanced.", "err");
+    return;
+  }
   collectAdvanced();
   const btn = $("#run"); btn.disabled = true;
   showProgress(true);
-  setStatus("Calibrating — identifying anchors, fitting the warp…", "busy");
+  /* warm Plotly while the engine calibrates, so it is ready the moment
+     the results need it */
+  window._ensurePlotly().catch(() => {});
+  setStatus("Calibrating — matching features, fitting the cross-column curve…", "busy");
   let res;
   try { res = await api().run_calibration(state.params); }
   catch (e) { res = { ok: false, error: String(e) }; }
-  btn.disabled = false; showProgress(false);
-  if (!res || !res.ok) { setStatus("", ""); showError((res && res.error) || "Calibration failed."); return; }
-  setStatus("");
-  state.bundle = res;
-  buildNav(); openOutput(); selectSection("overview");
+  if (!res || !res.ok) {
+    btn.disabled = false; showProgress(false);
+    setStatus("", ""); showError((res && res.error) || "Calibration failed."); return;
+  }
+  /* Async: the backend returned {"ok": true, "status": "running"}.
+     The UI stays responsive — __onCalibrationDone() will fire when ready. */
 }
 function setStatus(msg, cls) { const s = $("#status"); s.textContent = msg; s.className = "status" + (cls ? " " + cls : ""); }
 function showProgress(on) { $("#progress").classList.toggle("hidden", !on); }
@@ -211,18 +314,40 @@ $("#modal-ok").addEventListener("click", hideModal);
 $("#modal-backdrop").addEventListener("click", hideModal);
 document.addEventListener("keydown", e => { if (e.key === "Escape") hideModal(); });
 
-/* turn a raw backend error into a plain-language title + hint (+ technical detail) */
+/* Turn a raw backend error into a plain-language title + hint.
+   Ordered most-specific first; these are the v2 failure modes, in roughly the
+   order they actually happen to people. */
 const ERROR_HINTS = [
-  [/AnchorIdentificationError/i, "No standards were detected",
-    "None of the panel standards were found. Check that the polarity matches how the data were acquired, that the standards run really contains the panel, and try widening the m/z tolerance or RT window under Advanced."],
-  [/PanelError/i, "Panel / polarity problem",
-    "The standard panel couldn't be built for this polarity. Use “positive” or “negative” to match the acquisition mode."],
-  [/CalibrationError/i, "The warp couldn't be fitted",
-    "There were too few or non-monotonic anchors to fit a calibration curve. Check the standards run and the matching tolerances."],
+  [/must be given together|reference_sample|reference_standards/i, "Reference pair incomplete",
+    "A custom reference needs BOTH runs — the reference sample and the reference standards, from " +
+    "the same column and gradient. Set the other one under Advanced, or use “Reset to bundled " +
+    "reference” to go back to the Column 25 reference."],
+  [/share (fewer|less) than|<\s*5 matched pairs|too few matched pairs between/i,
+    "Your standards run and the reference barely match",
+    "Almost always one of two things: the polarity is wrong (a negative-mode run matched against " +
+    "a positive-mode reference shares almost no m/z), or the wrong file was chosen for the " +
+    "standards run. Check Polarity, then check that the standards file really is the standards " +
+    "mixture run."],
+  [/CalibrationError/i, "Not enough matched pairs to fit the curve",
+    "The curve is built from features matched by m/z between your runs and the reference runs. " +
+    "Too few survived. Check that the polarity matches how the data were acquired, that the " +
+    "sample and standards runs come from the SAME column and gradient, and that the m/z values " +
+    "are on the same scale (Da, not ppm-shifted). Widening the feature-match window under " +
+    "Advanced is the last resort, not the first."],
+  [/PanelError/i, "Panel or reference-data problem",
+    "The chosen panel could not be built for this polarity, or the bundled reference dataset is " +
+    "missing from this build. Use “positive” or “negative” to match the acquisition mode; if the " +
+    "message mentions reference_data, the app bundle is incomplete."],
   [/ColumnResolutionError|InputFormatError/i, "Unrecognised input table",
-    "The file format, or its m/z / retention-time columns, couldn't be read. Confirm it's an MS-DIAL, MZmine, MassCube or LipidScreener export."],
+    "The file format, or its m/z / retention-time columns, couldn't be read. Confirm it's an " +
+    "MS-DIAL, MZmine, MassCube or LipidScreener export — and that you picked the feature table, " +
+    "not a summary or a peak list."],
   [/RTUnitError/i, "Retention-time unit problem",
-    "The retention-time unit couldn't be inferred from the table."],
+    "The retention-time unit couldn't be inferred from the table. Retention times in seconds and " +
+    "in minutes look identical to a parser; set the unit explicitly if your export is unusual."],
+  [/A standards run is required/i, "Standards run missing",
+    "The cross-column method needs two runs from your column: the sample and a standards run. If " +
+    "the standards are spiked into the sample itself, choose that same file for both."],
   [/ConfigError/i, "Missing or invalid input", null],
 ];
 function showError(raw) {
@@ -238,57 +363,96 @@ function showError(raw) {
 function openOutput() { $("#view-input").classList.add("hidden"); $("#view-output").classList.remove("hidden"); }
 function openInput() { $("#view-output").classList.add("hidden"); $("#view-input").classList.remove("hidden"); }
 /* + New calibration — reset to a completely fresh input screen */
-const FILE_FIELDS = [
-  ["samples", "no file selected"],
-  ["standards", "no file selected"],
-  ["single_files", "no folder selected"],
-];
 function resetInput() {
-  state.params = { samples: "", standards: "", single_files: "", polarity: "positive", mixture: MIX_DEFAULT };
+  state.params = { samples: "", standards: "", polarity: "positive",
+                   mixture: MIX_DEFAULT, reference_sample: "", reference_standards: "" };
   if (MIXTURES.length) selectMixture(MIX_DEFAULT);
   state.bundle = null;
-  FILE_FIELDS.forEach(([key, placeholder]) => {
-    const el = $("#path-" + key);
-    if (el) { el.textContent = placeholder; el.title = ""; el.classList.remove("set"); }
-    const field = document.querySelector(`.field[data-key="${key}"]`);
-    if (field) field.classList.remove("filled");
-  });
+  Object.keys(_secCache).forEach(k => delete _secCache[k]);
+  $("#main-body").innerHTML = "";
+  FILE_FIELDS.forEach(([key]) => clearField(key));
   const seg = $('[data-seg="polarity"]');
   if (seg) $$("button", seg).forEach(b => b.classList.toggle("active", b.dataset.val === "positive"));
   $$("#adv-body input").forEach(inp => {                 // restore HTML defaults
     if (inp.type === "checkbox") inp.checked = inp.defaultChecked;
     else inp.value = inp.defaultValue;
   });
+  $$("#adv-body select").forEach(sel => {
+    Array.from(sel.options).forEach(o => { o.selected = o.defaultSelected; });
+  });
   const adv = $("#adv");
   adv.classList.remove("open");
   $("#adv-toggle").setAttribute("aria-expanded", "false");
+  refHint();
   setStatus("", ""); showProgress(false);
 }
 $("#new-run").addEventListener("click", () => { resetInput(); openInput(); });
 const ghBtn = $("#sb-github");
 if (ghBtn) ghBtn.addEventListener("click", () => { if (api().open_github) api().open_github(); });
 
+/* which sections have something to show for this run */
+function sectionEnabled(id) {
+  const m = state.bundle.meta || {};
+  if (id === "curve") return !!m.has_curve;
+  return true;
+}
 function buildNav() {
   const nav = $("#nav"); nav.innerHTML = "";
-  const hasRep = state.bundle.meta.has_repeatability;
-  const hasWarp = state.bundle.warp && !state.bundle.warp.empty;
   SECTIONS.forEach(s => {
     const b = document.createElement("button");
     b.className = "nav-item"; b.dataset.id = s.id;
     b.innerHTML = `<span class="idx">${s.idx}</span>${s.label}`;
-    const off = (s.id === "repeatability" && !hasRep) || (s.id === "warp" && !hasWarp);
-    if (off) b.disabled = true;
-    else b.addEventListener("click", () => selectSection(s.id));
+    if (!sectionEnabled(s.id)) {
+      b.disabled = true;
+      b.title = "Not available for this run";
+    } else {
+      b.addEventListener("click", () => selectSection(s.id));
+    }
     nav.appendChild(b);
   });
+  const eng = $("#sb-engine-d");
+  const m = state.bundle.meta || {};
+  if (eng && m.reference_label) {
+    eng.textContent = `RT Anchor · cross-column onto ${m.reference_label}`;
+  }
 }
+
+/* section DOM is rendered once and kept alive (plotly instances included) so
+   switching sections never rebuilds or re-parses anything */
+const _secCache = {};
 
 function selectSection(id) {
   state.section = id;
   const s = SECTIONS.find(x => x.id === id);
   $("#sec-title").textContent = s.title;
   $$(".nav-item").forEach(n => n.classList.toggle("active", n.dataset.id === id));
-  render(id);
+  CK.hideAll();
+  if (structPop) structPop.style.display = "none";
+  const body = $("#main-body");
+  if (!_secCache[id]) {
+    const node = document.createElement("div");
+    node.className = "section-body";
+    _secCache[id] = node;          /* cached before render: a render error must never
+                                      leave an uncached, unhidden section stacked */
+    body.appendChild(node);
+    try { renderSection(id, node); }
+    catch (e) {
+      node.innerHTML = `<div class="panel"><div class="panel-h">${esc(s.title)}</div>` +
+        `<div class="fig-note">This section could not be rendered: ${esc(String(e))}</div></div>`;
+    }
+  }
+  Object.keys(_secCache).forEach(k => _secCache[k].classList.toggle("offscreen", k !== id));
+  const activeNode = _secCache[id];
+  if (activeNode) {
+    void activeNode.offsetHeight;
+    if (window.Plotly) {
+      activeNode.querySelectorAll(".js-plotly-plot").forEach(el => {
+        try { Plotly.Plots.resize(el); } catch(_){}
+      });
+    }
+  }
+  const main = $(".main");
+  if (main) main.scrollTop = 0;
 }
 
 /* build a light card with a black header strip; returns the plot host div */
@@ -301,23 +465,34 @@ function panelInto(body, title) {
   return { panel, host };
 }
 
-function render(id) {
-  const body = $("#main-body");
-  $$(".js-plotly-plot", body).forEach(d => { try { Plotly.purge(d); } catch (e) {} });
-  CK.hideAll();
-  if (structPop) structPop.style.display = "none";
-  body.innerHTML = "";
+function renderSection(id, body) {
   if (id === "overview") return renderOverview(body);
   if (id === "table") return renderTable(body);
   if (id === "export") return renderExport(body);
+  if (id === "profile") {
+    const figs = state.bundle.figures || {};
+    if (figs.profile_before_after) {
+      const p1 = panelInto(body, "Before vs after calibration");
+      drawPlot(p1.host, figs.profile_before_after);
+    }
+    if (figs.profile_calibrated) {
+      const p2 = panelInto(body, "Calibrated profile — input vs reference");
+      drawPlot(p2.host, figs.profile_calibrated);
+    }
+    const note = state.bundle.notes && state.bundle.notes.profile;
+    if (note) {
+      const n = document.createElement("div"); n.className = "fig-note"; n.innerHTML = note;
+      body.appendChild(n);
+    }
+    return;
+  }
   const sec = SECTIONS.find(x => x.id === id);
   const { panel, host } = panelInto(body, sec ? sec.title : "");
-  if (id === "detection" || id === "profile") {
-    // reverted to the package's Plotly figures
-    drawPlot(host, state.bundle.figures[id]);
-    if (id === "detection") attachStructures(host);
+  if (id === "detection") {
+    // the package's own Plotly figure, so the app and the report agree
+    drawPlot(host, state.bundle.figures[id], attachStructures);
   } else {
-    CK.render(id, host, state.bundle);   // radar (via renderOverview) + warp + repeatability
+    CK.render(id, host, state.bundle);   // curve (SVG)
   }
   const note = state.bundle.notes && state.bundle.notes[id];
   if (note) {
@@ -331,29 +506,23 @@ function renderOverview(body) {
   const rowTiles = k.filter(t => t.rows && t.rows.length);
   const valTiles = k.filter(t => !(t.rows && t.rows.length));
 
-  /* shared-column table: one "sample" column + one "standards run" column */
+  /* metric rows: each value carries its own caption, because the v2 tiles pair
+     different things (two runs, two pair sources, a median and a P90) */
   if (rowTiles.length) {
     const rows = rowTiles.map(t => {
-      const kv = {};
-      t.rows.forEach(r => { kv[r.k] = r.v; });
-      const v = key => (kv[key] !== undefined && kv[key] !== null) ? esc(kv[key]) : "<span class=\"na\">—</span>";
       const sub = t.sub ? `<span class="kt-m-s">${esc(t.sub)}</span>` : "";
-      return `<tr><th class="kt-m"><span class="kt-m-l">${esc(t.label)}</span>${sub}</th>` +
-             `<td class="kt-v">${v("samples")}</td>` +
-             `<td class="kt-v">${v("standards run")}</td></tr>`;
+      const cells = t.rows.map(r =>
+        `<td class="kt-v"><span class="kt-c">${esc(r.k)}</span>${esc(r.v)}</td>`).join("");
+      return `<tr><th class="kt-m"><span class="kt-m-l">${esc(t.label)}</span>${sub}</th>${cells}</tr>`;
     }).join("");
     const tbl = document.createElement("div"); tbl.className = "kpi-table";
-    tbl.innerHTML =
-      `<table class="kpi-metrics">
-         <thead><tr><th class="kt-m">Metric</th><th class="kt-v">Sample</th><th class="kt-v">Standards run</th></tr></thead>
-         <tbody>${rows}</tbody>
-       </table>`;
+    tbl.innerHTML = `<table class="kpi-metrics"><tbody>${rows}</tbody></table>`;
     body.appendChild(tbl);
   }
 
   /* single-value metrics stay as bold tiles */
   if (valTiles.length) {
-    const grid = document.createElement("div"); grid.className = "kpis";
+    const grid = document.createElement("div"); grid.className = "kpis kpis-" + valTiles.length;
     grid.innerHTML = valTiles.map(t =>
       `<div class="kpi"><div class="kpi-l">${esc(t.label)}</div><div class="kpi-v">${esc(t.value)}</div>` +
       (t.sub ? `<div class="kpi-s">${esc(t.sub)}</div>` : "") + `</div>`
@@ -369,26 +538,33 @@ function renderExport(body) {
   body.innerHTML =
     `<div class="export-all">
        <button class="btn-exp big" id="exp-all"><div class="t">Export all outputs →</div>
-         <div class="d">Writes everything into one folder: calibrated CSV · model.json · anchors.csv · log.txt · interactive HTML report · run_info.json</div></button>
+         <div class="d">Writes everything into one folder: calibrated CSV · model.json ·
+           supporting evidence files · log.txt · interactive HTML report ·
+           run_info.json</div></button>
      </div>
      <div class="export-row">
        <button class="btn-exp" id="exp-csv"><div class="t">Calibrated table</div>
-         <div class="d">CSV — original columns + RI, RI_uncertainty, RI_reliability, RI_spread, flags</div></button>
+         <div class="d">CSV — your original columns plus Cal_RT_min, iRT, their uncertainties,
+           iRT_reliability and the extrapolation flag</div></button>
        <button class="btn-exp" id="exp-report"><div class="t">Report</div>
-         <div class="d">Interactive HTML — hover, zoom, pan (detection, warp, repeatability)</div></button>
+         <div class="d">Interactive HTML — detection QC and the cross-column curve</div></button>
        <button class="btn-exp" id="exp-info"><div class="t">Run info</div>
-         <div class="d">JSON — parameters, run time, versions, and a result summary</div></button>
-     </div>`;
-  const doExport = async (busyMsg, call, okMsg) => {
+         <div class="d">JSON — parameters, reference pair, run time, versions and a result
+           summary</div></button>
+     </div>
+     <div id="exp-manifest"></div>`;
+  const doExport = async (busyMsg, call, okMsg, after) => {
     if (busyMsg) toast(busyMsg);
     let r;
     try { r = await call(); } catch (e) { r = { ok: false, error: String(e) }; }
     if (r && !r.ok && r.error === "cancelled") { hideToast(); return; }   // user dismissed the dialog
     if (!r || !r.ok) { hideToast(); showError((r && r.error) || "Export failed."); return; }
     toast(okMsg(r));
+    if (after) after(r);
   };
   $("#exp-all").addEventListener("click", () => doExport("Writing all outputs…",
-    () => api().export_all(), r => `Wrote ${r.n_files} files to ${shortPath(r.dir)}`));
+    () => api().export_all(), r => `Wrote ${r.n_files} files to ${shortPath(r.dir)}`,
+    r => renderManifest(r)));
   $("#exp-csv").addEventListener("click", () => doExport(null,
     () => api().export_csv(), r => "Saved: " + shortPath(r.path)));
   $("#exp-report").addEventListener("click", () => doExport("Writing report…",
@@ -397,41 +573,93 @@ function renderExport(body) {
     () => api().export_run_info(), r => "Saved: " + shortPath(r.path)));
 }
 
+/* list exactly what "Export all" wrote, so the two new v2 files are named */
+function renderManifest(r) {
+  const host = $("#exp-manifest"); if (!host) return;
+  const files = r.files || [];
+  if (!files.length) { host.innerHTML = ""; return; }
+  const rows = files.map(f =>
+    `<tr><td>${esc(f.label)}</td><td class="mono">${esc(f.name)}</td></tr>`).join("");
+  const warn = r.report === false
+    ? `<div class="fig-note">The report could not be rendered for this run; the data files above
+        are unaffected — see the run log for the reason.</div>` : "";
+  host.innerHTML = `<div class="panel exp-manifest"><div class="panel-h">Written to ${esc(shortPath(r.dir))}</div>` +
+    `<div class="table-wrap"><table class="data-table"><thead><tr><th>Output</th><th>File</th></tr></thead>` +
+    `<tbody>${rows}</tbody></table></div>${warn}</div>`;
+}
+
 /* ---- calibrated-table preview ---- */
 const esc = s => String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
-const NUMERIC_COLS = new Set(["RT", "m/z", "RI", "RI_uncertainty", "RI_spread"]);
+const NUMERIC_COLS = new Set(["RT", "m/z", "Cal_RT (min)", "Cal_RT ± (min)", "iRT", "iRT ±", "iRT spread"]);
+const TABLE_PAGE_SIZE = 100;
+let _tablePage = 0;
 function renderTable(body) {
   const t = state.bundle.table;
   if (!t || !t.columns || !t.rows.length) {
     body.innerHTML = `<div class="panel"><div class="panel-h">No table available</div></div>`; return;
   }
-  const panel = document.createElement("div"); panel.className = "panel";
-  const h = document.createElement("div"); h.className = "panel-h";
-  h.textContent = `Calibrated table · first ${t.n_shown} of ${Number(t.n_total).toLocaleString()} rows`;
-  panel.appendChild(h);
-  const head = "<thead><tr>" + t.columns.map(c => `<th>${esc(c)}</th>`).join("") + "</tr></thead>";
-  const bodyRows = t.rows.map(r => "<tr>" + r.map((v, i) => {
-    const col = t.columns[i];
-    if (v === null || v === undefined) return `<td class="num"><span class="na">—</span></td>`;
-    if (col === "RI_reliability") return `<td><span class="rel rel-${esc(v)}">${esc(v)}</span></td>`;
-    const cls = NUMERIC_COLS.has(col) ? "num" : "";
-    return `<td class="${cls}">${esc(v)}</td>`;
-  }).join("") + "</tr>").join("");
-  const wrap = document.createElement("div"); wrap.className = "table-wrap";
-  wrap.innerHTML = `<table class="data-table">${head}<tbody>${bodyRows}</tbody></table>`;
-  panel.appendChild(wrap);
-  const note = document.createElement("div"); note.className = "fig-note";
-  note.innerHTML = "Preview of the calibrated feature table — <b>RT</b> and <b>m/z</b> beside the appended " +
-    "<b>RI</b> columns. The full table (all rows and every original column) is available under <b>Export</b>.";
-  panel.appendChild(note);
-  body.appendChild(panel);
+  const totalPages = Math.ceil(t.rows.length / TABLE_PAGE_SIZE);
+  _tablePage = 0;
+
+  function drawPage(page) {
+    body.innerHTML = "";
+    _tablePage = page;
+    const start = page * TABLE_PAGE_SIZE;
+    const end = Math.min(start + TABLE_PAGE_SIZE, t.rows.length);
+    const pageRows = t.rows.slice(start, end);
+
+    const panel = document.createElement("div"); panel.className = "panel";
+    const h = document.createElement("div"); h.className = "panel-h";
+    h.textContent = `Calibrated table · rows ${start + 1}–${end} of ${Number(t.n_total).toLocaleString()}`;
+    panel.appendChild(h);
+
+    const head = "<thead><tr>" + t.columns.map(c => `<th>${esc(c)}</th>`).join("") + "</tr></thead>";
+    const bodyHtml = pageRows.map(r => "<tr>" + r.map((v, i) => {
+      const col = t.columns[i];
+      if (v === null || v === undefined) return `<td class="num"><span class="na">—</span></td>`;
+      if (col === "reliability") return `<td><span class="rel rel-${esc(v)}">${esc(v)}</span></td>`;
+      const cls = NUMERIC_COLS.has(col) ? "num" : "";
+      return `<td class="${cls}">${esc(v)}</td>`;
+    }).join("") + "</tr>").join("");
+    const wrap = document.createElement("div"); wrap.className = "table-wrap";
+    wrap.innerHTML = `<table class="data-table">${head}<tbody>${bodyHtml}</tbody></table>`;
+    panel.appendChild(wrap);
+
+    if (totalPages > 1) {
+      const nav = document.createElement("div"); nav.className = "table-nav";
+      nav.style.cssText = "display:flex;align-items:center;gap:8px;padding:8px 12px;font:13px sans-serif;";
+      const prev = document.createElement("button"); prev.className = "btn-sm"; prev.textContent = "← Prev";
+      prev.disabled = page === 0;
+      prev.addEventListener("click", () => drawPage(page - 1));
+      const info = document.createElement("span");
+      info.textContent = `Page ${page + 1} of ${totalPages}`;
+      const next = document.createElement("button"); next.className = "btn-sm"; next.textContent = "Next →";
+      next.disabled = page >= totalPages - 1;
+      next.addEventListener("click", () => drawPage(page + 1));
+      nav.appendChild(prev); nav.appendChild(info); nav.appendChild(next);
+      panel.appendChild(nav);
+    }
+
+    const note = document.createElement("div"); note.className = "fig-note";
+    note.innerHTML = "Preview of the calibrated feature table — your <b>RT</b> and <b>m/z</b> beside " +
+      "<b>Cal_RT</b> (the same feature's retention time on the reference column) and <b>iRT</b> " +
+      "(the dimensionless 1–100 index). The full table, with every original column, is under " +
+      "<b>Export</b>.";
+    panel.appendChild(note);
+    body.appendChild(panel);
+  }
+  drawPage(0);
 }
 
-/* ---- Plotly (detection + profile only, reverted to the package figures) ---- */
-function drawPlot(div, figStr) {
+/* ---- Plotly (detection + profile, the package figures) ---- */
+/* `after(div)` runs once newPlot has resolved — earlier than that the div is
+   not a Plotly graph yet (no .on()), so event hooks must wait for it. */
+function drawPlot(div, figStr, after) {
   const f = typeof figStr === "string" ? JSON.parse(figStr) : figStr;
-  Plotly.newPlot(div, f.data, f.layout, { displaylogo: false, responsive: true,
-    modeBarButtonsToRemove: ["select2d", "lasso2d"], toImageButtonOptions: { format: "svg" } });
+  window._ensurePlotly().then(function() {
+    return Plotly.newPlot(div, f.data, f.layout, { displaylogo: false, responsive: true,
+      modeBarButtonsToRemove: ["select2d", "lasso2d"], toImageButtonOptions: { format: "svg" } });
+  }).then(function() { if (after) after(div); });
 }
 let structPop;
 function attachStructures(div) {
@@ -457,10 +685,65 @@ function attachStructures(div) {
   div.on("plotly_unhover", () => { if (structPop) structPop.style.display = "none"; });
 }
 
+/* ---- async calibration handler ---- */
+window.__onCalibrationDone = async function() {
+  try {
+    var res = await api().get_calibration_result();
+    var btn = $("#run");
+    btn.disabled = false;
+    if (!res || !res.ok) { showProgress(false); setStatus("", ""); showError((res && res.error) || "Calibration failed."); return; }
+    setStatus("Preparing results…", "busy");
+    const figs = res.figures || {};
+    Object.keys(figs).forEach(k => {              // parse figure JSON once, up front
+      if (typeof figs[k] === "string") {
+        try { figs[k] = JSON.parse(figs[k]); } catch (e) {}
+      }
+    });
+    setStatus(""); showProgress(false);
+    showResults(res);
+  } catch (e) {
+    var btn = $("#run");
+    if (btn) btn.disabled = false;
+    showProgress(false);
+    setStatus("", "");
+    showError(String(e));
+  }
+};
+
+/* Switch to the output view and paint the Overview atomically, then warm up
+   Plotly and pre-render the remaining sections offscreen in small idle chunks,
+   so the first click on any section never waits on anything. */
+function showResults(bundle) {
+  state.bundle = bundle;
+  buildNav();
+  openOutput();
+  selectSection("overview");
+  window._ensurePlotly().then(() => {
+    const b = state.bundle;
+    let i = 0;
+    const step = () => {
+      if (state.bundle !== b) return;             // user started a new run
+      while (i < SECTIONS.length) {
+        const s = SECTIONS[i++];
+        if (s.id !== state.section && !_secCache[s.id]) {
+          const node = document.createElement("div");
+          node.className = "section-body offscreen";
+          $("#main-body").appendChild(node);
+          try { renderSection(s.id, node); _secCache[s.id] = node; }
+          catch (e) { node.remove(); }   // left uncached: re-rendered on first real click
+          return setTimeout(step, 60);
+        }
+      }
+    };
+    step();
+  }).catch(() => {});
+}
+
 /* preview mode: auto-open output if preview data is injected */
 window.addEventListener("load", () => {
   initMixtures();
+  initReference();
   if (!window.pywebview && window.__PREVIEW__ && window.__PREVIEW__.ok) {
-    state.bundle = window.__PREVIEW__; buildNav(); openOutput(); selectSection("overview");
+    showResults(window.__PREVIEW__);
   }
 });

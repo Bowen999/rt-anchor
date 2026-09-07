@@ -24,14 +24,14 @@ from . import theme
 def is_applicable(result) -> bool:
     if result.model.get("calibration_scope") != "sample":
         return False
-    s = pd.to_numeric(result.table[result.col("RI_spread")], errors="coerce")
+    s = result.values("RI_spread")
     return bool(s.notna().any())
 
 
 def compute_repro(result) -> Dict:
     tbl = result.table
-    spread = pd.to_numeric(tbl[result.col("RI_spread")], errors="coerce")
-    ri = pd.to_numeric(tbl[result.col("RI")], errors="coerce")
+    spread = result.values("RI_spread")
+    ri = result.values("iRT")
     nc = pd.to_numeric(tbl[result.col("n_contributing")], errors="coerce")
     ok = spread.notna() & ri.notna() & (nc >= 2)
     s, r = spread[ok].to_numpy(), ri[ok].to_numpy()

@@ -20,6 +20,11 @@ icon = _icon if os.path.exists(_icon) else None
 
 datas = [(os.path.join(APP, "web"), "web"),
          (os.path.join(APP, "example"), "example")]   # bundled demo dataset
+
+# The v2 method needs the bundled reference pair — without it every calibration fails.
+REF_DATA = os.path.join(APP, "rt_anchor", "src", "rt_anchor", "reference_data")
+if os.path.isdir(REF_DATA):
+    datas += [(REF_DATA, os.path.join("rt_anchor", "reference_data"))]
 binaries = []
 hiddenimports = []
 
@@ -47,6 +52,16 @@ hiddenimports += ["scipy.interpolate",
                   "scipy._lib.messagestream",
                   "scipy.special.cython_special",
                   "scipy.sparse.csgraph._validation"]
+
+# ---- statsmodels + sklearn (v2 curve fitting) ----
+hiddenimports += ["statsmodels.api", "statsmodels.nonparametric.smoothers_lowess",
+                  "sklearn.isotonic"]
+for _pkg in ("statsmodels", "sklearn"):
+    try:
+        datas += collect_data_files(_pkg)
+        datas += copy_metadata(_pkg)
+    except Exception:
+        pass
 
 # ---- pywebview (WebView2 desktop shell) -------------------------------------
 # Bundled JS + WebView2Loader DLLs + the pythonnet-backed WinForms backend;
@@ -106,10 +121,10 @@ a = Analysis(
         "nbconvert", "nbformat", "pytest", "_pytest", "sphinx", "docutils",
         # heavy ML / unrelated stacks that must never sneak into the bundle
         "torch", "tensorflow", "tensorflow_probability", "keras", "onnx",
-        "numba", "llvmlite", "transformers", "datasets", "sklearn",
-        "scikit_learn", "sympy", "cv2", "xgboost", "lightgbm",
+        "numba", "llvmlite", "transformers", "datasets",
+        "sympy", "cv2", "xgboost", "lightgbm",
         "dask", "distributed", "streamlit", "gradio", "seaborn",
-        "statsmodels", "numexpr", "zmq", "tornado",
+        "zmq", "tornado",
         # unused optional deps verified against the full Run+Export pipeline
         "pyarrow", "sqlalchemy", "openpyxl", "xlrd", "bs4", "html5lib",
         "h5py", "tables", "zarr", "pywt",

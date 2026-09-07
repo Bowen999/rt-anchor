@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rt-anchor"
-version = "1.1.1"
-description = "Standard-panel retention-index (iRT) calibration for LC-MS lipidomics feature tables (MS-DIAL / MZmine / MassCube / LipidScreener)"
+version = "0.2.0"
+description = "Cross-column retention-time calibration and retention index (iRT) for LC-MS lipidomics feature tables (MS-DIAL / MZmine / MassCube / LipidScreener)"
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
@@ -13,6 +13,7 @@ license-files = ["LICENSE"]
 authors = [{ name = "Bowen Yang" }]
 keywords = [
     "retention index", "iRT", "retention time", "calibration",
+    "cross-column", "retention time alignment",
     "lipidomics", "metabolomics", "LC-MS", "mass spectrometry",
     "MS-DIAL", "MZmine", "MassCube", "LipidScreener",
 ]
@@ -28,6 +29,10 @@ dependencies = [
     "numpy>=1.21",
     "pandas>=1.3",
     "scipy>=1.7",
+    # the v2 stage-1 curve is LOESS (statsmodels) -> isotonic (scikit-learn);
+    # without these every calibration fails at import, so they are core, not extras
+    "scikit-learn>=1.0",
+    "statsmodels>=0.13",
     "matplotlib>=3.5",
     "plotly>=5.0",
 ]
@@ -56,4 +61,7 @@ rt-anchor-gui = "rt_anchor.gui:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-rt_anchor = ["py.typed", "assets/*.ico", "assets/*.png", "webui/*.html", "webui/*.css", "webui/*.js", "example/*.txt"]
+# reference_data/** is the bundled 35-min reference pair: the default second
+# axis of every calibration. Without it an installed wheel cannot calibrate at
+# all, so it is package data, not an optional extra.
+rt_anchor = ["py.typed", "assets/*.ico", "assets/*.png", "webui/*.html", "webui/*.css", "webui/*.js", "example/*.txt", "reference_data/*/*.csv", "reference_data/*/*.json"]

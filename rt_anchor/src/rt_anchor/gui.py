@@ -22,7 +22,8 @@ from typing import Dict, List, Optional
 from .config import CalibrationConfig
 from .errors import RtAnchorError
 from .helpers import write_results
-from .panel import load_manifest_csv, load_reference_csv
+from .mixtures import DEFAULT_MIXTURE
+from .panel import load_manifest_csv
 from .pipeline import calibrate
 
 GITHUB_URL = "https://github.com/Bowen999/rt-anchor"
@@ -146,14 +147,17 @@ class Api:
             if not sample or not standards:
                 return {"ok": False, "error": "Sample table and standards run are required.", "log": log}
             manifest = load_manifest_csv(params["manifest"]) if params.get("manifest") else None
-            reference = load_reference_csv(params["reference"]) if params.get("reference") else None
             single = _collect_single(params.get("single"))
             if single:
                 log.append(f"per-sample tier: {len(single)} injection tables")
+            # v2: the cross-column method needs a reference run pair. This GUI
+            # exposes no picker for one, so it always uses the bundled default;
+            # `reference_sample` / `reference_standards` are how a caller
+            # overrides that (see the desktop app or the CLI).
             result = calibrate(
                 sample_table=sample, polarity=params.get("polarity", "positive"),
-                standards_table=standards, single_files=single, config=cfg,
-                manifest=manifest, reference=reference,
+                standards_table=standards, panel=params.get("panel") or DEFAULT_MIXTURE,
+                single_files=single, config=cfg, manifest=manifest,
                 source_format=_opt(params.get("source_format")), rt_unit=_opt(params.get("rt_unit")),
             )
             self._result = result

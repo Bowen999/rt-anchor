@@ -51,10 +51,19 @@ def setup_logger(logfile: Optional[str] = None, level: int = logging.INFO) -> lo
 def write_results(result: CalibrationResult, out_prefix: str,
                   write_log: bool = True, report: bool = True,
                   tic_style: str = "clean", report_formats=("html", "pdf")) -> Dict[str, str]:
-    """Write the calibrated table (CSV), model (JSON), log (txt), and — by
-    default — a visual Report (interactive HTML + static PDF).
+    """Write every companion output of spec §5 and return ``{kind: path}``.
 
-    Set ``report=False`` for data-only output. Returns {kind: path}.
+    ``<p>_calibrated.csv``  the input table with the calibration columns appended
+    ``<p>_model.json``      the calibration model (§5.1)
+    ``<p>_anchors.csv``     the stage-2 plasma-lipid anchors, used and dropped
+    ``<p>_pairs.csv``       the stage-1 matched pairs — the curve's raw evidence
+    ``<p>_landmarks.csv``   the panel standards located on the reference run
+    ``<p>_log.txt``         the run log
+    ``<p>_report.html/.pdf``the visual report (``report=False`` for data only)
+
+    The report is the one optional piece: a failure to render it is logged and
+    the data outputs still stand, because the numbers are the deliverable and a
+    missing chart is not a reason to lose them.
     """
     os.makedirs(os.path.dirname(os.path.abspath(out_prefix)) or ".", exist_ok=True)
     paths: Dict[str, str] = {}
@@ -71,9 +80,14 @@ def write_results(result: CalibrationResult, out_prefix: str,
                   default=_json_default, allow_nan=False)
     paths["model_json"] = model_path
 
-    anchors_path = f"{out_prefix}_anchors.csv"
-    result.anchors.to_csv(anchors_path, index=False)
-    paths["anchors_csv"] = anchors_path
+    for kind, suffix, frame in (
+        ("anchors_csv", "_anchors.csv", result.anchors),
+        ("pairs_csv", "_pairs.csv", result.pairs),
+        ("landmarks_csv", "_landmarks.csv", result.landmarks),
+    ):
+        path = f"{out_prefix}{suffix}"
+        (frame if frame is not None else pd.DataFrame()).to_csv(path, index=False)
+        paths[kind] = path
 
     if write_log:
         log_path = f"{out_prefix}_log.txt"
@@ -89,7 +103,30 @@ def write_results(result: CalibrationResult, out_prefix: str,
         except ImportError as e:
             result.log.append(f"report skipped (missing viz deps: {e}); "
                               f"install rt_anchor[report] for matplotlib+plotly")
+        except Exception as e:      # a broken chart must not cost the user the data
+            result.log.append(f"report skipped ({type(e).__name__}: {e}); "
+                              f"the data outputs above are unaffected")
+            _drop_empty_report_files(out_prefix)
+        if write_log:               # re-write so the log carries the report note
+            with open(paths["log_txt"], "w") as fh:
+                fh.write("\n".join(result.log) + "\n")
     return paths
+
+
+def _drop_empty_report_files(out_prefix: str) -> None:
+    """Delete a zero-byte ``_report.*`` left behind by a renderer that died mid-write.
+
+    The writer opens its output before it builds the document, so a failure
+    leaves an empty file that looks like a report until you open it. An absent
+    report is honest; an empty one is not.
+    """
+    for ext in ("html", "pdf", "png", "svg"):
+        path = f"{out_prefix}_report.{ext}"
+        try:
+            if os.path.isfile(path) and os.path.getsize(path) == 0:
+                os.remove(path)
+        except OSError:
+            pass
 
 
 def _sanitize_json(o):

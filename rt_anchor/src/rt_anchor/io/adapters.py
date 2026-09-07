@@ -176,19 +176,44 @@ def load_lipidscreener(path: str, delim: str = ",", polarity: Optional[str] = No
                         polarity=pol, meta=meta)
 
 
+def _is_sample_class_label(label) -> bool:
+    """True when an MS-DIAL class-header cell marks a real per-sample column.
+
+    MS-DIAL appends ``Average`` and ``Stdev`` summary columns after the sample
+    columns and labels them ``NA`` in the class row. Counting them as samples
+    inflates every abundance we derive from the sample columns (and therefore
+    which candidate wins inside an m/z window), so empty, ``NA`` and ``NaN``
+    labels are all treated as "not a sample".
+    """
+    s = str(label).strip()
+    return bool(s) and s.lower() not in ("na", "nan", "n/a")
+
+
 def load_msdial(path: str, delim: str = "\t", header_row: int = 0,
                 polarity: Optional[str] = None) -> FeatureTable:
     # metadata rows (0..header_row-1) carry the per-sample class labels
     meta = {}
     class_labels = None
     if header_row > 0:
-        raw = pd.read_csv(path, sep=delim, header=None, nrows=header_row, dtype=str)
+        # keep_default_na=False: MS-DIAL writes a literal "NA" for the trailing
+        # Average/Stdev columns, and that string is meaningful here — it marks a
+        # column as *not* a sample (see _is_sample_class_label).
+        raw = pd.read_csv(path, sep=delim, header=None, nrows=header_row,
+                          dtype=str, keep_default_na=False)
+        first_row_labels = None
         for _, row in raw.iterrows():
             vals = [str(v) if not pd.isna(v) else "" for v in row.tolist()]
             key = next((v for v in vals if v.strip()), "")
             meta[f"header_{key or 'row'}"] = vals
+            if first_row_labels is None:
+                first_row_labels = vals
             if key.strip().lower() in ("class", "class name"):
                 class_labels = vals
+        # The row is always the Class row; its descriptor cell ("Class") sits
+        # above a metadata column and can be missing from a trimmed export, so
+        # fall back to position rather than losing the per-sample labels.
+        if class_labels is None:
+            class_labels = first_row_labels
     df = pd.read_csv(path, sep=delim, header=header_row, low_memory=False)
     cols = list(df.columns)
     mz = _find(cols, "Average Mz", "Average m/z", contains="Average Mz")
@@ -217,7 +242,7 @@ def load_msdial(path: str, delim: str = "\t", header_row: int = 0,
         # so a non-empty label alone does not make a column a sample — exclude
         # any column that is itself a known MS-DIAL metadata column.
         sample_cols = [c for c, lab in zip(cols, class_labels)
-                       if str(lab).strip() and c.strip().lower() not in meta_tokens]
+                       if _is_sample_class_label(lab) and c.strip().lower() not in meta_tokens]
     if not sample_cols:
         last_meta = 0
         for i, c in enumerate(cols):

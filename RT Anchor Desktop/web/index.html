@@ -5,7 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RT Anchor</title>
 <link rel="stylesheet" href="styles.css">
-<script src="vendor/plotly.min.js"></script>
+    <!-- Plotly loaded on-demand (4.8 MB) — only needed for Detection/Profile -->
+    <script>
+    window.__plotlyLoaded = false;
+    window.__plotlyReady = null;
+    window._ensurePlotly = function() {
+      if (window.__plotlyLoaded) return Promise.resolve();
+      if (window.__plotlyReady) return window.__plotlyReady;
+      window.__plotlyReady = new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = 'vendor/plotly.min.js';
+        s.onload = function() { window.__plotlyLoaded = true; resolve(); };
+        s.onerror = function() { reject(new Error('Failed to load Plotly')); };
+        document.head.appendChild(s);
+      });
+      return window.__plotlyReady;
+    };
+    </script>
 </head>
 <body>
 
@@ -14,7 +30,6 @@
   <div class="input-wrap">
     <header class="brand">
       <div class="wordmark">RT<span>ANCHOR</span></div>
-      <div class="tagline">Retention-index calibration &nbsp;/&nbsp; standard-panel iRT</div>
       <button type="button" class="btn-example" id="load-example">↓ Load example dataset</button>
     </header>
 
@@ -25,18 +40,19 @@
         <div class="field-head"><span class="lbl">Sample feature table</span><span class="req-tag">required</span></div>
         <div class="picker"><button class="btn-file" data-pick="file" data-target="samples">Choose file</button>
           <div class="path" id="path-samples">no file selected</div></div>
-        <div class="hint">MS-DIAL · MZmine · MassCube · LipidScreener — auto-detected</div>
+        <div class="hint">MS-DIAL · MZmine · MassCube · LipidScreener — auto-detected<br>The data includes uncalibrated precursor m/z and retention times.</div>
       </div>
 
       <div class="field req" data-key="standards">
         <div class="field-head"><span class="lbl">Standards mixture table</span><span class="req-tag">required</span></div>
         <div class="picker"><button class="btn-file" data-pick="file" data-target="standards">Choose file</button>
           <div class="path" id="path-standards">no file selected</div></div>
-        <div class="hint">The standards mixture run — builds the native anchor template</div>
+        <div class="hint">The input format is consistent with the sample feature table.<br><b>Must be from the same column and gradient as the sample.</b>
+         </div>
       </div>
 
       <div class="field req" data-key="mixture">
-        <div class="field-head"><span class="lbl">Mixture panel</span><span class="req-tag">choose one</span></div>
+        <div class="field-head"><span class="lbl">Standards panel</span><span class="req-tag">choose one</span></div>
         <div class="mix-cards" id="mix-cards"></div>
         <div class="mix-preview">
           <div class="table-wrap mix-table-wrap">
@@ -56,35 +72,78 @@
         <button type="button" class="adv-toggle" id="adv-toggle" aria-expanded="false">
           <span class="adv-chev">▸</span>
           <span class="adv-title">Advanced</span>
-          <span class="adv-sub">optional inputs &amp; matching parameters</span>
         </button>
         <div class="adv-body" id="adv-body">
-          <div class="field" data-key="single_files">
-            <div class="field-head"><span class="lbl">Per-injection files</span><span class="opt-tag">optional</span></div>
-            <div class="picker"><button class="btn-file" data-pick="folder" data-target="single_files">Choose folder</button>
-              <div class="path" id="path-single_files">no folder selected</div></div>
-            <div class="hint">Enables per-sample self-anchoring &amp; repeatability QC</div>
+
+          <div class="sub-lbl">Reference column
+            <button type="button" class="btn-reset" id="ref-reset">Reset to bundled reference</button>
+          </div>
+          <div class="field opt" data-key="reference_sample">
+            <div class="field-head"><span class="lbl">Reference sample</span><span class="opt-tag">optional</span></div>
+            <div class="picker"><button class="btn-file" data-pick="file" data-target="reference_sample">Choose file</button>
+              <div class="path" id="path-reference_sample">bundled Column 25</div></div>
+          </div>
+
+          <div class="field opt" data-key="reference_standards">
+            <div class="field-head"><span class="lbl">Reference standards</span><span class="opt-tag">optional</span></div>
+            <div class="picker"><button class="btn-file" data-pick="file" data-target="reference_standards">Choose file</button>
+              <div class="path" id="path-reference_standards">bundled Column 25</div></div>
+          </div>
+
+          <div class="sub-lbl">Matching &amp; fitting</div>
+
+          <div class="row2">
+            <div class="num-field">
+              <label class="lbl" for="adv-mzppm">Feature-match window <span class="unit">ppm</span></label>
+              <input class="num" id="adv-mzppm" type="number" step="0.1" min="0" value="15" inputmode="decimal">
+            </div>
+            <div class="num-field">
+              <label class="lbl" for="adv-mz">Panel m/z tolerance <span class="unit">ppm</span></label>
+              <input class="num" id="adv-mz" type="number" step="0.1" min="0" value="15" inputmode="decimal">
+            </div>
           </div>
 
           <div class="row2">
             <div class="num-field">
-              <label class="lbl" for="adv-mz">m/z tolerance <span class="unit">ppm</span></label>
-              <input class="num" id="adv-mz" type="number" step="0.1" min="0" value="15" inputmode="decimal">
+              <label class="lbl" for="adv-curvefrac">LOESS fraction <span class="unit">curve_frac</span></label>
+              <input class="num" id="adv-curvefrac" type="number" step="0.01" min="0.01" max="1" value="0.1" inputmode="decimal">
             </div>
             <div class="num-field">
               <label class="lbl" for="adv-rtw">RT window <span class="unit">min</span></label>
               <input class="num" id="adv-rtw" type="number" step="0.05" min="0" value="0.5" inputmode="decimal">
             </div>
           </div>
+          <div class="hint">LOESS fraction was chosen by 5-fold cross-validation on all five columns —
+            there is rarely a reason to change it.</div>
 
+          <div class="row2">
+            <label class="chk-field" for="adv-samplepairs">
+              <input class="chk" id="adv-samplepairs" type="checkbox" checked>
+              <span class="lbl">Use sample pairs in the curve</span>
+            </label>
+            <label class="chk-field" for="adv-sampleanchors">
+              <input class="chk" id="adv-sampleanchors" type="checkbox" checked>
+              <span class="lbl">sample anchors</span>
+            </label>
+          </div>
           <div class="row2">
             <div class="num-field">
               <label class="lbl" for="adv-minanchors">Min anchors</label>
-              <input class="num" id="adv-minanchors" type="number" step="1" min="3" value="6" inputmode="numeric">
+              <input class="num" id="adv-minanchors" type="number" step="1" min="3" value="3" inputmode="numeric">
             </div>
+            <div class="num-field">
+              <label class="lbl" for="adv-extramode">Extrapolation mode</label>
+              <select class="num" id="adv-extramode">
+                <option value="linear" selected>linear</option>
+                <option value="clamp">clamp</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row2">
             <label class="chk-field" for="adv-extrapolate">
-              <input class="chk" id="adv-extrapolate" type="checkbox">
-              <span class="lbl">Extrapolate beyond anchor span</span>
+              <input class="chk" id="adv-extrapolate" type="checkbox" checked>
+              <span class="lbl">Extrapolate beyond the matched-pair span</span>
             </label>
           </div>
         </div>
@@ -102,14 +161,14 @@
   <aside class="sidebar">
     <div class="side-head">
       <div class="side-brand">RT<span>ANCHOR</span></div>
-      <div class="side-sub">iRT calibration</div>
+      <div class="side-sub">cross-column calibration</div>
     </div>
     <nav class="nav" id="nav"></nav>
     <button id="new-run" class="btn-new">＋ New calibration</button>
     <button type="button" id="sb-github" class="sb-link">◆ GitHub Repository ↗</button>
     <div class="sb-engine">
       <div class="sb-engine-h">Engine</div>
-      <div class="sb-engine-d">RT Anchor · standard-panel anchor warp</div>
+      <div class="sb-engine-d" id="sb-engine-d">RT Anchor · cross-column calibration (v2)</div>
     </div>
   </aside>
   <main class="main">

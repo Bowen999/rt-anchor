@@ -29,9 +29,14 @@ cp "$ROOT/example/samples.txt" "$ROOT/example/standards.txt" "$STAGE/" 2>/dev/nu
 hdiutil create -volname "RT Anchor" -srcfolder "$STAGE" -format UDZO \
     -ov "$ROOT/dist/macos/RT Anchor.dmg"
 
+# 4. Also drop the .app next to the .dmg
+mkdir -p "$ROOT/dist/macos"
+rm -rf "$ROOT/dist/macos/RT Anchor.app"
+cp -R "$DIST/RT Anchor.app" "$ROOT/dist/macos/"
+
 echo
 echo "BUILD OK"
-echo "  $DIST/RT Anchor.app"
+echo "  $ROOT/dist/macos/RT Anchor.app"
 echo "  $ROOT/dist/macos/RT Anchor.dmg"
 echo "First open of the unsigned/ad-hoc app: right-click -> Open (or"
 echo "xattr -cr \"/Applications/RT Anchor.app\") to clear Gatekeeper quarantine."

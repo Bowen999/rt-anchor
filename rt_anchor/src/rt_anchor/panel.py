@@ -6,8 +6,10 @@ Two things live here:
 * ``DEFAULT_MANIFEST`` — the 15-lipid panel: name, class, exact (neutral
   monoisotopic) mass, and the expected adduct per polarity. Target ion m/z is
   computed from ``exact_mass`` + adduct, so no molecular formula is needed.
-* ``DEFAULT_REFERENCE`` — per-anchor Orbitrap reference RT (minutes) → this
-  defines the dimensionless iRT scale via the fixed affine map (see config).
+* ``rt_ref_min`` — per-anchor reference RT (minutes). Under v2 this is a
+  *seed* for locating the standard in a real run, not a scale: the iRT ruler is
+  built from the landmarks detected on the reference standards run
+  (:mod:`rt_anchor.irt`), so ``Panel.targets.irt`` is NaN here.
 
 Both can be overridden by the user (Mode B): ``load_manifest_csv`` /
 ``load_reference_csv`` read a CSV with the same columns.
@@ -162,7 +164,12 @@ def build_panel(polarity: str,
             "adduct": adduct,
             "mz": mz,
             "rt_ref_min": float(rt_ref),
-            "irt": config.irt_from_rt(float(rt_ref)),
+            # v1 stamped a fixed-affine iRT here from config.scale_rt_*. Under v2
+            # the iRT scale is derived from the landmarks actually detected on the
+            # reference standards run (rt_anchor.irt), so there is no number that
+            # could honestly go in this cell before that detection has happened.
+            # The column is kept for shape compatibility and carries NaN.
+            "irt": np.nan,
             "endogenous": bool(r.get("endogenous", False)),
             "void": bool(r.get("void", False)),
         })

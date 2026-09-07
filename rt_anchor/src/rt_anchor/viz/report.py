@@ -14,7 +14,7 @@ import html
 import json
 from typing import Dict, List
 
-from . import metrics, performance, repeatability, structures, theme, tic
+from . import anchors, metrics, performance, repeatability, structures, theme, tic
 
 
 def _tic_styles(style: str) -> List[str]:
@@ -29,7 +29,10 @@ def _sections(result, tic_style: str):
         if tic_style == "both":
             label += f" ({st})"
         secs.append((label, tic.figure_plotly(result, style=st), f"fig_profile_{st}"))
-    secs.append(("Calibration warp", performance.figure_plotly(result), "fig_warp"))
+    secs.append(("Cross-column calibration curve",
+                 performance.figure_plotly(result), "fig_curve"))
+    if anchors.is_applicable(result):
+        secs.append(("Stage-2 sample anchors", anchors.figure_plotly(result), "fig_anchors"))
     if repeatability.is_applicable(result):
         secs.append(("Injection repeatability", repeatability.figure_plotly(result), "fig_repeatability"))
     return secs
@@ -41,6 +44,63 @@ def _report_date() -> str:
     from datetime import datetime
     d = datetime.now()
     return f"{d.day} {d:%B %Y}"
+
+
+def method_facts(result) -> List[tuple]:
+    """The provenance a reader needs to know what these numbers mean.
+
+    Calibrated RT is only meaningful relative to a stated reference column, and
+    iRT only relative to a stated landmark panel on that column — so both are
+    named on the report itself rather than left in the model JSON. The iRT
+    definition is spelled out including the part that is easy to over-read: the
+    scale is affine between the earliest and latest detected landmark, so the
+    interior landmarks confirm the panel was found but do not bend the ruler.
+    """
+    m = result.model or {}
+    ref = (result.reference or {}) or m.get("reference", {}) or {}
+    irt = m.get("irt", {}) or {}
+    cur = m.get("curve", {}) or {}
+
+    ref_label = str(ref.get("label") or ref.get("key") or "unknown")
+    if ref.get("is_default"):
+        ref_label += " (bundled default)"
+    else:
+        ref_label += " (user-supplied)"
+
+    panel = str(m.get("panel", {}).get("key", "") or result.panel_key or "unknown")
+    panel_used = str(irt.get("panel_used") or panel)
+
+    n_land = irt.get("n_landmarks")
+    span = irt.get("landmark_rt_span_min") or []
+    if n_land and len(span) == 2:
+        irt_txt = (f"1–100, affine on the reference RT axis between the earliest "
+                   f"and latest of {n_land} landmarks ({span[0]:.2f}–{span[1]:.2f} min); "
+                   f"landmark panel {panel_used}")
+    else:
+        irt_txt = "not established for this run — iRT is NaN"
+
+    npairs = cur.get("n_pairs")
+    nstd, nsamp = cur.get("n_pairs_standards"), cur.get("n_pairs_sample")
+    pair_txt = (f"{npairs} m/z-matched pairs ({nstd} standards-run + {nsamp} sample-run), "
+                f"{cur.get('n_pairs_kept')} kept after outlier trimming"
+                if npairs is not None else "n/a")
+
+    return [
+        ("Method", "cross-column calibration onto a reference column (v2)"),
+        ("Reference column", ref_label),
+        ("Standards panel", panel),
+        ("Stage 1 curve", pair_txt),
+        ("Stage 2 anchors", anchors.verdict_line(anchors.compute_anchors(result))),
+        ("iRT scale", irt_txt),
+    ]
+
+
+def _method_band_html(result) -> str:
+    rows = "".join(
+        f'<div class="mf-r"><span class="mf-k">{html.escape(k)}</span>'
+        f'<span class="mf-v">{html.escape(str(v))}</span></div>'
+        for k, v in method_facts(result))
+    return f'<section class="methodband">{rows}</section>'
 
 
 def build_html(result, tic_style: str = "clean") -> str:
@@ -84,6 +144,7 @@ def build_html(result, tic_style: str = "clean") -> str:
     js = get_plotlyjs()
     return _HTML_SHELL.format(css=_CSS, plotlyjs=js, tiles=tiles, radar=radar_div,
                               sections=sections, struct_js=struct_js,
+                              method=_method_band_html(result),
                               date=html.escape(_report_date()))
 
 
@@ -101,6 +162,18 @@ body {{ margin:0; background:var(--paper); color:var(--txt);
         font-family:{theme.FONT_STACK}; font-size:16px; line-height:1.55;
         -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }}
 .wrap {{ max-width:1200px; margin:0 auto; padding:48px 36px 84px; }}
+
+/* method provenance band */
+.methodband {{ background:var(--surface); border:1px solid var(--line);
+               border-radius:var(--r); padding:16px 20px; margin-bottom:26px;
+               box-shadow:var(--shadow); }}
+.mf-r {{ display:flex; gap:14px; padding:5px 0; border-bottom:1px solid var(--line);
+         font-size:13.5px; }}
+.mf-r:last-child {{ border-bottom:none; }}
+.mf-k {{ flex:0 0 158px; color:var(--muted); font-weight:600;
+         text-transform:uppercase; letter-spacing:.04em; font-size:11.5px;
+         padding-top:2px; }}
+.mf-v {{ color:var(--txt); }}
 
 /* masthead */
 .masthead {{ display:flex; justify-content:space-between; align-items:flex-end; gap:28px;
@@ -216,6 +289,7 @@ _HTML_SHELL = """<!doctype html><html lang="en"><head><meta charset="utf-8">
   </div>
   <div class="masthead-date">{date}</div>
 </header>
+{method}
 <div class="keydata">
   <div class="kpis">{tiles}</div>
   <div class="radar">
@@ -248,34 +322,50 @@ def build_pdf(result, path: str, tic_style: str = "clean") -> None:
                     "Standard detection — reference vs panel vs samples")); plt.close("all")
         for st in _tic_styles(tic_style):
             pdf.savefig(tic.figure_mpl(result, style=st)); plt.close("all")   # tic has its own suptitle
-        pdf.savefig(titled(performance.figure_mpl(result), r"Calibration warp — RT $\rightarrow$ iRT")); plt.close("all")
+        pdf.savefig(performance.figure_mpl(result)); plt.close("all")   # has its own suptitle
+        if anchors.is_applicable(result):
+            pdf.savefig(anchors.figure_mpl(result)); plt.close("all")   # has its own suptitle
         if repeatability.is_applicable(result):
             pdf.savefig(repeatability.figure_mpl(result)); plt.close("all")   # has its own suptitle
+
+
+def _wrap(text: str, width: int) -> str:
+    import textwrap
+    return "\n".join(textwrap.wrap(text, width)) or text
 
 
 def _cover_page(result):
     import matplotlib.pyplot as plt
     fig = plt.figure(figsize=(11.5, 8.0))
-    fig.text(0.06, 0.92, "Retention-index calibration report", fontsize=24,
-             color=theme.TXT, weight="bold")
+    fig.text(0.06, 0.985, "Cross-column RT calibration report", fontsize=23,
+             color=theme.TXT, weight="bold", va="top")
+    # the same provenance the HTML masthead band carries: what these numbers
+    # are relative to. Without it a Cal_RT / iRT number is not interpretable.
+    yy = 0.945
+    for k, v in method_facts(result):
+        fig.text(0.06, yy, k.upper(), fontsize=8.5, color=theme.TXT2, weight="bold", va="top")
+        fig.text(0.20, yy, _wrap(theme.mpl_safe(v), 92), fontsize=9, color=theme.TXT, va="top")
+        yy -= 0.030 + 0.016 * str(v).count("\n") + 0.016 * (len(str(v)) // 92)
+    top = yy - 0.02
     for i, (lab, val, sub) in enumerate(metrics.kpi_tiles(result)):
         r, c = divmod(i, 3)
         x = 0.06 + c * 0.30
-        y = 0.78 - r * 0.15
-        fig.text(x, y, lab.upper(), fontsize=10.5, color=theme.TXT2, weight="bold")
+        y = top - r * 0.15
+        fig.text(x, y, theme.mpl_safe(lab).upper(), fontsize=10.5, color=theme.TXT2, weight="bold")
         y -= 0.036
         if isinstance(val, str):
-            fig.text(x, y, val, fontsize=21, color=theme.PRIMARY, weight="bold")
+            fig.text(x, y, theme.mpl_safe(val), fontsize=21, color=theme.PRIMARY, weight="bold")
             y -= 0.034
         else:
             for k, v in val:
-                fig.text(x, y, k, fontsize=9.5, color=theme.TXT2)
-                fig.text(x + 0.12, y, v, fontsize=14.5, color=theme.PRIMARY, weight="bold")
+                fig.text(x, y, theme.mpl_safe(k), fontsize=9.5, color=theme.TXT2)
+                fig.text(x + 0.12, y, theme.mpl_safe(v), fontsize=14.5,
+                         color=theme.PRIMARY, weight="bold")
                 y -= 0.030
         if sub:
-            fig.text(x, y, sub, fontsize=10, color=theme.TXT2)
+            fig.text(x, y, theme.mpl_safe(sub), fontsize=10, color=theme.TXT2)
     # radar on the lower half
-    fig.text(0.06, 0.48, "Quality fingerprint", fontsize=13.5, color=theme.TXT, weight="bold")
+    fig.text(0.06, 0.44, "Quality fingerprint", fontsize=13.5, color=theme.TXT, weight="bold")
     axr = fig.add_axes([0.30, 0.04, 0.4, 0.34], polar=True)
     metrics.radar_mpl(result, ax=axr)
     return fig

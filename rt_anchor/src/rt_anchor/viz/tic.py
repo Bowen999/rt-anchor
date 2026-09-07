@@ -6,9 +6,11 @@ by binning feature apex intensities (summed over samples) and lightly smoothing.
 
 The figure is a **mirror**: the before trace (raw RT) points up, the after trace
 (iRT) points down. Each axis is normalised to its own range; the two axes are
-labelled independently (RT on top, iRT on the bottom). The panel **standards are
-highlighted and connected by dashed lines** whose slant shows the RT offset the
-calibration removes (near-flat early, fanning in the compressed tail).
+labelled independently (RT on top, iRT on the bottom). Identified species are
+**highlighted and connected by dashed lines** whose slant shows the RT offset the
+calibration removes (near-flat early, fanning in the compressed tail). Those
+lines come from the stage-2 anchors when the run has them, and otherwise from a
+sample of the stage-1 matched pairs — see :func:`tie_points`.
 
 Styles: ``clean`` (honest binned intensity) / ``realistic`` (adds a simulated
 baseline + noise). ``clean`` is the report default.
@@ -57,27 +59,85 @@ def _intensity(result) -> np.ndarray:
     return np.ones(len(df))
 
 
+MAX_PAIR_TIES = 15          # tie lines drawn when there are no stage-2 anchors
+
+
+def tie_points(result) -> pd.DataFrame:
+    """Species to connect across the mirror: ``name``, ``rt``, ``irt``, ``kind``.
+
+    Under v2 there is no single set of anchors living on both axes, so the tie
+    lines are drawn from whatever the run actually identified:
+
+    * **stage-2 anchors** when they exist — endogenous lipids located in the
+      sample run itself (``rt_src``) whose reference-column RT maps straight
+      onto the iRT ruler. These are named species, which is the point of the
+      tanglegram: *this* lipid moved *this* far.
+    * otherwise an evenly-spaced sample of the **stage-1 matched pairs**, drawn
+      unnamed. A gated-off or non-plasma run still deserves to show the offset
+      the calibration removed, even when nothing in it has a name.
+
+    The iRT ruler may be absent (``result.irt is None``); then no tie line can
+    be placed and an empty frame comes back.
+    """
+    cols = ["name", "rt", "irt", "kind"]
+    if result.irt is None:
+        return pd.DataFrame(columns=cols)
+
+    anc = result.anchors
+    if len(anc) and "dropped_by_sanity_filter" in anc.columns:
+        anc = anc[~anc["dropped_by_sanity_filter"].astype(bool)]
+    if len(anc):
+        rt = pd.to_numeric(anc["rt_src"], errors="coerce")
+        ref = pd.to_numeric(anc["rt_ref"], errors="coerce")
+        ok = rt.notna() & ref.notna()
+        if ok.any():
+            return pd.DataFrame({
+                "name": anc.loc[ok, "label"].astype(str).to_numpy(),
+                "rt": rt[ok].to_numpy(),
+                "irt": result.irt.to_irt(ref[ok].to_numpy()),
+                "kind": "anchor",
+            })
+
+    pairs = result.pairs
+    if pairs is None or not len(pairs):
+        return pd.DataFrame(columns=cols)
+    if "kept" in pairs.columns:
+        pairs = pairs[pairs["kept"].astype(bool)]
+    pairs = pairs.sort_values("rt_a")
+    if not len(pairs):
+        return pd.DataFrame(columns=cols)
+    idx = np.unique(np.linspace(0, len(pairs) - 1, min(MAX_PAIR_TIES, len(pairs)))
+                    .round().astype(int))
+    sub = pairs.iloc[idx]
+    return pd.DataFrame({
+        "name": [""] * len(sub),
+        "rt": sub["rt_a"].to_numpy(dtype=float),
+        "irt": result.irt.to_irt(sub["rt_b"].to_numpy(dtype=float)),
+        "kind": "pair",
+    })
+
+
 def compute_tic(result, style: str = "clean") -> Dict:
     rt = result.rt_minutes().to_numpy()
-    ri = pd.to_numeric(result.table[result.col("RI")], errors="coerce").to_numpy()
+    ri = result.values("iRT").to_numpy()
     inten = _intensity(result)
-    anchors = result.anchors.drop_duplicates("name") if len(result.anchors) else result.anchors
+    ties = tie_points(result)
     rt_lo, rt_hi = float(np.nanmin(rt)), float(np.nanmax(rt))
     fr = ri[np.isfinite(ri)]
     ir_lo, ir_hi = (float(np.nanmin(fr)), float(np.nanmax(fr))) if fr.size else (0.0, 100.0)
-    # extend both axes so anchor markers can never fall outside the plotted range
-    if len(anchors):
-        a_rt = pd.to_numeric(anchors["rt_obs_min"], errors="coerce")
-        a_ir = pd.to_numeric(anchors["irt"], errors="coerce")
-        if a_rt.notna().any():
-            rt_lo, rt_hi = min(rt_lo, float(a_rt.min())), max(rt_hi, float(a_rt.max()))
-        if a_ir.notna().any():
-            ir_lo, ir_hi = min(ir_lo, float(a_ir.min())), max(ir_hi, float(a_ir.max()))
+    # extend both axes so a tie marker can never fall outside the plotted range
+    if len(ties):
+        t_rt = pd.to_numeric(ties["rt"], errors="coerce")
+        t_ir = pd.to_numeric(ties["irt"], errors="coerce")
+        if t_rt.notna().any():
+            rt_lo, rt_hi = min(rt_lo, float(t_rt.min())), max(rt_hi, float(t_rt.max()))
+        if t_ir.notna().any():
+            ir_lo, ir_hi = min(ir_lo, float(t_ir.min())), max(ir_hi, float(t_ir.max()))
     cb, yb = _reconstruct(rt, inten, rt_lo, rt_hi, style, seed=1)
     ca, ya = _reconstruct(ri, inten, ir_lo, ir_hi, style, seed=2)
     return dict(cb=cb, yb=yb / (yb.max() or 1), ca=ca, ya=ya / (ya.max() or 1),
                 rt_range=(rt_lo, rt_hi), ir_range=(ir_lo, ir_hi),
-                anchors=anchors, style=style)
+                ties=ties, style=style)
 
 
 def _norm(v, lo, hi):
@@ -105,10 +165,10 @@ def figure_mpl(result, style: str = "clean"):
     ax.plot(na, -d["ya"], color=theme.darker(C_AFTER, 0.6), lw=1.0)
     ax.axhline(0, color=theme.AXIS, lw=0.8)
 
-    anc = d["anchors"]
-    if len(anc):
-        for _, r in anc.iterrows():
-            xb = float(_norm(r["rt_obs_min"], rt_lo, rt_hi))
+    ties = d["ties"]
+    if len(ties):
+        for _, r in ties.iterrows():
+            xb = float(_norm(r["rt"], rt_lo, rt_hi))
             xa = float(_norm(r["irt"], ir_lo, ir_hi))
             ax.plot([xb, xa], [0.07, -0.07], color=theme.NEUTRAL, lw=0.8, ls=(0, (4, 3)), zorder=2)
             ax.scatter([xb], [0.07], s=26, color=C_BEFORE, zorder=4, edgecolor="white", lw=0.6)
@@ -139,7 +199,9 @@ def figure_mpl(result, style: str = "clean"):
             else "reconstructed + SIMULATED baseline/noise")
     fig.suptitle("Reconstructed feature-intensity profile  ·  before vs after calibration", x=0.02, y=0.985,
                  ha="left", fontsize=theme.FS_TITLE, color=theme.TXT)
-    fig.text(0.02, 0.93, f"standards highlighted & connected — line slant = RT offset · {note}",
+    kind = ("stage-2 anchors" if (len(d["ties"]) and d["ties"]["kind"].iloc[0] == "anchor")
+            else "sampled matched pairs")
+    fig.text(0.02, 0.93, f"{kind} connected — line slant = RT offset · {note}",
              ha="left", fontsize=theme.FS_SUB, color=theme.TXT2, style="italic")
     fig.subplots_adjust(left=0.04, right=0.98, top=0.82, bottom=0.11)
     return fig
@@ -162,20 +224,21 @@ def figure_plotly(result, style: str = "clean"):
                   name="after · iRT", hoverinfo="skip"))
     fig.add_hline(y=0, line=dict(color=theme.AXIS, width=0.8))
 
-    anc = d["anchors"]
-    if len(anc):
-        for _, r in anc.iterrows():
-            xb = float(_norm(r["rt_obs_min"], rt_lo, rt_hi)); xa = float(_norm(r["irt"], ir_lo, ir_hi))
+    ties = d["ties"]
+    if len(ties):
+        for _, r in ties.iterrows():
+            xb = float(_norm(r["rt"], rt_lo, rt_hi)); xa = float(_norm(r["irt"], ir_lo, ir_hi))
+            label = str(r["name"]) or "matched feature"
             fig.add_trace(go.Scatter(x=[xb, xa], y=[0.07, -0.07], mode="lines",
                           line=dict(color=theme.NEUTRAL, width=0.8, dash="dash"),
                           showlegend=False, hoverinfo="skip"))
             fig.add_trace(go.Scatter(x=[xb], y=[0.07], mode="markers", showlegend=False,
                           marker=dict(size=8, color=C_BEFORE, line=dict(color="white", width=0.6)),
-                          hovertemplate=f"{r['name']}<br>RT %{{customdata:.2f}} min<extra></extra>",
-                          customdata=[r["rt_obs_min"]]))
+                          hovertemplate=f"{label}<br>RT %{{customdata:.2f}} min<extra></extra>",
+                          customdata=[r["rt"]]))
             fig.add_trace(go.Scatter(x=[xa], y=[-0.07], mode="markers", showlegend=False,
                           marker=dict(size=8, color=C_AFTER, line=dict(color="white", width=0.6)),
-                          hovertemplate=f"{r['name']}<br>iRT %{{customdata:.1f}}<extra></extra>",
+                          hovertemplate=f"{label}<br>iRT %{{customdata:.1f}}<extra></extra>",
                           customdata=[r["irt"]]))
 
     it = _ticks(ir_lo, ir_hi, 20); rtt = _ticks(rt_lo, rt_hi, 5)
