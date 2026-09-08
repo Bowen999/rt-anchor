@@ -82,7 +82,14 @@ function toast(msg, err) {
 function hideToast() { const t = $("#toast"); clearTimeout(toastT); t.className = "toast"; }
 
 /* ===================== INPUT VIEW ===================== */
-function shortPath(p) { return p ? p.split("/").slice(-2).join("/") : ""; }
+/* last two path components, on either separator. Windows hands us
+   "C:\Users\x\data\samples.txt" — splitting on "/" alone left the whole path
+   in a field sized for two components, so it overflowed its box. */
+function shortPath(p) {
+  if (!p) return "";
+  const parts = String(p).split(/[\\/]+/).filter(Boolean);
+  return parts.slice(-2).join("/");
+}
 
 /* file/folder fields, and what their empty state says */
 const FILE_FIELDS = [
@@ -299,30 +306,57 @@ async function run() {
 function setStatus(msg, cls) { const s = $("#status"); s.textContent = msg; s.className = "status" + (cls ? " " + cls : ""); }
 
 /* ---- staged run progress ------------------------------------------------
-   The engine reports no intermediate progress, so the bar eases toward
-   staged caps on a timer (always moving, never claiming to be done) and only
-   completes when the result actually arrives. */
+   Two sources of truth, blended. The BACKEND knows the real stage boundaries
+   (api.progress(): preparing / calibrating / building views) — on a slow
+   machine a run can sit in the fit for a minute, and only the backend can say
+   so. Where that endpoint is missing (browser preview, older backend) the
+   time-based guesses below are all we have: the bar eases toward staged caps
+   (always moving, never claiming to be done) and only completes when the
+   result actually arrives. */
 const RUN_STAGES = [
   { at: 0.0, cap: 0.10 },   // reading & validating inputs
   { at: 1.2, cap: 0.38 },   // matching features
   { at: 6.0, cap: 0.72 },   // fitting the curve
   { at: 14.0, cap: 0.95 },  // rendering results
 ];
-let _runTimer = null;
+/* backend stage -> front-end stage + bar cap. The backend's stage 1 ("matching
+   features and fitting the curve") covers front stages 1 AND 2, so it maps to
+   1; its stage 2 ("building the result views") maps to front stage 3. Caps are
+   per backend stage: the bar may not pass 75% while the fit is still running,
+   however long that takes. */
+const BE_TO_FRONT = [0, 1, 3, 3];
+const BE_CAPS = [0.10, 0.75, 0.95];
+let _runTimer = null, _pollTimer = null, _beStage = null;
 function showProgress(on) {
   const card = $("#runcard");
   clearInterval(_runTimer); _runTimer = null;
+  clearInterval(_pollTimer); _pollTimer = null; _beStage = null;
   if (!on) { card.classList.add("hidden"); return; }
   card.classList.remove("hidden");
   $$("#rc-stages li").forEach(li => { li.className = ""; });
   const fill = $("#rc-fill"), t0 = performance.now();
   let cur = 0, stage = -1;
   fill.style.width = "0%";
+  if (api().progress) {
+    _pollTimer = setInterval(async () => {
+      try {
+        const p = await api().progress();
+        if (p && p.ok && typeof p.stage === "number") _beStage = p.stage;
+      } catch (e) { /* keep the time-based fallback */ }
+    }, 600);
+  }
   _runTimer = setInterval(() => {
     const t = (performance.now() - t0) / 1000;
     $("#rc-elapsed").textContent = t.toFixed(1) + "s";
-    let s = 0;
-    RUN_STAGES.forEach((st, i) => { if (t >= st.at) s = i; });
+    let s, cap;
+    if (_beStage != null) {
+      s = BE_TO_FRONT[Math.min(_beStage, BE_TO_FRONT.length - 1)];
+      cap = BE_CAPS[Math.min(_beStage, BE_CAPS.length - 1)] * 100;
+    } else {
+      s = 0;
+      RUN_STAGES.forEach((st, i) => { if (t >= st.at) s = i; });
+      cap = RUN_STAGES[s].cap * 100;
+    }
     if (s !== stage) {
       stage = s;
       $$("#rc-stages li").forEach((li, i) => {
@@ -330,13 +364,14 @@ function showProgress(on) {
         li.classList.toggle("active", i === stage);
       });
     }
-    cur += (RUN_STAGES[stage].cap * 100 - cur) * 0.055;   // asymptotic crawl
+    cur += (cap - cur) * 0.055;   // asymptotic crawl
     fill.style.width = cur.toFixed(1) + "%";
   }, 90);
 }
 /* result arrived: run the bar to 100%, tick every stage, then hand over */
 function finishProgress(cb) {
   clearInterval(_runTimer); _runTimer = null;
+  clearInterval(_pollTimer); _pollTimer = null;
   $$("#rc-stages li").forEach(li => { li.classList.add("done"); li.classList.remove("active"); });
   $("#rc-fill").style.width = "100%";
   setTimeout(cb, 420);
@@ -792,11 +827,91 @@ function showResults(bundle) {
   }).catch(() => {});
 }
 
-/* preview mode: auto-open output if preview data is injected */
-window.addEventListener("load", () => {
-  initMixtures();
-  initReference();
+/* ===================== BOOT ===================== */
+/* Two things must be true before the input screen means anything: the
+   pywebview bridge has to exist, and the Python side has to have finished
+   importing the calibration engine. On a fast Mac both are done before the
+   first paint. On a low-spec Windows machine the bridge lands late and the
+   engine import (scipy + scikit-learn + statsmodels) can take half a minute,
+   and the old code just called the API on `load` — which meant it either
+   silently fell through to the browser PREVIEW stub and showed fake panel
+   cards, or left the standards-panel section empty with nothing to explain
+   why. The overlay stays up and says which of the two we are waiting on. */
+const boot = {
+  el: () => document.getElementById("boot"),
+  say(msg, sub) {
+    const m = document.getElementById("boot-msg");
+    const s = document.getElementById("boot-sub");
+    if (m && msg != null) m.textContent = msg;
+    if (s && sub != null) s.textContent = sub;
+  },
+  fail(msg, sub) {
+    const b = this.el(); if (b) b.classList.add("err");
+    this.say(msg, sub);
+  },
+  done() {
+    const b = this.el(); if (!b) return;
+    b.classList.add("gone");
+    setTimeout(() => b.remove(), 400);
+  },
+};
+
+/* Resolve the bridge, or decide we are in a plain browser. */
+function whenBridgeReady() {
+  return new Promise(resolve => {
+    if (window.pywebview && window.pywebview.api) return resolve(true);
+    if (window.__PREVIEW__) return resolve(false);      // explicit browser preview
+    let settled = false;
+    const go = ok => { if (!settled) { settled = true; resolve(ok); } };
+    window.addEventListener("pywebviewready", () => go(true), { once: true });
+    /* pywebviewready can fire before this script runs, so poll as well. */
+    const t0 = performance.now();
+    const tick = setInterval(() => {
+      if (window.pywebview && window.pywebview.api) { clearInterval(tick); go(true); }
+      else if (performance.now() - t0 > 20000) { clearInterval(tick); go(false); }
+      else if (performance.now() - t0 > 2500) boot.say("Connecting to the app…");
+    }, 120);
+  });
+}
+
+/* Wait for the Python-side engine import, narrating the wait. */
+async function whenEngineReady() {
+  if (!api().engine_status) return true;              // preview stub
+  for (;;) {
+    let st;
+    try { st = await api().engine_status(); }
+    catch (e) { return true; }                        // older backend: just proceed
+    if (!st) return true;
+    if (st.error) {
+      boot.fail("The calibration engine could not be loaded.", st.error);
+      return false;
+    }
+    if (st.ready) return true;
+    const s = Number(st.elapsed || 0);
+    boot.say("Starting the calibration engine…",
+      s > 4 ? `${s.toFixed(0)}s — first launch is the slow one; the libraries are being read from disk.` : "");
+    await new Promise(r => setTimeout(r, 250));
+  }
+}
+
+async function boot_() {
+  boot.say("Starting…");
+  const bridged = await whenBridgeReady();
+  if (!bridged && !window.__PREVIEW__) {
+    /* Opened as a file in a browser, or the bridge never arrived. The UI still
+       works against the preview stub; say so rather than pretending. */
+    boot.say("Preview mode — no calibration backend attached.");
+  }
+  if (bridged && !(await whenEngineReady())) return;   // overlay stays, showing why
+  boot.say("Loading standards panels…");
+  await Promise.all([initMixtures(), initReference()]);
+  boot.done();
   if (!window.pywebview && window.__PREVIEW__ && window.__PREVIEW__.ok) {
     showResults(window.__PREVIEW__);
   }
-});
+}
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", boot_, { once: true });
+} else {
+  boot_();
+}

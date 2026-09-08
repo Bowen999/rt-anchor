@@ -159,12 +159,15 @@ Smoke-test a windowed (no-console) build by exit code:
 ```bat
 "dist\win\RT Anchor\RT Anchor.exe" --selftest && echo OK
 ```
-> ⚠️ **`build/windows/RTAnchor.win.spec` has not been updated for v2.** It still
-> excludes `sklearn` and `statsmodels` and does not bundle
-> `rt_anchor/reference_data/**`, so a Windows build made from it will start and
-> then fail every calibration. It needs the same two changes the macOS spec
-> received. This port was scoped to macOS source only, so the file was left
-> untouched deliberately rather than edited blind.
+The Windows spec is v2‑current: it bundles `rt_anchor/reference_data/**` from
+the sibling engine checkout (failing loudly if absent) and pulls in
+`statsmodels` + `sklearn` (the stage‑1 LOWESS → isotonic chain) as
+hiddenimports + data files — the same two changes the macOS spec received.
+Startup feedback on slow machines is the **HTML boot overlay**
+(`web/index.html`): it paints with the first frame and narrates the bridge +
+engine‑import wait. There is intentionally no PyInstaller `Splash()` — its
+Tcl/Tk payload fails to collect from a Microsoft Store Python build host and
+the frozen app then pops “failed to load Tcl DLL” dialogs on every launch.
 
 Notes: the Windows spec targets pywebview's WinForms/WebView2 backend via
 pythonnet (.NET Framework); `app_win.py` is the frozen entry — it silences

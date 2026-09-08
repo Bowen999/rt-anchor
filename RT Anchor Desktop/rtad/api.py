@@ -16,6 +16,7 @@ import math
 import os
 import sys
 import threading
+import time
 from typing import Dict, List, Optional
 
 
@@ -61,10 +62,28 @@ def _json_safe(obj):
 #: What the UI shows in the reference pickers until the user overrides them.
 BUNDLED_REFERENCE_LABEL = "bundled Column 25"
 
+#: Run stages the UI names while it waits. The engine reports no intermediate
+#: progress, so rather than inventing sub-steps we report the boundaries we
+#: genuinely control — and the front-end eases the bar *within* a stage instead
+#: of pretending to know how far through it is.
+RUN_STAGES = [
+    "Preparing inputs",
+    "Matching features and fitting the curve",
+    "Building the result views",
+    "Done",
+]
+
 
 class Api:
     def __init__(self):
-        self.window = None
+        # NOTE: the window reference must stay underscore-private. pywebview's
+        # bridge generator walks every PUBLIC attribute of this object
+        # (dir() + getattr, recursing into anything non-callable), and a
+        # public ``window`` makes it descend into the WinForms/WebView2 COM
+        # objects — from a worker thread, which WebView2 forbids ("can only be
+        # accessed from the UI thread") and which can wedge the message pump
+        # (window shows "Not Responding" while the page still paints).
+        self._window = None
         self.result = None
         self.run_info = None
         self._running = False
@@ -72,6 +91,62 @@ class Api:
         self._cal_error = None
         self._cancel_event = None
         self._cal_thread = None
+        # ---- engine warm-up (see warm_engine) ----
+        self._engine_ready = False
+        self._engine_error = None
+        self._engine_t0 = None
+        self._engine_seconds = None
+        self._engine_thread = None
+        # ---- run progress (see progress) ----
+        self._stage = 0
+        self._stage_t0 = None
+
+    # ---- engine warm-up -------------------------------------------------
+    def warm_engine(self) -> None:
+        """Import the calibration engine on a daemon thread, at app start.
+
+        ``import rt_anchor`` is not cheap: the package ``__init__`` pulls in
+        ``crosscolumn``, which imports scipy, scikit-learn and statsmodels at
+        module level. Measured cold on a mid-range machine that chain costs
+        ~10 s; on the low-spec Windows boxes this app has to run on, with a
+        spinning disk and a cold file cache, it is far worse.
+
+        It used to be paid *lazily*, by whichever bridge call needed the engine
+        first — which is ``mixture_previews()``, fired the moment the input
+        screen loads. The window appeared, and then the standards-panel cards
+        simply were not there for half a minute, with nothing on screen to say
+        why. Doing it here instead overlaps the import with WebView2 start-up
+        and gives the front-end something to wait on and animate.
+        """
+        if self._engine_thread is not None:
+            return
+        self._engine_t0 = time.time()
+
+        def _warm():
+            try:
+                import rt_anchor  # noqa: F401
+                from rt_anchor import mixtures  # noqa: F401  (the first call needs it)
+            except Exception as e:
+                self._engine_error = f"{type(e).__name__}: {e}"
+            finally:
+                self._engine_seconds = round(time.time() - self._engine_t0, 2)
+                self._engine_ready = self._engine_error is None
+
+        self._engine_thread = threading.Thread(target=_warm, daemon=True,
+                                               name="rtad-engine-warmup")
+        self._engine_thread.start()
+
+    def engine_status(self) -> Dict:
+        """Is the engine importable yet? Polled by the boot overlay.
+
+        Deliberately touches nothing that could block: the front-end calls this
+        every few hundred ms while the splash is up, and a bridge call that
+        blocked would defeat the point.
+        """
+        return {"ok": True, "ready": bool(self._engine_ready),
+                "error": self._engine_error,
+                "elapsed": round(time.time() - self._engine_t0, 1) if self._engine_t0 else 0.0,
+                "seconds": self._engine_seconds}
 
     # ---- bundled standard mixtures (card choice on the input screen) ----
     def mixture_previews(self) -> Dict:
@@ -79,9 +154,17 @@ class Api:
 
         Sourced from ``rt_anchor.mixtures`` so the cards can never describe a
         different panel from the one the engine actually uses.
+
+        The front-end waits on :meth:`engine_status` before calling this, so by
+        the time it runs the import is already paid for. A failed import is
+        reported rather than raised: the bridge would otherwise turn it into an
+        opaque JS error and the cards would just silently never appear.
         """
-        from .mixtures import DEFAULT_MIXTURE, preview_payload
-        return {"ok": True, "default": DEFAULT_MIXTURE, "mixtures": preview_payload()}
+        try:
+            from .mixtures import DEFAULT_MIXTURE, preview_payload
+            return {"ok": True, "default": DEFAULT_MIXTURE, "mixtures": preview_payload()}
+        except Exception as e:
+            return {"ok": False, "error": f"{type(e).__name__}: {e}"}
 
     # ---- bundled reference datasets (the column results are expressed on) ----
     def reference_info(self) -> Dict:
@@ -137,7 +220,7 @@ class Api:
     def pick_file(self, title: str = "Choose a file") -> Optional[str]:
         try:
             import webview
-            r = self.window.create_file_dialog(webview.OPEN_DIALOG, allow_multiple=False)
+            r = self._window.create_file_dialog(webview.OPEN_DIALOG, allow_multiple=False)
             return r[0] if r else None
         except Exception as e:
             return None
@@ -145,7 +228,7 @@ class Api:
     def pick_files(self) -> List[str]:
         try:
             import webview
-            r = self.window.create_file_dialog(webview.OPEN_DIALOG, allow_multiple=True)
+            r = self._window.create_file_dialog(webview.OPEN_DIALOG, allow_multiple=True)
             return list(r) if r else []
         except Exception:
             return []
@@ -153,7 +236,7 @@ class Api:
     def pick_folder(self) -> Optional[str]:
         try:
             import webview
-            r = self.window.create_file_dialog(webview.FOLDER_DIALOG)
+            r = self._window.create_file_dialog(webview.FOLDER_DIALOG)
             return r[0] if r else None
         except Exception:
             return None
@@ -202,25 +285,28 @@ class Api:
         self._cal_error = None
         self._running = True
         self._cancel_event = threading.Event()
+        self._stage = 0
+        self._stage_t0 = time.time()
 
         def _worker():
             try:
                 from rt_anchor import calibrate
                 from .appviz import build_viz
 
-                import time
                 from datetime import datetime
                 t0 = time.time()
+                self._set_stage(1)
                 res = calibrate(samples, polarity, standards_table=standards,
                                 panel=mix_key,
                                 reference_sample=ref_sample,
                                 reference_standards=ref_standards,
                                 single_files=single, config=cfg)
                 if self._cancel_event.is_set():
-                    self._running = False
+                    self._cal_error = "cancelled"
                     return
                 elapsed = time.time() - t0
                 self.result = res
+                self._set_stage(2)
                 bundle = build_viz(res)
 
                 m = res.model
@@ -264,16 +350,43 @@ class Api:
             except Exception as e:
                 self._cal_error = f"{type(e).__name__}: {e}"
             finally:
+                self._set_stage(3)
                 self._running = False
+                # Best-effort nudge. `evaluate_js` blocks up to 20 s waiting for
+                # the page and then raises, and a WebView2 that is busy laying
+                # out a big result can miss it — so this is an optimisation, not
+                # the delivery mechanism. The front-end also polls
+                # `get_calibration_result()`, which is what actually guarantees
+                # a finished run is never left hanging behind a spinner.
                 try:
-                    if self.window:
-                        self.window.evaluate_js("window.__onCalibrationDone()")
+                    if self._window:
+                        self._window.evaluate_js("window.__onCalibrationDone()")
                 except Exception:
                     pass
 
-        self._cal_thread = threading.Thread(target=_worker, daemon=True)
+        self._cal_thread = threading.Thread(target=_worker, daemon=True,
+                                            name="rtad-calibration")
         self._cal_thread.start()
-        return {"ok": True, "status": "running"}
+        return {"ok": True, "status": "running", "stages": RUN_STAGES}
+
+    # ---- run progress ---------------------------------------------------
+    def _set_stage(self, i: int) -> None:
+        self._stage = int(i)
+        self._stage_t0 = time.time()
+
+    def progress(self) -> Dict:
+        """Which stage the run is in, and how long it has been there.
+
+        Polled by the run card. The stage index is *real* — it is set at the
+        boundaries the app controls — while the seconds let the front-end ease
+        the bar within a stage without ever claiming the stage is finished.
+        """
+        return {"ok": True, "running": bool(self._running),
+                "stage": int(self._stage), "n_stages": len(RUN_STAGES),
+                "label": RUN_STAGES[min(self._stage, len(RUN_STAGES) - 1)],
+                "stage_seconds": round(time.time() - self._stage_t0, 1)
+                                 if self._stage_t0 else 0.0,
+                "done": self._cal_bundle is not None or self._cal_error is not None}
 
     def get_calibration_result(self) -> Dict:
         """Return the result if calibration is complete, or status."""
@@ -286,16 +399,22 @@ class Api:
         return {"ok": False, "error": "No calibration in progress."}
 
     def cancel_calibration(self) -> Dict:
-        """Request cancellation of a running calibration."""
+        """Ask the running calibration to stop.
+
+        ``calibrate()`` is a single uninterruptible call, so this cannot abort
+        the fit itself — the flag is read at the next boundary, and the result
+        is then discarded rather than rendered. Says so plainly instead of
+        letting the UI imply an instant stop.
+        """
         if self._cancel_event:
             self._cancel_event.set()
-        return {"ok": True}
+        return {"ok": True, "immediate": False}
 
     def export_csv(self) -> Dict:
         import webview
         if self.result is None:
             return {"ok": False, "error": "Nothing to export yet."}
-        r = self.window.create_file_dialog(webview.SAVE_DIALOG, save_filename="calibrated.csv")
+        r = self._window.create_file_dialog(webview.SAVE_DIALOG, save_filename="calibrated.csv")
         if not r:
             return {"ok": False, "error": "cancelled"}
         path = r if isinstance(r, str) else r[0]
@@ -308,7 +427,7 @@ class Api:
         import webview
         if self.result is None:
             return {"ok": False, "error": "Nothing to export yet."}
-        r = self.window.create_file_dialog(webview.SAVE_DIALOG, save_filename="report")
+        r = self._window.create_file_dialog(webview.SAVE_DIALOG, save_filename="report")
         if not r:
             return {"ok": False, "error": "cancelled"}
         prefix = r if isinstance(r, str) else r[0]
@@ -353,7 +472,7 @@ class Api:
         import webview
         if self.result is None:
             return {"ok": False, "error": "Nothing to export yet."}
-        r = self.window.create_file_dialog(webview.FOLDER_DIALOG)
+        r = self._window.create_file_dialog(webview.FOLDER_DIALOG)
         if not r:
             return {"ok": False, "error": "cancelled"}
         folder = r[0] if isinstance(r, (list, tuple)) else r
@@ -377,7 +496,7 @@ class Api:
     # ---- helpers ----
     def _save_dialog(self, default_name: str) -> Optional[str]:
         import webview
-        r = self.window.create_file_dialog(webview.SAVE_DIALOG, save_filename=default_name)
+        r = self._window.create_file_dialog(webview.SAVE_DIALOG, save_filename=default_name)
         if not r:
             return None
         return r if isinstance(r, str) else r[0]

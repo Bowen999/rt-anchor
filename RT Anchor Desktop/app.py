@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import sys
+import threading
 
 import webview
 
@@ -76,17 +77,57 @@ def _selftest() -> int:
 
 
 # ---- persistent matplotlib font cache (avoid re-indexing on every launch) ----
-import os as _os
-_mpl_dir = _os.path.join(_os.path.expanduser("~"), "Library", "Caches", "RTAnchor", "mpl")
+def _cache_dir(*parts: str) -> str:
+    """Per-platform cache root. Used for the matplotlib font cache.
+
+    This used to hardcode ``~/Library/Caches``, which on Windows quietly created
+    a stray ``C:\\Users\\<you>\\Library\\Caches`` tree that matplotlib was never
+    pointed at anyway (``app_win`` sets ``MPLCONFIGDIR`` first, so the
+    ``setdefault`` below is a no-op there).
+    """
+    if sys.platform == "darwin":
+        base = os.path.join(os.path.expanduser("~"), "Library", "Caches")
+    elif os.name == "nt":
+        base = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
+    else:
+        base = os.environ.get("XDG_CACHE_HOME") or os.path.join(os.path.expanduser("~"), ".cache")
+    return os.path.join(base, *parts)
+
+
+_mpl_dir = _cache_dir("RTAnchor", "mpl")
 try:
-    _os.makedirs(_mpl_dir, exist_ok=True)
-    _os.environ.setdefault("MPLCONFIGDIR", _mpl_dir)
+    os.makedirs(_mpl_dir, exist_ok=True)
+    os.environ.setdefault("MPLCONFIGDIR", _mpl_dir)
 except OSError:
     pass
 
 
+def _close_splash() -> None:
+    """Dismiss the PyInstaller splash screen, if this build has one.
+
+    Only Windows builds carry one (``Splash()`` is unsupported on macOS), and
+    only frozen ones — ``pyi_splash`` does not exist when running from source,
+    so the import failing is the normal case, not an error. The env-var check
+    comes first: when the bootloader never started a splash, ``import
+    pyi_splash`` dies noisily on the missing ``_PYI_SPLASH_IPC`` (it prints a
+    traceback before raising), which a console-mode ``--selftest`` would show.
+    """
+    if "_PYI_SPLASH_IPC" not in os.environ:
+        return
+    try:
+        import pyi_splash  # type: ignore[import-not-found]
+    except Exception:
+        return
+    try:
+        if pyi_splash.is_alive():
+            pyi_splash.close()
+    except Exception:
+        pass
+
+
 def main() -> None:
     if "--selftest" in sys.argv:
+        _close_splash()
         raise SystemExit(_selftest())
     api = Api()
     window = webview.create_window(
@@ -94,9 +135,32 @@ def main() -> None:
         _resource("web/index.html"),
         js_api=api,
         width=1200, height=820, min_size=(960, 660),
-        background_color="#0C0F14",
+        # the chrome behind the page, seen while WebView2/WKWebView paints.
+        # Matches --bg in web/styles.css; it was still the pre-redesign near-black,
+        # which on a slow Windows box meant several seconds of dark rectangle
+        # before a warm-paper UI faded in.
+        background_color="#FCFBF9",
     )
-    api.window = window
+    api._window = window
+
+    # Start importing the engine now, in parallel with WebView2 start-up,
+    # instead of leaving the bill for whichever bridge call needs it first.
+    api.warm_engine()
+
+    # Hand over from the native splash the moment the page is up. Both events
+    # are subscribed because either can be the one that fires first on a given
+    # backend, and _close_splash() is idempotent.
+    try:
+        window.events.loaded += _close_splash
+        window.events.shown += _close_splash
+    except Exception:
+        pass
+    # ...and a watchdog, so a page that never loads cannot strand an
+    # always-on-top splash over the user's desktop.
+    _t = threading.Timer(30.0, _close_splash)
+    _t.daemon = True
+    _t.start()
+
     webview.start(debug=("--debug" in sys.argv))
 
 

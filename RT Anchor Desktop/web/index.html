@@ -4,6 +4,32 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RT Anchor</title>
+<!-- Critical boot styles, inline and first: this is the only thing on screen
+     while styles.css, the pywebview bridge and the calibration engine are still
+     loading, so it must not itself wait on a stylesheet. -->
+<style>
+  html,body{margin:0;height:100%;background:#FCFBF9;}
+  #boot{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;
+        align-items:center;justify-content:center;gap:18px;background:#FCFBF9;
+        color:#2B2B2B;font:14px/1.55 "Inter",-apple-system,"Segoe UI",Arial,sans-serif;
+        transition:opacity .32s ease;}
+  #boot.gone{opacity:0;pointer-events:none;}
+  #boot .bw{font-weight:800;letter-spacing:-.045em;font-size:26px;color:#2B2B2B;}
+  #boot .bw span{color:#2B5D7D;}
+  #boot .bmsg{color:#4D4D4D;min-height:1.5em;text-align:center;max-width:30em;padding:0 24px;}
+  #boot .bsub{color:#7A7A7A;font-size:12.5px;min-height:1.4em;}
+  /* Indeterminate sweep: the engine import reports no progress, so the bar says
+     "working", not "42% done". It is CSS-only — no JS timer, no layout thrash,
+     so it keeps animating even while the bridge thread is busy. */
+  #boot .bbar{position:relative;width:240px;height:3px;border-radius:99px;
+              background:#EAE8E2;overflow:hidden;}
+  #boot .bbar i{position:absolute;top:0;left:0;height:100%;width:38%;border-radius:99px;
+                background:#2B5D7D;animation:bsweep 1.35s ease-in-out infinite;}
+  @keyframes bsweep{0%{left:-38%}100%{left:100%}}
+  #boot.err .bbar{display:none;}
+  #boot.err .bmsg{color:#A63D40;}
+  @media (prefers-reduced-motion:reduce){#boot .bbar i{animation-duration:3s;}}
+</style>
 <link rel="stylesheet" href="styles.css">
     <!-- Plotly loaded on-demand (4.8 MB) — only needed for Detection/Profile -->
     <script>
@@ -24,6 +50,19 @@
     </script>
 </head>
 <body>
+
+<!-- ============================ BOOT OVERLAY ==========================
+     Shown from first paint until the pywebview bridge is up AND the engine
+     import has finished. Both can take tens of seconds on a low-spec Windows
+     box (scipy + scikit-learn + statsmodels off a cold spinning disk), and
+     without this the window appeared blank-then-half-populated and read as a
+     hang. Dismissed by bootGate() in app.js. -->
+<div id="boot">
+  <div class="bw">RT<span>ANCHOR</span></div>
+  <div class="bbar" role="progressbar" aria-valuetext="Starting"><i></i></div>
+  <div class="bmsg" id="boot-msg">Starting…</div>
+  <div class="bsub" id="boot-sub"></div>
+</div>
 
 <!-- ============================ INPUT VIEW ============================ -->
 <section id="view-input" class="view view-input">

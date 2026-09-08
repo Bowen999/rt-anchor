@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rt-anchor"
-version = "0.2.0"
+version = "1.2.0"
 description = "Cross-column retention-time calibration and retention index (iRT) for LC-MS lipidomics feature tables (MS-DIAL / MZmine / MassCube / LipidScreener)"
 readme = "README.md"
 requires-python = ">=3.9"

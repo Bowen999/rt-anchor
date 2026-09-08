@@ -21,10 +21,15 @@ icon = _icon if os.path.exists(_icon) else None
 datas = [(os.path.join(APP, "web"), "web"),
          (os.path.join(APP, "example"), "example")]   # bundled demo dataset
 
-# The v2 method needs the bundled reference pair — without it every calibration fails.
-REF_DATA = os.path.join(APP, "rt_anchor", "src", "rt_anchor", "reference_data")
-if os.path.isdir(REF_DATA):
-    datas += [(REF_DATA, os.path.join("rt_anchor", "reference_data"))]
+# The v2 method needs the bundled reference pair — without it every calibration
+# fails. Resolve it from the sibling engine checkout (same layout the macOS spec
+# and build_win.bat's build_venv path assume), and fail loudly if absent.
+RT_SRC = os.path.join(os.path.dirname(APP), "rt_anchor", "src")
+REF_DATA = os.path.join(RT_SRC, "rt_anchor", "reference_data")
+if not os.path.isdir(REF_DATA):
+    raise SystemExit(f"reference_data not found at {REF_DATA} — the frozen app "
+                     f"cannot calibrate without it")
+datas += [(REF_DATA, os.path.join("rt_anchor", "reference_data"))]
 binaries = []
 hiddenimports = []
 
@@ -146,6 +151,16 @@ pyz = PYZ(a.pure)
 # ONEDIR: exe + _internal\ of dependencies -> dist\RT Anchor\. Distributed as a
 # .zip — onedir triggers far fewer antivirus false-positives than onefile and
 # starts faster (no unpacking).
+#
+# NOTE: deliberately NO PyInstaller Splash() here. The splash needs Tcl/Tk
+# DLLs + script libraries collected into the bundle, and that collection
+# silently no-ops for a Microsoft Store Python / venv build host (the tcl tree
+# lives under the ACL-restricted WindowsApps dir) — the result is an app that
+# pops "failed to load Tcl DLL" / "SPLASH: failed to load tcl/tk shared
+# libraries" dialogs on every launch. The HTML boot overlay in web/index.html
+# is the loading mechanism instead: it paints with the first frame and narrates
+# the bridge + engine wait, which is where the real delay lives on a low-spec
+# box. app.py's _close_splash() stays as a harmless no-op guard.
 exe = EXE(
     pyz,
     a.scripts,

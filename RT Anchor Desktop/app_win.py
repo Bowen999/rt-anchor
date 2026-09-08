@@ -75,16 +75,36 @@ def _strip_motw() -> None:
 
 
 def _check_webview2() -> None:
-    """Warn once if the WebView2 Runtime is missing (Win 10 LTSC, older builds)."""
+    """Warn once if the WebView2 Runtime is missing (Win 10 LTSC, older builds).
+
+    Registry first (the documented check, per-machine and per-user), then the
+    install directory as a fallback — the client keys are occasionally absent
+    even when the runtime is installed and working, and a false warning is
+    worse than none.
+    """
+    found = False
     try:
         import winreg
-        key = winreg.OpenKey(
-            winreg.HKEY_LOCAL_MACHINE,
-            r"SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BEE-13A6279B0CE9}",
-            0, winreg.KEY_READ)
-        winreg.CloseKey(key)
-    except OSError:
-        import sys
+        subs = (r"SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BEE-13A6279B0CE9}",
+                r"SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BEE-13A6279B0CE9}")
+        for root in (winreg.HKEY_LOCAL_MACHINE, winreg.HKEY_CURRENT_USER):
+            for sub in subs:
+                try:
+                    key = winreg.OpenKey(root, sub, 0, winreg.KEY_READ)
+                    winreg.CloseKey(key)
+                    found = True
+                except OSError:
+                    pass
+    except Exception:
+        pass
+    if not found:
+        import glob as _glob
+        for base in (os.environ.get("ProgramFiles(x86)"), os.environ.get("ProgramFiles")):
+            if base and _glob.glob(os.path.join(
+                    base, "Microsoft", "EdgeWebView", "Application", "*", "msedgewebview2.exe")):
+                found = True
+                break
+    if not found:
         print("[RT Anchor] WARNING: WebView2 Runtime not found. "
               "The app may fail to start. Download from:\n"
               "  https://developer.microsoft.com/en-us/microsoft-edge/webview2/",

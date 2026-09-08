@@ -14,7 +14,11 @@ const CK = (() => {
     blue: "#2B5D7D", navy: "#1B4A6B", teal: "#3E7C73", brick: "#A63D40", hot: "#C08552",
     steel: "#3D7CA8", pale: "#9CC3D5",
   };
-  const MONO = '"JetBrains Mono","IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace';
+  /* Windows ships none of the mac-first faces below, and Chromium/WebView2 only
+     honours ui-monospace on macOS — without the Cascadia/Consolas steps the
+     chart labels fell all the way back to Courier New. */
+  const MONO = '"JetBrains Mono","IBM Plex Mono",ui-monospace,"SF Mono",Menlo,' +
+               '"Cascadia Mono",Consolas,"Segoe UI Mono",monospace';
   /* Lipid classes -> colour. The stage-2 anchors are endogenous plasma lipids,
      so the palette has to cover more than the mixture's PC/DG/CE; the ordering
      keeps classes that neighbour each other in RT visually apart. */

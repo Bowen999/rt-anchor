@@ -65,7 +65,7 @@ from .reference import (
     resolve_reference,
 )
 
-__version__ = "0.2.0"
+__version__ = "1.2.0"
 
 __all__ = [
     # entry points
