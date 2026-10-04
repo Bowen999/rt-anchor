@@ -3,16 +3,16 @@
 A native desktop app (pywebview + the `rt_anchor` engine) for **cross‑column
 retention‑time calibration**: it puts a sample's retention times onto a stated
 **reference column's** time axis (`Cal_RT_min`) and onto a dimensionless 1–100
-**iRT** index. Dark, blue, refined‑brutalist UI. macOS build (`.app` / `.dmg`,
-arm64) and Windows build (`RT Anchor.exe`, onedir zip) ship from the same
-shared source.
+**iRT** index. Light "scientific" UI (warm paper, slate‑blue accents, Inter).
+macOS build (`.app` / `.dmg`, arm64) and Windows build (`RT Anchor.exe`,
+onedir zip) ship from the same shared source.
 
 > **v2 — the method changed.** Earlier versions warped a sample onto iRT using
 > the standard panel found *in that same sample*. The engine now calibrates one
 > column *onto another*: your standards run tells it how your column's time axis
 > maps onto the reference column's, and the sample inherits that map. The
 > outputs, the sections and the advanced inputs all changed accordingly — see
-> `RI_CALIBRATION_SPEC_V2.md`.
+> [`docs/RI_CALIBRATION_SPEC_V2.md`](../docs/RI_CALIBRATION_SPEC_V2.md).
 
 ## Deliverables
 - macOS: `dist/macos/RT Anchor.dmg` — drag‑to‑Applications installer
@@ -64,17 +64,20 @@ A left sidebar switches sections:
 
 | # | Section | Content |
 |---|---|---|
-| 01 | **Overview** | method/provenance band (reference column, panel, pair counts, gate verdict, iRT definition), KPI metrics, quality radar |
+| 01 | **Overview** | KPI metrics (features per run, curve residual median / P90, iRT range and extrapolated share) and the quality radar |
 | 02 | **Detection** | the chosen panel located in **your standards run**, on the reference column's axis — **QC only, it does not drive the calibration** |
-| 03 | **Profile** | intensity‑weighted feature profile, raw RT vs. iRT |
+| 03 | **Profile** | intensity‑weighted feature profile: before vs. after calibration (raw RT vs. `Cal_RT`), then the calibrated profile against the reference |
 | 04 | **Curve** | the stage‑1 cross‑column curve: matched pairs (standards = squares, sample = diamonds, MAD‑trimmed = hollow grey), the fit, the anchor‑refined fit when engaged, the stage‑2 anchors as rings, and the residual strip |
-| 05 | **Anchors** | the stage‑2 endogenous‑plasma‑lipid anchors: residual against the stage‑1 curve vs. the leave‑one‑out residual under the correction, coloured by lipid class, with the gate's verdict and the class median offsets. Disabled when no anchors validated |
-| 06 | **Repeatability** | per‑injection only |
-| 07 | **Table** | preview: your RT and m/z beside `Cal_RT_min`, `iRT`, their uncertainties, reliability and the extrapolation flag |
-| 08 | **Export** | see below |
+| 05 | **Table** | preview: your RT and m/z beside `Cal_RT_min`, `iRT`, their uncertainties, reliability and the extrapolation flag |
+| 06 | **Export** | see below |
 
-Detection and Profile are the engine's own Plotly figures; the radar, curve,
-anchors and repeatability charts are hand‑authored SVG (`web/charts.js`). The
+The stage‑2 anchor table (residuals, class offsets, gate verdict) is not a
+section of its own: it is in the exported `_anchors.csv`, `_model.json` and the
+report. The app has no per‑injection input, so the repeatability view of the
+engine's per‑sample tier is not shown here either.
+
+Detection and Profile are the engine's own Plotly figures; the radar and curve
+charts are hand‑authored SVG (`web/charts.js`). The
 numbers behind all of them come from the same engine helpers the exported
 report uses (`viz.metrics`, `viz.performance.compute_curve`,
 `viz.anchors.compute_anchors`, `viz.report.method_facts`), so the app and the

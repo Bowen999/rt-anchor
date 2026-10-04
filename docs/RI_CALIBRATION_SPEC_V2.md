@@ -2,6 +2,8 @@
 
 Status: **implementation contract**. Supersedes the method described in
 `RI_CALIBRATION_SPEC.md` (v1, standard-panel warp). Written 2026-09-06.
+The v1 spec has been removed from the tree; it is in git history
+(`git show 8269da9:RI_CALIBRATION_SPEC.md`).
 
 The v1 engine warped a sample's RT onto a dimensionless iRT scale using the
 spiked standard panel found *in that same sample*. v2 replaces that method

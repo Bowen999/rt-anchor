@@ -1,76 +1,121 @@
 # RT Anchor
 
-Standard-panel **retention-index (iRT) calibration** for LC-MS lipidomics
+**Cross-column retention-time calibration for LC-MS lipidomics.**
 
-![RT Anchor — input](docs/input.png)
+RT Anchor puts every feature of an LC-MS run onto a shared time axis: the
+retention time it *would have had* on a reference column (`Cal_RT_min`), plus a
+dimensionless 1–100 retention index (`iRT`). Retention then becomes comparable
+across columns, gradients, instruments and labs. The input table is never
+altered — calibration only appends columns.
 
-![RT Anchor — overview](docs/overview.png)
+It ships as a Python package (`rt-anchor`: library, CLI, HTML/PDF report) and as
+a desktop app for macOS and Windows.
 
-![RT Anchor — feature-intensity profile](docs/profile.png)
-
-## Purpose
-
-Convert the retention time of every feature in an LC-MS table into a
-dimensionless, portable **retention index (RI / iRT)** anchored on a spiked
-standard panel, so retention is comparable across injections, batches, and
-instruments. The original table is never altered — calibration only appends columns.
+<p>
+  <img src="docs/images/overview.png" alt="RT Anchor — run overview" width="49%">
+  <img src="docs/images/curve.png" alt="RT Anchor — cross-column calibration curve" width="49%">
+</p>
 
 ## Download
 
-- **Python package:** `pip install rt-anchor` — [`rt-anchor` on PyPI](https://pypi.org/project/rt-anchor/)
-- **macOS desktop app:** download the `.dmg` from the [**latest release**](https://github.com/Bowen999/rt-anchor/releases/latest), open it, and drag **RT Anchor** to Applications. On first launch, right-click → **Open** (the app is signed but not yet notarized).
+- **Desktop app** — from the [**latest release**](https://github.com/Bowen999/rt-anchor/releases/latest):
+  - macOS (Apple Silicon): the `.dmg` — drag **RT Anchor** to Applications; on first
+    launch right-click → **Open** (the app is ad-hoc signed, not notarized).
+  - Windows 10/11 x64: the `win64` `.zip` — unzip anywhere and run `RT Anchor.exe`
+    (needs the WebView2 Runtime, preinstalled on Windows 11 and most Windows 10).
+- **Python package** — `pip install rt-anchor` ([PyPI](https://pypi.org/project/rt-anchor/));
+  add `[report]` for the HTML/PDF report.
 
-## Input
+## Quick start
 
-The desktop app asks for:
+```python
+from rt_anchor import calibrate, write_results
 
- * a **sample feature table** — needs an *m/z* and a retention-time column (MS-DIAL · MZmine · MassCube · LipidScreener, auto-detected)
- * a **standards mixture table** — the run of your standard mixture, which builds the native anchor template
- * a **mixture panel** — **Mix 15** or **Mix 21**, the two bundled standard panels; a per-standard preview table (m/z per polarity · reference RT) helps pick the right one
- * the **polarity** (`positive` / `negative`).
+res = calibrate("samples.txt", polarity="positive",
+                standards_table="standards.txt", panel="mix21")
+write_results(res, "out/run1")
+```
 
-Optional: per-injection files (per-sample tier + repeatability QC) and matching
-parameters (`mz_tol_ppm`, `rt_window_min`, `min_anchors`, `extrapolate`). With
-the engine API, a custom manifest / reference baseline can still be passed to
-`calibrate()`.
+```bash
+rt-anchor calibrate --samples samples.txt --standards standards.txt \
+                    --polarity positive --panel mix21 --out out/run1
+```
 
-Supported feature-table formats: [MZmine](https://mzio.io/mzmine-news/) ·
-[MS-DIAL](https://systemsomicslab.github.io/compms/msdial/main.html) ·
-[MassCube](https://huaxuyu.github.io/masscubedocs/) ·
-[Lipidscreener](https://tmiclinode.com/web-servers-software/).
+A runnable walk-through with bundled data is in
+[`examples/quickstart.ipynb`](examples/quickstart.ipynb).
 
-## Output
+## Inputs and outputs
 
-- **`*_calibrated.csv`** — original table + `RI`, `RI_uncertainty`, `RI_reliability`,
-  `RI_spread`, `n_contributing`, `is_extrapolated`, `calibration_scope`, `warp_source`.
-- **`*_model.json`**, **`*_anchors.csv`**, **`*_log.txt`** — the fitted model, anchors, and log.
-- **`*_report.html`** + **`*_report.pdf`** — interactive + static report (on by default).
+| Input | |
+|---|---|
+| **Sample feature table** | the run to calibrate — MS-DIAL · MZmine · MassCube · LipidScreener, auto-detected; needs a precursor *m/z* and a retention-time column |
+| **Standards run** | a run of the standards mixture **from the same column and gradient as the sample** |
+| **Panel** | `mix15` (15-standard Caley mix), `mix21` (Mix 4.4, 21 standards; default) or `none` |
+| **Polarity** | `positive` or `negative` |
+| *Reference pair* (optional) | defaults to the bundled reference column (`col35`: human serum + Mix 4.4 standards, QTOF, positive mode) |
 
-## Examples
+Outputs (`write_results`): `*_calibrated.csv` (the input table plus `Cal_RT_min`,
+`iRT`, their uncertainties, a reliability tier and an extrapolation flag),
+`*_model.json`, `*_pairs.csv`, `*_landmarks.csv`, `*_anchors.csv`, `*_log.txt`,
+and an `*_report.html` / `*_report.pdf` report.
 
-- [`examples/quickstart.ipynb`](examples/quickstart.ipynb) — a Jupyter notebook running the bundled Mix 15 example end-to-end.
-- [`examples/input_15_mixture/`](examples/input_15_mixture/) — example sample + standards tables for the **Mix 15** panel.
-- [`examples/input_21_mixture/`](examples/input_21_mixture/) — example sample + standards tables for the **Mix 21** panel.
-- [`examples/output/`](examples/output/) — the generated CSV, model, anchors, log, and HTML/PDF report.
+## How it works
 
-## How calibration works
+1. **Stage 1 — anchor-free curve.** Features of your standards run are matched to
+   the reference standards run by accurate *m/z* alone (reciprocal best match),
+   sample-run pairs are merged in to cover the early and late gradient, and a
+   robust monotone curve (LOESS → isotonic → PCHIP, MAD outlier trimming) maps
+   your RT onto the reference column. No standard identities are needed.
+2. **Stage 2 — gated sample anchors.** Seventeen endogenous plasma lipids found in
+   both sample runs refine the curve with a class-aware correction, applied only
+   when it cuts leave-one-out error by at least 20%. On other matrices Stage 2
+   does not engage and the Stage-1 curve is used.
+3. **iRT.** The chosen panel's standards located on the reference standards run
+   define the scale: the earliest is 1, the latest 100.
 
-Retention time drifts between injections, batches, and instruments, which makes
-features hard to compare across runs. RT Anchor removes that drift by mapping each
-feature's retention time onto a dimensionless **retention index (RI)** — the similar
-principle as a Kováts index in GC, adapted to reversed-phase LC with a spiked lipid
-standard panel.
+Details, accuracy figures and all parameters: [`rt_anchor/README.md`](rt_anchor/README.md).
+The full method specification: [`docs/RI_CALIBRATION_SPEC_V2.md`](docs/RI_CALIBRATION_SPEC_V2.md).
 
-A panel of standards spanning the gradient is run alongside the samples. Each
-standard is located in the **standards run** by its *m/z* (and, where available,
-MS² and intensity), pairing its **observed** retention time with a **fixed reference
-index**. A shape-preserving **monotone spline (PCHIP)** is fitted through these
-anchor points and applied to every feature, converting retention time → retention
-index on a scale fixed by two reference times (making the index instrument-independent).
+## Repository layout
 
-Every feature is reported with its RI, a per-feature **uncertainty**, and a **reliability**
-tier; supplying per-injection tables additionally yields a run-to-run **spread**
-(repeatability QC).
+```
+rt_anchor/                 Python package "rt-anchor" (PyPI) — engine, CLI, report
+├── src/rt_anchor/
+│   ├── pipeline.py        calibrate(): orchestrates the stages below
+│   ├── crosscolumn.py     stage 1 — m/z matching + robust monotone curve
+│   ├── plasma_lipids.py   stage 2 — endogenous plasma-lipid anchors
+│   ├── irt.py             the iRT ruler (panel landmarks on the reference run)
+│   ├── reference_data/    bundled reference column (col35) — the default Cal_RT axis
+│   ├── io/ · viz/         table loaders (4 formats) · figures + HTML/PDF report
+│   ├── cli.py · helpers.py   rt-anchor CLI · write_results()
+│   └── gui.py · webui/ · example/   built-in rt-anchor-gui client + its demo data
+├── tests/                 pytest suite; tests/data/ holds the test datasets
+├── rt_anchor_gui.py/.spec · build.bat · packaging/   Windows build of rt-anchor-gui
+└── pyproject.toml · README.md (the PyPI page)
+RT Anchor Desktop/         desktop app (pywebview) — one source, macOS + Windows builds
+examples/                  quickstart notebook · Mix 15 / Mix 21 inputs · example outputs
+docs/                      method specification (v2) · screenshots
+.github/workflows/         CI — Windows build of rt-anchor-gui on v* tags
+```
 
-# Bug Report
+## Desktop app
+
+Pick the two runs, the panel and the polarity, then browse the result sections
+(Overview · Detection · Profile · Curve · Table · Export) and export every output
+in one click. Build and development notes: [`RT Anchor Desktop/README.md`](RT%20Anchor%20Desktop/README.md).
+
+<p>
+  <img src="docs/images/input.png" alt="RT Anchor — input screen" width="49%">
+  <img src="docs/images/profile.png" alt="RT Anchor — feature-intensity profile" width="49%">
+</p>
+
+## Development
+
+```bash
+pip install -e "rt_anchor[test,report]"
+pytest rt_anchor/tests
+```
+
+## Bug report
+
 If you have any questions or encounter any bugs, please contact Bowen Yang (by8@ualberta.ca).

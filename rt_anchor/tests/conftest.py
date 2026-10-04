@@ -1,7 +1,8 @@
 """Shared fixtures for the rt_anchor QA suite.
 
 Provides:
-* paths to the shipped example inputs and the real LipidScreener files,
+* paths to the shipped test datasets (``tests/data``) and the real
+  LipidScreener files,
 * builders that synthesise small-but-valid MS-DIAL / MZmine v2 / MZmine v3
   tables seeded with real panel-standard m/z at plausible RTs (so calibration
   can actually run), and
@@ -25,41 +26,41 @@ from rt_anchor.reference import resolve_reference
 
 HERE = Path(__file__).resolve().parent
 PKG_ROOT = HERE.parent                      # .../rt_anchor
-EXAMPLES = PKG_ROOT / "example_input"
+DATA = HERE / "data"                        # shipped test datasets (data/README.md)
 PROCESSED = PKG_ROOT.parent / "processed no RT"   # real LipidScreener files
 
 
 # ----------------------------------------------------------------- paths ------
 
 @pytest.fixture(scope="session")
-def examples() -> Path:
-    assert EXAMPLES.is_dir(), f"missing example_input at {EXAMPLES}"
-    return EXAMPLES
+def data_dir() -> Path:
+    assert DATA.is_dir(), f"missing test data at {DATA}"
+    return DATA
 
 
 @pytest.fixture(scope="session")
-def orbitrap_samples(examples) -> str:
-    return str(examples / "Orbitrap" / "samples" / "aligned_feature_table.txt")
+def orbitrap_samples(data_dir) -> str:
+    return str(data_dir / "Orbitrap" / "samples" / "aligned_feature_table.txt")
 
 
 @pytest.fixture(scope="session")
-def orbitrap_standards(examples) -> str:
-    return str(examples / "Orbitrap" / "standards" / "aligned_feature_table.txt")
+def orbitrap_standards(data_dir) -> str:
+    return str(data_dir / "Orbitrap" / "standards" / "aligned_feature_table.txt")
 
 
 @pytest.fixture(scope="session")
-def qtof_samples(examples) -> str:
-    return str(examples / "QTOF" / "samples" / "aligned_feature_table.txt")
+def qtof_samples(data_dir) -> str:
+    return str(data_dir / "QTOF" / "samples" / "aligned_feature_table.txt")
 
 
 @pytest.fixture(scope="session")
-def qtof_standards(examples) -> str:
-    return str(examples / "QTOF" / "standards" / "aligned_feature_table.txt")
+def qtof_standards(data_dir) -> str:
+    return str(data_dir / "QTOF" / "standards" / "aligned_feature_table.txt")
 
 
 @pytest.fixture(scope="session")
-def qtof_full(examples) -> Path:
-    return examples / "QTOF_full"
+def qtof_full(data_dir) -> Path:
+    return data_dir / "QTOF_full"
 
 
 @pytest.fixture(scope="session")

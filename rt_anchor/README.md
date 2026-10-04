@@ -159,9 +159,10 @@ human plasma/serum: other matrices get the Stage-1 curve only.
 
 ## Desktop client
 
-A native-window client (pywebview) wraps the engine with a sectioned UI —
-Overview · Detection · Profile · Warp · Anchors · Repeatability · Table ·
-Export. See `RT Anchor Desktop/` for the macOS and Windows builds.
+The package ships a lightweight native-window client (pywebview) with a
+sectioned UI — Overview · Detection · Profile · Warp · Repeatability · Table ·
+Export. The full desktop app, with installers for macOS and Windows, is in
+`RT Anchor Desktop/` in the [repository](https://github.com/Bowen999/rt-anchor).
 
 ```bash
 pip install "rt-anchor[app,report]"
