@@ -62,7 +62,8 @@ and an `*_report.html` / `*_report.pdf` report.
 ## How it works
 
 1. **Stage 1 — anchor-free curve.** Features of your standards run are matched to
-   the reference standards run by accurate *m/z* alone (reciprocal best match),
+   the reference standards run by accurate *m/z* alone (reciprocal best match
+   within 15 ppm),
    sample-run pairs are merged in to cover the early and late gradient, and a
    robust monotone curve (LOESS → isotonic → PCHIP, MAD outlier trimming) maps
    your RT onto the reference column. No standard identities are needed.

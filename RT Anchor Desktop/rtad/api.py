@@ -532,8 +532,8 @@ class Api:
         """Build a CalibrationConfig from the Advanced parameters.
 
         Instrument type is intentionally NOT an input; the user tunes the actual
-        knobs. Blank/invalid fields fall back to the package defaults, which are
-        the values the v2 method was validated with.
+        knobs. Blank/invalid fields fall back to the package defaults — 15 ppm
+        for both m/z windows, the same values the two fields show.
         """
         from rt_anchor import CalibrationConfig
 

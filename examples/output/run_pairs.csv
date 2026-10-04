@@ -2,13 +2,14 @@ mz_src,rt_src,rt_ref,source,kept
 594.4125,2.882,5.806,standards,True
 650.4751,4.514,8.093,standards,True
 758.5686,7.368,11.726,standards,True
-760.5845,8.422,12.903,standards,False
+760.5845,8.422,12.903,standards,True
 678.5062,5.626,9.513,standards,True
 642.6024,15.068,17.995,standards,True
 790.6311,11.08,15.813,standards,True
 614.5711,12.658,16.99,standards,True
 455.2588,1.056,1.455,standards,True
 1321.2407,18.419,21.614,standards,True
+369.3511,17.433,21.627,standards,True
 579.5335,12.631,16.982,standards,True
 1267.1712,15.068,17.99,standards,True
 1359.1709,17.433,20.471,standards,True
@@ -31,6 +32,7 @@ mz_src,rt_src,rt_ref,source,kept
 810.5973,9.834,14.51,standards,True
 644.4255,3.574,6.847,standards,True
 929.4863,1.056,1.436,standards,True
+341.3045,12.685,17.995,standards,True
 1293.2191,18.419,21.601,standards,True
 691.6116,17.433,20.697,standards,True
 625.5761,15.068,17.995,standards,True
@@ -75,7 +77,6 @@ mz_src,rt_src,rt_ref,source,kept
 780.5414,6.596,11.726,standards,True
 695.5635,17.378,15.523,standards,False
 685.4356,8.724,13.094,standards,False
-369.3436,18.035,21.627,standards,True
 706.5381,6.897,11.076,standards,True
 682.6127,18.446,19.315,standards,False
 702.6091,17.159,20.714,standards,True
@@ -121,7 +122,6 @@ mz_src,rt_src,rt_ref,source,kept
 846.6686,8.422,14.51,standards,True
 579.4444,2.496,13.358,standards,False
 669.5582,17.652,20.696,standards,True
-341.2986,12.822,17.995,standards,True
 941.8275,17.844,21.025,standards,True
 574.4906,5.572,13.371,standards,False
 614.5265,12.794,12.332,standards,False
@@ -439,6 +439,7 @@ mz_src,rt_src,rt_ref,source,kept
 890.7715,17.491,18.72,sample,False
 803.539,6.274,6.659,sample,False
 653.5828,11.207,15.85,sample,True
+369.3486,4.698,21.166,sample,False
 850.66,9.668,15.707,sample,True
 899.7101,16.999,19.794,sample,True
 544.3366,1.945,3.918,sample,True
@@ -459,7 +460,6 @@ mz_src,rt_src,rt_ref,source,kept
 754.5352,7.177,9.983,sample,False
 603.5344,6.683,16.014,sample,False
 669.5499,5.888,20.738,sample,False
-369.3435,14.858,20.738,sample,False
 931.8528,17.791,21.502,sample,True
 731.6386,11.125,20.911,sample,False
 963.8051,15.269,20.474,sample,False
@@ -472,7 +472,6 @@ mz_src,rt_src,rt_ref,source,kept
 909.7739,17.19,21.755,sample,False
 798.5818,2.825,6.659,sample,True
 768.5517,7.751,13.49,sample,True
-369.3448,18.174,21.166,sample,True
 753.579,7.094,12.694,sample,True
 822.6282,8.188,14.235,sample,True
 783.6279,7.421,13.088,sample,True

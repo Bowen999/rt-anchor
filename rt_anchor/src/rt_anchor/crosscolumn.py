@@ -66,7 +66,7 @@ from .io.schema import FeatureTable
 # module stays importable against an older CalibrationConfig.
 DEFAULTS = {
     "mz_tol_ppm": 15.0,
-    "mz_tol_min_da": 0.008,
+    "mz_tol_min_da": 0.0,
     "curve_frac": 0.1,
     "curve_iter": 3,
     "curve_mad_k": 3.0,
@@ -104,10 +104,10 @@ def mz_window(mz, config: Any = None, *, mz_tol_ppm: Optional[float] = None,
               mz_tol_min_da: Optional[float] = None) -> np.ndarray:
     """Half-width of the m/z match window, per feature, in Da.
 
-    ``max(ppm window, absolute floor)``. Anonymous matching uses
-    ``match_mz_tol_ppm`` / ``match_mz_tol_da`` (defaults 15 ppm, 0.008 Da), so
-    the floor dominates below m/z 533 and the ppm term above it; targeted
-    identification uses ``mz_tol_ppm`` / ``mz_tol_min_da``.
+    ``max(ppm window, absolute floor)``, 15 ppm with no floor by default.
+    Anonymous matching passes ``match_mz_tol_ppm`` / ``match_mz_tol_da``
+    explicitly; targeted identification uses ``mz_tol_ppm`` /
+    ``mz_tol_min_da``.
     """
     ppm = float(cfg(config, "mz_tol_ppm", mz_tol_ppm))
     floor = float(cfg(config, "mz_tol_min_da", mz_tol_min_da))
@@ -684,7 +684,7 @@ def build_calibrator(std_src: FeatureTable,
             f"Only {len(std_pairs)} feature pairs matched between the standards run "
             f"and the reference standards run. That is almost always a polarity "
             f"mismatch, or a reference dataset from a different experiment — check "
-            f"both before widening mz_tol_ppm."
+            f"both before widening the m/z matching window (match_mz_tol_ppm)."
         )
     std_pairs = std_pairs.assign(source="standards")
 
@@ -698,7 +698,8 @@ def build_calibrator(std_src: FeatureTable,
         raise CalibrationError(
             f"Only {len(pairs)} matched pairs (need {min_points}) and no sample-run "
             f"pairs to fall back on. Check that both runs are the same polarity, "
-            f"and that mz_tol_ppm / mz_tol_min_da are not unreasonably tight."
+            f"and that the m/z matching window (match_mz_tol_ppm / match_mz_tol_da) "
+            f"is not unreasonably tight."
         )
 
     curve, keep, order = fit_robust_curve_sorted(

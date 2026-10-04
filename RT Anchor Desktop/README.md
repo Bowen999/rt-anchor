@@ -51,10 +51,11 @@ The panel cards come from `rt_anchor.mixtures`, not from a copy in the app —
   serum and another lab's standards produces plausible‑looking nonsense.
   Substituting your own pair moves the time axis, so those results are not
   comparable with default‑reference runs.
-- **Matching & fitting** — the two m/z tolerances (an absolute **Da** window for
-  anonymous feature matching, default 0.008; a **ppm** window for identifying
-  named panel standards), the LOESS fraction `curve_frac` (CV‑chosen — rarely a
-  reason to change it), the RT window, min anchors, both stage toggles
+- **Matching & fitting** — the two m/z tolerances, both **15 ppm** by default
+  (the *feature‑match window* for anonymous feature matching, and the *panel
+  m/z tolerance* for identifying named panel standards), the LOESS fraction
+  `curve_frac` (CV‑chosen — rarely a reason to change it), the RT window, min
+  anchors, both stage toggles
   (**use sample pairs in the curve**, **stage‑2 sample anchors**), and
   extrapolation (on by default; out‑of‑span features are still valued and
   flagged).

@@ -1,28 +1,29 @@
 """Configuration for the v2 cross-column calibration.
 
-Defaults reproduce the **validated** method (see ``RI_CALIBRATION_SPEC_V2.md``
-§7 and §9): the numbers here are the ones the port was accepted against, not
-taste. Two of them deserve to be read before they are changed:
+Defaults follow the **validated** method (see ``RI_CALIBRATION_SPEC_V2.md``
+§7 and §9) with one deliberate change since: the default m/z window is
+**15 ppm** for every match. Two values deserve to be read before they are
+changed:
 
 * ``curve_frac = 0.1`` was chosen by 5-fold CV on the panel-masked training
   pairs of all five validation columns. Do not change it casually.
-* ``match_mz_tol_ppm = 15.0`` is the **ppm** window used for every *anonymous*
-  operation, applied on top of the ``match_mz_tol_da`` absolute floor.
+* ``match_mz_tol_ppm = 15.0`` is the m/z window of every *anonymous*
+  operation. The validation runs used a flat 0.008 Da window instead;
+  ``match_mz_tol_ppm=0, match_mz_tol_da=0.008`` reproduces them.
 
-**Two m/z tolerances, two jobs.** They are not interchangeable:
+**One default, two knobs.** Both m/z tolerances default to 15 ppm with no
+absolute floor, but they do different jobs and are tuned separately:
 
 ``match_mz_tol_ppm`` / ``match_mz_tol_da``
-    The *anonymous* matching window, ``max(ppm, Da floor)`` — reciprocal
-    feature matching between two runs, the stage-2 panel-mask exclusion, and
-    the plasma-lipid m/z windows, all the places where nothing is claimed
-    about a feature's identity. ``match_mz_tol_ppm`` is the ppm window
-    (default 15) and ``match_mz_tol_da`` (default 0.008) is the absolute floor
-    beneath it, so low-m/z pairs keep a sensible minimum width.
+    The *anonymous* matching window, ``max(ppm window, absolute floor)`` —
+    reciprocal feature matching between two runs, the stage-2 panel-mask
+    exclusion, and the plasma-lipid m/z windows, all the places where nothing
+    is claimed about a feature's identity. The floor is 0 (off) by default.
 
 ``mz_tol_ppm`` / ``mz_tol_min_da``
-    The v1 meaning, unchanged: ``max(ppm window, absolute floor)`` for
-    *targeted* identification of named panel standards — the iRT landmarks and
-    the detection QC, both of which go through :mod:`rt_anchor.identify`.
+    The same window for *targeted* identification of named panel standards —
+    the iRT landmarks and the detection QC, both of which go through
+    :mod:`rt_anchor.identify`. The ``orbitrap()`` preset narrows it to 8 ppm.
 
 Everything is override-able (constructor kwargs, the :meth:`qtof` /
 :meth:`orbitrap` presets, or :meth:`from_dict`). Nothing is instrument-locked.
@@ -65,8 +66,8 @@ REMOVED_FIELDS = {
 @dataclass
 class CalibrationConfig:
     # ---- anonymous m/z matching (spec §2.1, §7) ----
-    match_mz_tol_ppm: float = 15.0      # ppm window; absolute floor beneath it
-    match_mz_tol_da: float = 0.008      # the floor — max(ppm, Da) is the window
+    match_mz_tol_ppm: float = 15.0      # the matching window, ppm
+    match_mz_tol_da: float = 0.0        # optional absolute floor, Da (0 = off)
 
     # ---- targeted identification: landmarks + detection QC (v1 meaning) ----
     mz_tol_ppm: float = 15.0            # QTOF default (Orbitrap ~8)

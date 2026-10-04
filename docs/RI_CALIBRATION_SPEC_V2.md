@@ -80,7 +80,7 @@ permitted changes are the generalisations in §3.
 
 1. **Reciprocal m/z matching** of the *standards* runs — every feature of the
    user's standards run against every feature of the reference standards run,
-   window `match_mz_tol_da` (§7). For each feature the in-window candidate with
+   window `match_mz_tol_ppm` (§7). For each feature the in-window candidate with
    the highest **S/N** wins — `FeatureTable.sn()`, i.e. the format's S/N column
    where one exists and summed abundance where it does not — in both
    directions; only mutual best matches are kept, giving a 1-to-1 pairing. No
@@ -307,23 +307,27 @@ yields <2 landmarks, iRT is NaN per §4.
 
 ## 7. `CalibrationConfig` — v2 fields
 
-**Two m/z tolerances, two jobs.** They must not be conflated:
+**Two m/z tolerances, two jobs — one default.** They are tuned separately, and
+both default to **15 ppm with no absolute floor** (the window is
+`max(ppm, floor)`):
 
-* `match_mz_tol_da = 0.008` — **absolute**, for *anonymous* work: reciprocal
-  feature matching (§2.1), the panel-mask exclusion, and the plasma-lipid m/z
-  windows. This is the value the v2 method was validated with, so it is what
-  ships by default.
+* `match_mz_tol_ppm = 15`, `match_mz_tol_da = 0.0` — for *anonymous* work:
+  reciprocal feature matching (§2.1), the panel-mask exclusion, and the
+  plasma-lipid m/z windows.
 * `mz_tol_ppm = 15`, `mz_tol_min_da = 0.0` — for *targeted* panel-standard
   identification (landmarks, detection QC) via `identify`. This is the v1
   meaning, unchanged.
 
-Do **not** apply the ppm window to anonymous matching. Measured consequence of
-doing so: at `max(15 ppm, 0.008 Da)` the window widens above m/z 533, column
-90's gate flips from OFF (14%) to engaged (28%), and 7 of 40 check lipids leave
-the 0.01 min band. Widening is not obviously *worse* there — column 90's
-held-out error improves — but the shipping default must reproduce the validated
-method, and a decision that flips on the tolerance is exactly the decision to
-pin rather than to drift.
+**Changed 2026-10-04 — the anonymous default is 15 ppm.** The v2 method was
+validated with a flat 0.008 Da window (`match_mz_tol_ppm = 0`,
+`match_mz_tol_da = 0.008`), and the first port shipped `max(15 ppm, 0.008 Da)`;
+both remain one setting away. The decision is one 15 ppm threshold for every
+match. For the record, what was measured before it: at `max(15 ppm, 0.008 Da)`
+the window widens above m/z 533, column 90's gate flips from OFF (14%) to
+engaged (28%), and 7 of 40 check lipids leave the 0.01 min band — widening is
+not obviously *worse* there, column 90's held-out error improves. The §9
+numbers were measured with the flat 0.008 Da window and have not been
+re-measured at 15 ppm.
 
 Keep: `mz_tol_ppm`, `mz_tol_min_da`, `rt_window_min`, `rt_window_seed_min`,
 `min_anchors`, `conf_high_irt`, `conf_low_irt`, `min_gaussian_similarity`,
@@ -350,7 +354,8 @@ Add:
 
 | field | default | note |
 |---|---|---|
-| `match_mz_tol_da` | `0.008` | absolute window for anonymous matching — see above |
+| `match_mz_tol_ppm` | `15.0` | anonymous matching window — see above |
+| `match_mz_tol_da` | `0.0` | optional absolute floor under it; `0.008` with ppm `0` is the validation window |
 | `curve_frac` | `0.1` | LOESS fraction — CV-chosen, do not change |
 | `curve_iter` | `3` | MAD outlier rounds |
 | `curve_mad_k` | `3.0` | |
@@ -459,6 +464,9 @@ an 80% training split. Run the parity check both ways
 (`sample_pair_frac=0.8, seed=0` reproduces the baseline exactly) and report
 both numbers.
 
+Parity is defined for the validation window: run it with
+`match_mz_tol_ppm=0, match_mz_tol_da=0.008`, not the 15 ppm default (§7).
+
 ---
 
 ## 10. Deliberate decisions worth revisiting
@@ -482,6 +490,9 @@ at the end of the run.
 4. **`extrapolate` now defaults to `True`** (§7).
 5. **The per-injection tier's semantics changed**: injections are now matched
    against the reference sample run rather than self-anchored on the panel.
+6. **The default m/z window is 15 ppm** (§7), one threshold for anonymous
+   matching and panel identification alike — not the flat 0.008 Da window the
+   method was validated with.
 
 ---
 
@@ -492,7 +503,8 @@ rt-anchor calibrate --samples S --standards T --polarity positive \
                     --panel {mix15,mix21,none} \
                     [--reference-sample R --reference-standards RT] \
                     [--single-files ...] [--no-sample-anchors] [--no-sample-pairs] \
-                    [--curve-frac F] [--mz-tol-ppm P] [--mz-tol-da D] \
+                    [--curve-frac F] [--match-mz-tol-ppm P] [--mz-tol-da D] \
+                    [--mz-tol-ppm P] \
                     [--min-anchors N] [--no-extrapolate] \
                     [--extrapolate-mode {linear,clamp}] \
                     --out PREFIX
