@@ -300,8 +300,10 @@ async function run() {
     btn.disabled = false; showProgress(false);
     setStatus("", ""); showError((res && res.error) || "Calibration failed."); return;
   }
-  /* Async: the backend returned {"ok": true, "status": "running"}.
-     The UI stays responsive — __onCalibrationDone() will fire when ready. */
+  /* Async: the backend returned {"ok": true, "status": "running"}. The UI stays
+     responsive; __onCalibrationDone() takes the result, fired by the backend's
+     nudge or by the progress poll once the run reports done. */
+  _awaitingResult = true;
 }
 function setStatus(msg, cls) { const s = $("#status"); s.textContent = msg; s.className = "status" + (cls ? " " + cls : ""); }
 
@@ -327,6 +329,12 @@ const RUN_STAGES = [
 const BE_TO_FRONT = [0, 1, 3, 3];
 const BE_CAPS = [0.10, 0.75, 0.95];
 let _runTimer = null, _pollTimer = null, _beStage = null;
+/* True from the moment the backend accepts a run until its result is taken.
+   Two paths deliver it: the backend's evaluate_js nudge, which is best-effort
+   (WebView2 can drop it while busy), and the progress poll seeing `done`,
+   which is what guarantees a finished run never sits behind the bar. Both go
+   through __onCalibrationDone(), and only the first one acts. */
+let _awaitingResult = false;
 function showProgress(on) {
   const card = $("#runcard");
   clearInterval(_runTimer); _runTimer = null;
@@ -342,6 +350,7 @@ function showProgress(on) {
       try {
         const p = await api().progress();
         if (p && p.ok && typeof p.stage === "number") _beStage = p.stage;
+        if (p && p.done && _awaitingResult) window.__onCalibrationDone();
       } catch (e) { /* keep the time-based fallback */ }
     }, 600);
   }
@@ -775,8 +784,13 @@ function attachStructures(div) {
 
 /* ---- async calibration handler ---- */
 window.__onCalibrationDone = async function() {
+  if (!_awaitingResult) return;          // already taken, or no run in flight
+  _awaitingResult = false;               // claim it before awaiting: one delivery per run
   try {
     var res = await api().get_calibration_result();
+    /* a `done` read before this run started (the poll can race the start)
+       reaches a backend that is still running: not ours yet, keep waiting */
+    if (res && !res.ok && res.status === "running") { _awaitingResult = true; return; }
     var btn = $("#run");
     btn.disabled = false;
     if (!res || !res.ok) { showProgress(false); setStatus("", ""); showError((res && res.error) || "Calibration failed."); return; }

@@ -245,9 +245,10 @@ class Api:
     def run_calibration(self, params: Dict) -> Dict:
         """Launch calibration in a background thread; UI stays responsive.
 
-        Returns ``{"ok": True, "status": "running"}`` immediately.  The front-end
-        must then listen for ``window.__onCalibrationDone()`` and call
-        ``get_calibration_result()`` to collect the bundle.
+        Returns ``{"ok": True, "status": "running"}`` immediately. The front-end
+        collects the bundle with ``get_calibration_result()`` once the run is
+        over: when ``progress()`` reports ``done``, or earlier if the
+        ``window.__onCalibrationDone()`` nudge below reaches the page first.
         """
         if self._running:
             return {"ok": False, "error": "A calibration is already in progress."}
@@ -355,9 +356,10 @@ class Api:
                 # Best-effort nudge. `evaluate_js` blocks up to 20 s waiting for
                 # the page and then raises, and a WebView2 that is busy laying
                 # out a big result can miss it — so this is an optimisation, not
-                # the delivery mechanism. The front-end also polls
-                # `get_calibration_result()`, which is what actually guarantees
-                # a finished run is never left hanging behind a spinner.
+                # the delivery mechanism. The front-end's progress poll sees
+                # `done` and calls `get_calibration_result()` itself, which is
+                # what actually guarantees a finished run is never left hanging
+                # behind a spinner.
                 try:
                     if self._window:
                         self._window.evaluate_js("window.__onCalibrationDone()")
