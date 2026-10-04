@@ -99,7 +99,7 @@ Individual exports (calibrated CSV, HTML report, run info) are also available.
 ```bash
 /opt/anaconda3/bin/python "app.py"        # macOS, needs rt_anchor installed
 /opt/anaconda3/bin/python "app.py" --selftest   # headless end-to-end check
-build_venv python app.py                  # Windows (rt_anchor build venv)
+..\rt_anchor\build_venv\Scripts\python app.py   # Windows (the build venv)
 ```
 `--selftest` runs a **real calibration** — the bundled reference pair against
 itself — and asserts `Cal_RT_min == RT` to machine precision, then builds the
@@ -109,7 +109,7 @@ things PyInstaller drops silently, and only a run that produces the right
 number proves they survived.
 
 ```
-SELFTEST_OK reference=col35 features=610 pairs=827 landmarks=21 self_error=1.09e-11min structures=15
+SELFTEST_OK reference=col35 features=610 pairs=825 landmarks=21 self_error=3.92e-11min structures=15
 ```
 
 ## Layout
@@ -154,11 +154,15 @@ Both are handled in `build/macos/RTAnchor.spec`; the `--selftest` above is what
 proves it. arm64‑only build.
 
 ## Rebuild — Windows (exe / zip)
-One command (uses the shared `../rt_anchor/build_venv`, where rt-anchor,
-pywebview, PyInstaller and rdkit are pip‑installed — see `rt_anchor/build.bat`):
+One command. On first use it creates a pip‑only build venv at
+`../rt_anchor/build_venv` (rt-anchor, pywebview, PyInstaller, and rdkit when it
+installs); delete that folder to rebuild it after an engine change:
 ```bat
 build\windows\build_win.bat     :: -> dist\win\"RT Anchor.exe" + RT Anchor-win64.zip
 ```
+The release CI (`.github/workflows/build-windows.yml`) runs the same script on
+every `v*` tag, self‑tests the frozen exe, and attaches the zip to the GitHub
+Release as `RT-Anchor-<version>-Windows-x64.zip`.
 Smoke-test a windowed (no-console) build by exit code:
 ```bat
 "dist\win\RT Anchor\RT Anchor.exe" --selftest && echo OK

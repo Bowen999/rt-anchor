@@ -165,16 +165,18 @@ where the Stage-2 correction is active, because curve + piecewise-linear
 correction is not monotone by construction. And Stage 2's anchor panel is
 human plasma/serum: other matrices get the Stage-1 curve only.
 
-## Desktop client
+## Desktop app
 
-The package ships a lightweight native-window client (pywebview) with a
-sectioned UI — Overview · Detection · Profile · Warp · Repeatability · Table ·
-Export. The full desktop app, with installers for macOS and Windows, is in
-`RT Anchor Desktop/` in the [repository](https://github.com/Bowen999/rt-anchor).
+The graphical client is the RT Anchor desktop app — Overview · Detection ·
+Profile · Curve · Table · Export over this engine. Installers for macOS and
+Windows are on the [releases page](https://github.com/Bowen999/rt-anchor/releases/latest);
+the source is `RT Anchor Desktop/` in the
+[repository](https://github.com/Bowen999/rt-anchor), and runs from a checkout:
 
 ```bash
-pip install "rt-anchor[app,report]"
-rt-anchor-gui          # or:  python -m rt_anchor.gui
+git clone https://github.com/Bowen999/rt-anchor && cd rt-anchor
+pip install -e "./rt_anchor[app,report]"     # this engine + pywebview
+python "RT Anchor Desktop/app.py"
 ```
 
 ## License

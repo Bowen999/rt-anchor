@@ -1,4 +1,5 @@
-# --- Windows GUI build artifacts (build.bat / rt_anchor_gui.spec) ---
+# --- build artifacts: package build/ + dist/, and the build venv that
+#     RT Anchor Desktop/build/windows/build_win.bat creates here ---
 /build/
 /dist/
 /build_venv/

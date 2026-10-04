@@ -88,15 +88,13 @@ rt_anchor/                 Python package "rt-anchor" (PyPI) — engine, CLI, re
 │   ├── irt.py             the iRT ruler (panel landmarks on the reference run)
 │   ├── reference_data/    bundled reference column (col35) — the default Cal_RT axis
 │   ├── io/ · viz/         table loaders (4 formats) · figures + HTML/PDF report
-│   ├── cli.py · helpers.py   rt-anchor CLI · write_results()
-│   └── gui.py · webui/ · example/   built-in rt-anchor-gui client + its demo data
+│   └── cli.py · helpers.py   rt-anchor CLI · write_results()
 ├── tests/                 pytest suite; tests/data/ holds the test datasets
-├── rt_anchor_gui.py/.spec · build.bat · packaging/   Windows build of rt-anchor-gui
 └── pyproject.toml · README.md (the PyPI page)
-RT Anchor Desktop/         desktop app (pywebview) — one source, macOS + Windows builds
+RT Anchor Desktop/         the desktop app (pywebview) — one source, macOS + Windows builds
 examples/                  quickstart notebook · Mix 15 / Mix 21 inputs · example outputs
 docs/                      method specification (v2) · screenshots
-.github/workflows/         CI — Windows build of rt-anchor-gui on v* tags
+.github/workflows/         CI — builds the Windows desktop app on v* tags
 ```
 
 ## Desktop app

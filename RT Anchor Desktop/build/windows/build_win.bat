@@ -4,21 +4,40 @@ REM  build_win.bat -- Build "RT Anchor" desktop as a Windows onedir app.
 REM  Lives in build\windows\. Run directly or from the app root; produces:
 REM    dist\win\"RT Anchor.exe" (+ _internal\)  and  dist\win\RT Anchor-win64.zip
 REM
-REM  Requires the rt_anchor build venv (rt_anchor\build_venv) where
-REM  rt-anchor + pywebview + PyInstaller + rdkit are pip-installed — see
-REM  rt_anchor\build.bat for how that venv is created.
+REM  The release CI (.github\workflows\build-windows.yml) runs this script.
+REM
+REM  Builds in a pip-only venv at rt_anchor\build_venv, created on first use
+REM  with rt-anchor + pywebview + PyInstaller (+ rdkit when it installs).
+REM  pip-only on purpose: conda/conda-forge numpy+scipy link MKL, which
+REM  roughly doubles the bundle and can throw "Intel MKL FATAL ERROR" frozen.
+REM  Delete that folder to rebuild the venv, e.g. after an engine change.
 REM =====================================================================
 setlocal enabledelayedexpansion
 
 REM --- app root is two levels up (build\windows\) -----------------------
 set "ROOT=%~dp0..\.."
+set "ENGINE=%~dp0..\..\..\rt_anchor"
+set "VENV=%ENGINE%\build_venv"
+set "PYEXE=%VENV%\Scripts\python.exe"
 
-REM --- 1. Locate the build venv python ---------------------------------
-set "PYEXE=%~dp0..\..\..\rt_anchor\build_venv\Scripts\python.exe"
+REM --- 1. The build venv: create it on first use -----------------------
 if not exist "%PYEXE%" (
-    echo build_venv not found at %PYEXE%
-    echo Create it first: see rt_anchor\build.bat steps 2-3.
-    exit /b 1
+    set "BASEPY="
+    py -3.11 --version >nul 2>nul && set "BASEPY=py -3.11"
+    if not defined BASEPY ( python --version >nul 2>nul && set "BASEPY=python" )
+    if not defined BASEPY (
+        echo No Python found. Install Python 3.11 first.
+        exit /b 1
+    )
+    echo Creating the build venv at !VENV! with !BASEPY!
+    !BASEPY! -m venv "%VENV%" || goto :err
+    "%PYEXE%" -m pip install --upgrade pip wheel setuptools || goto :err
+    pushd "%ENGINE%" || goto :err
+    "%PYEXE%" -m pip install ".[report,app]" "pyinstaller>=6.3"
+    set "PIPERR=!errorlevel!"
+    popd
+    if not "!PIPERR!"=="0" goto :err
+    "%PYEXE%" -m pip install rdkit || echo WARNING: rdkit did not install - structure hover disabled.
 )
 echo Using interpreter: %PYEXE%
 

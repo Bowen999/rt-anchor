@@ -16,6 +16,5 @@ The second axis of every calibration — the reference column — is not here: i
 is bundled with the package in `src/rt_anchor/reference_data/col35/`.
 
 Copies elsewhere in the repository: `Orbitrap/` is byte-identical to
-[`examples/mix15/`](../../../examples/mix15/) and to the package's demo data
-(`src/rt_anchor/example/`); the `QTOF_full/` aligned tables are the desktop app's
-**Load example** dataset (`RT Anchor Desktop/example/`).
+[`examples/mix15/`](../../../examples/mix15/), and the `QTOF_full/` aligned
+tables are the desktop app's **Load example** dataset (`RT Anchor Desktop/example/`).

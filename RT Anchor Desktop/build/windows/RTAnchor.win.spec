@@ -2,11 +2,11 @@
 # RT Anchor desktop — PyInstaller ONEDIR, windowed build for Windows 10/11.
 #
 #   Build:  build_win.bat   (or:)
-#           pyinstaller --noconfirm --clean build\RTAnchor.win.spec
+#           pyinstaller --noconfirm --clean build\windows\RTAnchor.win.spec
 #
-# Uses the rt_anchor build venv (`rt_anchor\build_venv`) where the engine is
-# pip-installed, so `import rt_anchor` resolves — same layout as
-# rt_anchor\rt_anchor_gui.spec (the proven Windows webview build in this repo).
+# Runs in the build venv build_win.bat creates (`rt_anchor\build_venv`), where
+# the engine is pip-installed so `import rt_anchor` resolves. The release CI
+# (.github/workflows/build-windows.yml) builds through the same script.
 #
 # Backend: pywebview → WinForms/WebView2 via pythonnet (.NET Framework).
 import os
