@@ -59,7 +59,7 @@ def _collect_single_files(spec: Optional[str]) -> Optional[List[str]]:
 
 def _build_config(args) -> CalibrationConfig:
     if args.config:
-        with open(args.config) as fh:
+        with open(args.config, encoding="utf-8") as fh:
             cfg = CalibrationConfig.from_dict(json.load(fh))
     else:
         cfg = CalibrationConfig()

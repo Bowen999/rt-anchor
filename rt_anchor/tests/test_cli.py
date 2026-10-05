@@ -163,6 +163,22 @@ def test_write_results_json_has_no_raw_nan(tmp_path, result):
     json.loads(raw)
 
 
+def test_write_results_log_is_utf8(tmp_path, result):
+    """Pins the run log's encoding to UTF-8.
+
+    Every run's log contains an em dash (the ``reference:`` line). Written
+    with the platform default encoding the log came out as cp1252 on Windows
+    — not valid UTF-8, unlike the same file produced on Linux/macOS — and a
+    log line holding a character the locale cannot encode would have raised
+    outright. The bytes on disk must decode as UTF-8 and keep the em dash.
+    (Fails before the ``encoding="utf-8"`` fix on Windows, passes after.)
+    """
+    prefix = str(tmp_path / "out")
+    paths = write_results(result, prefix, report=False)
+    text = open(paths["log_txt"], "rb").read().decode("utf-8")
+    assert "—" in text
+
+
 def test_a_failing_report_never_costs_the_data(tmp_path, result, monkeypatch):
     """The numbers are the deliverable; a broken chart is not a reason to lose them."""
     import rt_anchor.viz.report as report_mod

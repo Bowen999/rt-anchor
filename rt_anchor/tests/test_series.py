@@ -559,7 +559,7 @@ def test_cli_no_series_term(tmp_path, orbitrap_samples, orbitrap_standards):
     pairs = pd.read_csv(f"{prefix}_pairs.csv")
     assert not pairs["in_series"].any()
     assert ("series term: disabled (use_series_term=False) — stage-1 curve only"
-            in (tmp_path / "nos_log.txt").read_text())
+            in (tmp_path / "nos_log.txt").read_text(encoding="utf-8"))
 
 
 def test_cli_sample_anchors_is_opt_in(tmp_path, orbitrap_samples, orbitrap_standards):
