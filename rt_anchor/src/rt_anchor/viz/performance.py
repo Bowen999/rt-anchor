@@ -10,7 +10,8 @@ questions (the mixture pins the middle of the gradient, serum pins the sparse
 early and late ends); the pairs MAD-trimming rejected, drawn as hollow grey so
 they are visible as *excluded* rather than quietly deleted; the fitted anchor-free
 curve; the anchor-refined curve when the stage-2 gate engaged; and the stage-2
-anchors as rings.
+anchors as rings. The stage-1b series term is a per-feature correction, not a
+curve, so it is not drawn — its gate decision is annotated under the title.
 
 **lower panel** — the residuals of those same pairs about the curve, before and
 after the anchor correction. It is the panel that shows whether the correction
@@ -81,6 +82,11 @@ def compute_curve(result, ngrid: int = 400) -> Dict:
     if len(anchors) and "dropped_by_sanity_filter" in anchors.columns:
         anchors = anchors[~anchors["dropped_by_sanity_filter"].astype(bool)]
 
+    # the series term is a per-feature correction, not a curve — it is not
+    # drawn, but its gate decision is annotated (from the model, so the
+    # figure cannot disagree with model.json)
+    ser = (result.model or {}).get("series", {}) or {}
+
     return dict(
         empty=False, grid=grid, fit=fit, refined=refined,
         rt_src=rt_src, rt_ref=rt_ref, source=src, kept=kept,
@@ -92,6 +98,8 @@ def compute_curve(result, ngrid: int = 400) -> Dict:
         gate_reduction=float(cal.gate_mse_reduction),
         gate_threshold=float(cal.gate_threshold),
         gate_reason=str(cal.gate_reason or ""),
+        series_engaged=bool(ser.get("engaged", False)),
+        series_reason=str(ser.get("gate_reason", "") or ""),
         source_label="your column", ref_label="the reference column",
     )
 
@@ -193,8 +201,16 @@ def figure_mpl(result):
 
     fig.suptitle("Cross-column calibration curve  ·  your column -> the reference column",
                  x=0.02, y=0.985, ha="left", fontsize=theme.FS_TITLE, color=theme.TXT)
-    if d["gate_reason"]:
-        fig.text(0.02, 0.947, theme.mpl_safe(d["gate_reason"]), ha="left", va="top",
+    # the gate decisions, said out loud: the series term's always (it is not a
+    # curve, so nothing else on this page shows it), the anchors' too — unless
+    # stage 2 never ran, where "anchors disabled" would be noise
+    notes = []
+    if d.get("series_reason"):
+        notes.append(f"series term: {d['series_reason']}")
+    if d["gate_reason"] and d["gate_reason"] != "anchors disabled":
+        notes.append(d["gate_reason"])
+    if notes:
+        fig.text(0.02, 0.947, theme.mpl_safe("\n".join(notes)), ha="left", va="top",
                  fontsize=theme.FS_SUB - 1, color=theme.TXT2, style="italic")
     fig.subplots_adjust(top=0.90)
     return fig

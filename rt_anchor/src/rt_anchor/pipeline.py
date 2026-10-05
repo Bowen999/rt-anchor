@@ -9,14 +9,18 @@ What :func:`calibrate` does, in the order it does it, and why the order matters:
    JSON records it.
 2. **Validate the stage-2 anchor candidates** — the 17 endogenous plasma lipids
    — in the user's sample run *and* in the reference sample run. A lipid that is
-   not confidently found in both is not an anchor.
+   not confidently found in both is not an anchor. (Stage 2 is opt-in since
+   1.2.2: this and steps 5-6 run only with ``use_sample_anchors=True``.)
 3. **Match the sample runs anonymously** by accurate m/z and mask out anything
    sitting on an anchor candidate's m/z. Those pairs extend the curve into the
    early and late elution regions where a standards mixture is sparse; the mask
    is what keeps the anchors from partly fitting themselves.
 4. **Fit the stage-1 curve** from the two *standards* runs plus those sample
    pairs. No identities are used, which is why the method survives an unknown
-   or undetectable mixture.
+   or undetectable mixture. On the kept pairs, **stage 1b** then fits the
+   homologous-series term (:mod:`rt_anchor.series`), gated by its leave-own-out
+   error — it is applied per feature only where the feature's own m/z places it
+   in a validated series.
 5. **Refine the isomer picks with that curve** — each source-run candidate is
    re-picked as the in-window feature whose *curve-calibrated* RT lands closest
    to the reference-run RT. This step needs the curve, which is why it cannot
@@ -51,7 +55,7 @@ from .crosscolumn import (
     MonotoneCurve,
     build_calibrator,
     exclude_pairs_near_mz,
-    fit_robust_curve,
+    fit_robust_curve_sorted,
     match_features_by_mz,
 )
 from .errors import CalibrationError, ConfigError, RtAnchorError
@@ -68,13 +72,14 @@ from .plasma_lipids import (
     validate_candidates,
 )
 from .reference import load_reference
+from .series import SeriesTerm
 
 #: Run keys used inside the plasma-lipid validation tables.
 SOURCE_KEY = "source"
 REF_KEY = "reference"
 
 #: Columns of ``<prefix>_pairs.csv`` (spec §5).
-PAIR_COLUMNS = ["mz_src", "rt_src", "rt_ref", "source", "kept"]
+PAIR_COLUMNS = ["mz_src", "rt_src", "rt_ref", "source", "kept", "in_series"]
 
 #: Columns of ``<prefix>_anchors.csv`` (spec §5).
 ANCHOR_COLUMNS = ["label", "lipid_class", "rt_src", "rt_ref", "residual_min",
@@ -116,6 +121,11 @@ class CalibrationResult:
     def anchors_used(self) -> bool:
         """True when the stage-2 correction passed the gate and is applied."""
         return bool(self.calibrator is not None and self.calibrator.anchors_used)
+
+    @property
+    def series_used(self) -> bool:
+        """True when the stage-1b series term passed the gate and is applied."""
+        return bool(self.calibrator is not None and self.calibrator.series_used)
 
     def to_model_json(self) -> Dict:
         return self.model
@@ -207,12 +217,13 @@ def calibrate(sample_table: str,
 
     # ---- evaluate -------------------------------------------------------—-
     rt = ft.rt_minutes().to_numpy(dtype=float)
+    mz = ft.mz().to_numpy(dtype=float)
     if single_files:
-        res, n_inj, tier_log = _per_sample(rt, single_files, ref, cal, cfg, mapper,
+        res, n_inj, tier_log = _per_sample(rt, mz, single_files, ref, cal, cfg, mapper,
                                            pol, source_format, rt_unit)
         log.extend(tier_log)
     else:
-        res, n_inj = _per_project(rt, cal, cfg, mapper), 0
+        res, n_inj = _per_project(rt, mz, cal, cfg, mapper), 0
 
     out, colmap = _append_results(ft.df, res)
 
@@ -268,6 +279,15 @@ def _fit_calibrator(ft: FeatureTable, std_ft: FeatureTable, ref, cfg
                f"{cal.n_pairs_kept} kept after MAD trimming; source RT span "
                f"{cal.curve.x0:.2f}-{cal.curve.x1:.2f} -> reference "
                f"{cal.curve.y0:.2f}-{cal.curve.y1:.2f} min")
+    if cal.series is None:
+        log.append("series term: disabled (use_series_term=False) — stage-1 curve only")
+    else:
+        _, n_mem = cal.series.correction(ft.mz().to_numpy(dtype=float),
+                                         ft.rt_minutes().to_numpy(dtype=float))
+        log.append(f"series term: {cal.series.gate_reason}; {cal.series.n_series} "
+                   f"homologous series ({int(cal.series.member_mask.sum())} pairs, "
+                   f"{cal.series.n_pairs_covered} with a leave-own-out prediction); "
+                   f"{int((n_mem > 0).sum())}/{ft.n_features()} features corrected")
 
     if not cfg.use_sample_anchors:
         log.append("stage 2: disabled (use_sample_anchors=False) — stage-1 curve only")
@@ -358,33 +378,64 @@ def _build_irt(ref, panel_obj: Optional[Panel], cfg: CalibrationConfig, pol: str
 # Per-project / per-sample tiers
 # ---------------------------------------------------------------------------
 
-def _per_project(rt: np.ndarray, cal: ColumnCalibrator, cfg: CalibrationConfig,
-                 mapper: Optional[IRTMapper]) -> pd.DataFrame:
-    cal_rt = cal.predict(rt)
+def _per_project(rt: np.ndarray, mz: np.ndarray, cal: ColumnCalibrator,
+                 cfg: CalibrationConfig, mapper: Optional[IRTMapper]) -> pd.DataFrame:
+    cal_rt = cal.predict(rt, mz=mz)
     unc = cal.uncertainty(rt)
-    res = _assemble(rt, cal_rt, unc, cal.is_extrapolated(rt), cal.warp_source,
+    corr, n_mem = _series_columns(cal, mz, rt)
+    res = _assemble(rt, cal_rt, unc, cal.is_extrapolated(rt), _warp_rows(cal, n_mem),
                     "project", cfg, mapper)
     res["RI_spread"] = np.nan
     res["n_contributing"] = 1
+    res["series_correction_min"] = corr
+    res["series_n_members"] = n_mem
     return res
 
 
-def _per_sample(rt: np.ndarray, single_files: Sequence[str], ref,
+def _series_columns(cal: ColumnCalibrator, mz: np.ndarray, rt: np.ndarray
+                    ) -> Tuple[np.ndarray, np.ndarray]:
+    """``(series_correction_min, series_n_members)`` for one prediction pass.
+
+    Zeros wherever no correction was applied — which is everywhere when the
+    term is disabled or its gate declined: :meth:`SeriesTerm.correction`
+    already returns zeros then.
+    """
+    if cal.series is None:
+        return np.zeros(len(rt), dtype=float), np.zeros(len(rt), dtype=int)
+    corr, n_mem = cal.series.correction(mz, rt)
+    return corr, n_mem.astype(int)
+
+
+def _warp_rows(cal: ColumnCalibrator, n_mem: np.ndarray) -> np.ndarray:
+    """Per-row ``warp_source``: ``curve+series`` only where the series term
+    actually corrected the row, ``+anchors`` on every row when stage 2 engaged."""
+    ws = np.where(np.asarray(n_mem) > 0, "curve+series", "curve").astype(object)
+    if cal.anchors_used:
+        ws = np.array([f"{w}+anchors" for w in ws], dtype=object)
+    return ws
+
+
+def _per_sample(rt: np.ndarray, mz: np.ndarray, single_files: Sequence[str], ref,
                 cal: ColumnCalibrator, cfg: CalibrationConfig,
                 mapper: Optional[IRTMapper], pol: str,
                 source_format: Optional[str], rt_unit: Optional[str]
                 ) -> Tuple[pd.DataFrame, int, List[str]]:
     """One curve per injection against the reference *sample* run.
 
-    ``Cal_RT_min`` / ``iRT`` become the median across injections and
-    ``RI_spread`` their 1.4826·MAD dispersion — the honest inter-injection QC.
-    Uncertainty and the extrapolation flag stay on the project-level calibrator:
-    they describe the calibration, and the project curve is the one built from
-    the standards runs as well as the samples.
+    Each injection also fits its own series term from its own kept pairs, with
+    its own gate, and the injection's prediction is its curve plus its series
+    correction. ``Cal_RT_min`` / ``iRT`` become the median across injections and
+    ``RI_spread`` their 1.4826·MAD dispersion — the honest inter-injection QC;
+    the series columns are the median of the applied corrections and the
+    maximum ``n_members``. Uncertainty and the extrapolation flag stay on the
+    project-level calibrator: they describe the calibration, and the project
+    curve is the one built from the standards runs as well as the samples.
     """
     log: List[str] = []
     anon = _anon_tol(cfg)
     preds: List[np.ndarray] = []
+    series_preds: List[np.ndarray] = []
+    series_members: List[np.ndarray] = []
     for p in single_files:
         try:
             sf = load_feature_table(p, source_format=source_format, polarity=pol,
@@ -394,11 +445,26 @@ def _per_sample(rt: np.ndarray, single_files: Sequence[str], ref,
                 raise CalibrationError(
                     f"only {len(pairs)} m/z-matched pairs against the reference "
                     f"sample run")
-            curve, _ = fit_robust_curve(
+            curve, keep, order = fit_robust_curve_sorted(
                 pairs["rt_a"].to_numpy(), pairs["rt_b"].to_numpy(),
                 frac=cfg.curve_frac, n_iter=cfg.curve_iter, mad_k=cfg.curve_mad_k,
                 min_points=cfg.curve_min_points, mode=cfg.extrapolate_mode)
-            preds.append(curve.predict(rt))
+            pred = curve.predict(rt)
+            corr = np.zeros(len(rt), dtype=float)
+            n_mem = np.zeros(len(rt), dtype=int)
+            if cfg.use_series_term:
+                kept = np.zeros(len(pairs), dtype=bool)
+                kept[order] = keep                      # keep mask, input order
+                xa = pairs["rt_a"].to_numpy(dtype=float)[kept]
+                xb = pairs["rt_b"].to_numpy(dtype=float)[kept]
+                sterm = SeriesTerm.fit(pairs["mz_a"].to_numpy(dtype=float)[kept],
+                                       xa, xb, xb - curve.predict(xa),
+                                       curve.x0, curve.x1, cfg)
+                corr, n_mem = sterm.correction(mz, rt)
+                pred = pred + corr
+            preds.append(pred)
+            series_preds.append(corr)
+            series_members.append(n_mem)
             log.append(f"  per-injection curve ok: {os.path.basename(p)} "
                        f"({len(pairs)} pairs)")
         except RtAnchorError as e:
@@ -406,7 +472,7 @@ def _per_sample(rt: np.ndarray, single_files: Sequence[str], ref,
                        f"(skipped)")
     if not preds:
         log.append("no per-injection curve succeeded -> falling back to per-project")
-        return _per_project(rt, cal, cfg, mapper), 0, log
+        return _per_project(rt, mz, cal, cfg, mapper), 0, log
 
     import warnings
 
@@ -416,18 +482,25 @@ def _per_sample(rt: np.ndarray, single_files: Sequence[str], ref,
         warnings.simplefilter("ignore", RuntimeWarning)
         cal_rt = np.nanmedian(mat, axis=0)
     cal_rt[n_contrib == 0] = np.nan
+    series_corr = np.median(np.vstack(series_preds), axis=0)
+    series_n = np.max(np.vstack(series_members), axis=0)
 
     # features no injection covers -> the project curve, so a row is never blank
-    proj = cal.predict(rt)
+    proj = cal.predict(rt, mz=mz)
     fallback = (n_contrib == 0) & np.isfinite(proj)
     if fallback.any():
         cal_rt[fallback] = proj[fallback]
+        proj_corr, proj_n = _series_columns(cal, mz, rt)
+        series_corr[fallback] = proj_corr[fallback]
+        series_n[fallback] = proj_n[fallback]
         log.append(f"per-injection fallback: {int(fallback.sum())} features covered "
                    f"by no injection took the project-level curve")
 
     unc = cal.uncertainty(rt)
-    res = _assemble(rt, cal_rt, unc, cal.is_extrapolated(rt), cal.warp_source,
+    res = _assemble(rt, cal_rt, unc, cal.is_extrapolated(rt), _warp_rows(cal, series_n),
                     "sample", cfg, mapper)
+    res["series_correction_min"] = series_corr
+    res["series_n_members"] = series_n.astype(int)
     if mapper is not None:
         with np.errstate(all="ignore"), warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
@@ -445,9 +518,14 @@ def _per_sample(rt: np.ndarray, single_files: Sequence[str], ref,
 
 
 def _assemble(rt: np.ndarray, cal_rt: np.ndarray, unc: np.ndarray,
-              extrapolated: np.ndarray, warp_source: str, scope: str,
+              extrapolated: np.ndarray, warp_source: np.ndarray, scope: str,
               cfg: CalibrationConfig, mapper: Optional[IRTMapper]) -> pd.DataFrame:
-    """The §1 output columns for one set of predictions."""
+    """The §1 output columns for one set of predictions.
+
+    ``warp_source`` is per row: ``curve+series`` only where the series term
+    actually corrected the row, ``+anchors`` on every row when stage 2 engaged
+    (see :func:`_warp_rows`).
+    """
     rt = np.asarray(rt, dtype=float)
     bad = ~np.isfinite(rt)                       # no RT -> no calibrated RT
     cal_rt = np.asarray(cal_rt, dtype=float).copy()
@@ -557,8 +635,9 @@ def _anchor_frame(cal: Optional[ColumnCalibrator]) -> pd.DataFrame:
         out["dropped_by_sanity_filter"] = False
     out["dropped_by_sanity_filter"] = out["dropped_by_sanity_filter"].fillna(False).astype(bool)
     # recompute for the dropped rows too, so every row's residual is comparable
+    # (on the stage-1 basis: curve + the series term when it is engaged)
     out["residual_min"] = (out["rt_ref"].to_numpy(dtype=float)
-                           - cal.curve.predict(out["rt_src"].to_numpy(dtype=float)))
+                           - cal._stage1_basis(out, out["rt_src"].to_numpy(dtype=float)))
     for c in ANCHOR_COLUMNS:
         if c not in out.columns:
             out[c] = np.nan
@@ -594,6 +673,35 @@ def _span(ft: FeatureTable) -> str:
     return f"{float(np.nanmin(rt)):.2f}-{float(np.nanmax(rt)):.2f} min"
 
 
+def _series_block(cal: ColumnCalibrator, res: pd.DataFrame, cfg: CalibrationConfig) -> Dict:
+    """``model["series"]`` — always present, also when the term is disabled.
+
+    ``n_features_corrected`` counts the rows of the result table that actually
+    received a series correction (``series_n_members > 0``); the rest of the
+    block is the fit-level record from :meth:`SeriesTerm.to_model`.
+    """
+    n_corrected = int((pd.to_numeric(res["series_n_members"]) > 0).sum()) \
+        if "series_n_members" in res.columns else 0
+    if cal.series is None:
+        return {
+            "enabled": False,
+            "engaged": False,
+            "gate_mse_reduction": None,
+            "gate_threshold": float(cfg.series_gate_min_mse_reduction),
+            "gate_reason": "disabled (use_series_term=False)",
+            "n_series": 0,
+            "n_pairs_covered": 0,
+            "n_features_corrected": 0,
+            "kmd_tol": float(cfg.series_kmd_tol),
+            "min_members": int(cfg.series_min_members),
+            "end_reach_ch2": int(cfg.series_end_reach_ch2),
+            "exclude_rt_min": float(max(
+                cfg.series_exclude_rt_floor_min,
+                cfg.series_exclude_rt_frac * (cal.curve.x1 - cal.curve.x0))),
+        }
+    return {**cal.series.to_model(), "n_features_corrected": n_corrected}
+
+
 def _model_dict(cal: ColumnCalibrator, anchors: pd.DataFrame,
                 mapper: Optional[IRTMapper], panel_used: str, irt_reason: str,
                 ref, panel_key: str, panel_manifest: Optional[pd.DataFrame],
@@ -623,6 +731,7 @@ def _model_dict(cal: ColumnCalibrator, anchors: pd.DataFrame,
             "n_standards": (0 if panel_manifest is None else int(len(panel_manifest))),
         },
         "curve": blocks["curve"],
+        "series": _series_block(cal, res, cfg),
         "anchors": {**blocks["anchors"], "table": anchors.to_dict(orient="records")},
         "irt": irt_block,
         "detection_qc": {

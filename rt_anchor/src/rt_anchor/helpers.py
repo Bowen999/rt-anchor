@@ -73,7 +73,7 @@ def write_results(result: CalibrationResult, out_prefix: str,
     paths["calibrated_csv"] = csv_path
 
     model_path = f"{out_prefix}_model.json"
-    with open(model_path, "w") as fh:
+    with open(model_path, "w", encoding="utf-8") as fh:
         # allow_nan=False + a NaN->null sanitiser so the file is *valid* JSON
         # (bare ``NaN`` is rejected by strict parsers, e.g. JS ``JSON.parse``).
         json.dump(_sanitize_json(result.model), fh, indent=2,
@@ -91,7 +91,7 @@ def write_results(result: CalibrationResult, out_prefix: str,
 
     if write_log:
         log_path = f"{out_prefix}_log.txt"
-        with open(log_path, "w") as fh:
+        with open(log_path, "w", encoding="utf-8") as fh:
             fh.write("\n".join(result.log) + "\n")
         paths["log_txt"] = log_path
 
@@ -108,7 +108,7 @@ def write_results(result: CalibrationResult, out_prefix: str,
                               f"the data outputs above are unaffected")
             _drop_empty_report_files(out_prefix)
         if write_log:               # re-write so the log carries the report note
-            with open(paths["log_txt"], "w") as fh:
+            with open(paths["log_txt"], "w", encoding="utf-8") as fh:
                 fh.write("\n".join(result.log) + "\n")
     return paths
 

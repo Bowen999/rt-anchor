@@ -52,14 +52,20 @@ def compute_anchors(result) -> Dict:
     """Everything both renderers need, computed once.
 
     ``empty`` is True when stage 2 never produced an anchor — a non-plasma
-    matrix, or a panel-free run. The renderers then say so instead of drawing
-    an empty axis.
+    matrix, a panel-free run, or a run that never asked for stage 2 (it has
+    been opt-in since 1.2.2). The renderers then say so instead of drawing an
+    empty axis.
     """
     a = getattr(result, "anchors", None)
     if a is None or not len(a):
+        model = getattr(result, "model", None) or {}
+        requested = bool((model.get("config", {}) or {}).get("use_sample_anchors", False))
         return dict(empty=True,
-                    reason="no plasma-lipid anchors validated in this run "
-                           "(stage 1 curve only)")
+                    requested=requested,
+                    reason=("not requested (use_sample_anchors=False) — stage 2 is "
+                            "opt-in since 1.2.2" if not requested else
+                            "no plasma-lipid anchors validated in this run "
+                            "(stage 1 curve only)"))
 
     a = a.copy()
     if "dropped_by_sanity_filter" not in a.columns:

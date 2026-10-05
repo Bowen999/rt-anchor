@@ -52,7 +52,7 @@
   },
   "curve": {
     "n_pairs": 595,
-    "n_pairs_kept": 421,
+    "n_pairs_kept": 433,
     "n_pairs_standards": 173,
     "n_pairs_sample": 422,
     "rt_span_src_min": [
@@ -64,232 +64,41 @@
       24.229
     ],
     "residual_min": {
-      "median_abs": 0.3657474143174504,
-      "p90_abs": 4.212578450187308
+      "median_abs": 0.38920366933014705,
+      "p90_abs": 4.2452609501458625
     }
   },
-  "anchors": {
-    "engaged": true,
-    "class_aware": true,
-    "n_validated": 17,
-    "n_used": 15,
-    "lam_g": 0.6,
-    "lam_c": 0.5,
-    "gate_mse_reduction": 0.28697427088648575,
+  "series": {
+    "enabled": true,
+    "engaged": false,
+    "gate_mse_reduction": -0.34535720991053154,
     "gate_threshold": 0.2,
-    "gate_reason": "class-aware correction engaged: LOO MSE 29% below no-correction (threshold 20%)",
-    "sigma_anchor_min": 0.17432093980222746,
+    "gate_reason": "series term gated off: leave-own-out MSE 35% above curve-only (threshold: 20% below)",
+    "n_series": 27,
+    "n_pairs_covered": 148,
+    "kmd_tol": 0.008,
+    "min_members": 4,
+    "end_reach_ch2": 2,
+    "exclude_rt_min": 0.033590999999999996,
+    "n_features_corrected": 0
+  },
+  "anchors": {
+    "engaged": false,
+    "class_aware": false,
+    "n_validated": 0,
+    "n_used": 0,
+    "lam_g": 1.0,
+    "lam_c": 0.0,
+    "gate_mse_reduction": null,
+    "gate_threshold": 0.2,
+    "gate_reason": "anchors disabled",
+    "sigma_anchor_min": 0.0,
     "loo_residual_min": {
-      "median": 0.1358508312856375,
-      "p90": 0.2884016843377799,
-      "max": 0.2951065306279498
+      "median": 0.0,
+      "p90": 0.0,
+      "max": 0.0
     },
-    "table": [
-      {
-        "label": "LPC 18:2",
-        "lipid_class": "LPC",
-        "rt_src": 1.757,
-        "rt_ref": 3.987,
-        "residual_min": 0.27080242411999267,
-        "loo_residual_min": -0.1386439326258321,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": false,
-        "dropped_by_sanity_filter": false
-      },
-      {
-        "label": "LPC 16:0",
-        "lipid_class": "LPC",
-        "rt_src": 2.001,
-        "rt_ref": 4.456,
-        "residual_min": 0.2587556772162918,
-        "loo_residual_min": -0.1358508312856375,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": false,
-        "dropped_by_sanity_filter": false
-      },
-      {
-        "label": "LPC 18:1",
-        "lipid_class": "LPC",
-        "rt_src": 2.111,
-        "rt_ref": 4.642,
-        "residual_min": 0.230949148356145,
-        "loo_residual_min": -0.11934689152177302,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": false,
-        "dropped_by_sanity_filter": false
-      },
-      {
-        "label": "LPC 18:0",
-        "lipid_class": "LPC",
-        "rt_src": 2.605,
-        "rt_ref": 5.401,
-        "residual_min": 0.09608217128660357,
-        "loo_residual_min": 0.012898233455306524,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": false,
-        "dropped_by_sanity_filter": false
-      },
-      {
-        "label": "PC 36:4",
-        "lipid_class": "PC",
-        "rt_src": 6.52,
-        "rt_ref": 11.551,
-        "residual_min": -0.0339024664030525,
-        "loo_residual_min": 0.003831556370456124,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": true,
-        "dropped_by_sanity_filter": false
-      },
-      {
-        "label": "PC 34:2",
-        "lipid_class": "PC",
-        "rt_src": 6.656,
-        "rt_ref": 11.732,
-        "residual_min": -0.02914197330335888,
-        "loo_residual_min": 0.03246756967625155,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": true,
-        "dropped_by_sanity_filter": false
-      },
-      {
-        "label": "SM 34:1;O2",
-        "lipid_class": "SM",
-        "rt_src": 6.876,
-        "rt_ref": 11.057,
-        "residual_min": -0.9443341066586992,
-        "loo_residual_min": null,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": false,
-        "dropped_by_sanity_filter": true
-      },
-      {
-        "label": "SM 36:1;O2",
-        "lipid_class": "SM",
-        "rt_src": 7.093,
-        "rt_ref": 12.694,
-        "residual_min": 0.5084942348212955,
-        "loo_residual_min": null,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": true,
-        "dropped_by_sanity_filter": true
-      },
-      {
-        "label": "PC 34:1",
-        "lipid_class": "PC",
-        "rt_src": 7.394,
-        "rt_ref": 12.901,
-        "residual_min": 0.35607636637731765,
-        "loo_residual_min": -0.2368509958546614,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": true,
-        "dropped_by_sanity_filter": false
-      },
-      {
-        "label": "PC 36:2",
-        "lipid_class": "PC",
-        "rt_src": 7.75,
-        "rt_ref": 13.343,
-        "residual_min": 0.301420842298997,
-        "loo_residual_min": -0.2951065306279498,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": true,
-        "dropped_by_sanity_filter": false
-      },
-      {
-        "label": "PC 38:4",
-        "lipid_class": "PC",
-        "rt_src": 7.887,
-        "rt_ref": 13.161,
-        "residual_min": -0.12918174600301846,
-        "loo_residual_min": 0.2831588223926191,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": true,
-        "dropped_by_sanity_filter": false
-      },
-      {
-        "label": "PC 36:1",
-        "lipid_class": "PC",
-        "rt_src": 8.762,
-        "rt_ref": 14.508,
-        "residual_min": 0.12742846845777223,
-        "loo_residual_min": -0.19844500868731182,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": true,
-        "dropped_by_sanity_filter": false
-      },
-      {
-        "label": "TG 52:3",
-        "lipid_class": "TG",
-        "rt_src": 17.791,
-        "rt_ref": 20.95,
-        "residual_min": -0.22985151051291908,
-        "loo_residual_min": 0.05019711456038298,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": false,
-        "dropped_by_sanity_filter": false
-      },
-      {
-        "label": "CE 18:2",
-        "lipid_class": "CE",
-        "rt_src": 18.037,
-        "rt_ref": 21.158,
-        "residual_min": -0.24766133206610164,
-        "loo_residual_min": 0.2918969256345538,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": false,
-        "dropped_by_sanity_filter": false
-      },
-      {
-        "label": "TG 52:2",
-        "lipid_class": "TG",
-        "rt_src": 18.092,
-        "rt_ref": 21.318,
-        "residual_min": -0.16374789432737913,
-        "loo_residual_min": 0.015284617272223494,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": false,
-        "dropped_by_sanity_filter": false
-      },
-      {
-        "label": "TG 54:3",
-        "lipid_class": "TG",
-        "rt_src": 18.147,
-        "rt_ref": 21.365,
-        "residual_min": -0.19731570477579297,
-        "loo_residual_min": 0.1310335030043946,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": false,
-        "dropped_by_sanity_filter": false
-      },
-      {
-        "label": "CE 18:1",
-        "lipid_class": "CE",
-        "rt_src": 18.42,
-        "rt_ref": 21.625,
-        "residual_min": 0.0626842952242086,
-        "loo_residual_min": -0.18651496125725942,
-        "n_isomer_candidates": 0,
-        "isomer_rts": "",
-        "pick_refined": true,
-        "dropped_by_sanity_filter": false
-      }
-    ]
+    "table": []
   },
   "irt": {
     "n_landmarks": 14,
@@ -337,9 +146,9 @@
   "n_features": 22314,
   "n_features_extrapolated": 569,
   "confidence_counts": {
-    "medium": 15334,
-    "low": 6396,
-    "high": 584
+    "medium": 13106,
+    "low": 6545,
+    "high": 2663
   },
   "config": {
     "match_mz_tol_ppm": 15.0,
@@ -353,7 +162,15 @@
     "curve_mad_k": 3.0,
     "curve_min_points": 20,
     "use_sample_pairs": true,
-    "use_sample_anchors": true,
+    "use_series_term": true,
+    "series_kmd_tol": 0.008,
+    "series_min_members": 4,
+    "series_end_reach_ch2": 2,
+    "series_exclude_rt_frac": 0.0015,
+    "series_exclude_rt_floor_min": 0.03,
+    "series_gate_min_mse_reduction": 0.2,
+    "series_min_covered_pairs": 20,
+    "use_sample_anchors": false,
     "class_aware": true,
     "min_anchors": 3,
     "anchor_gate_min_mse_reduction": 0.2,

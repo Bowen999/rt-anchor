@@ -268,7 +268,8 @@ function collectAdvanced() {
   state.params.rt_window_min = v("#adv-rtw");
   state.params.min_anchors = v("#adv-minanchors");
   state.params.use_sample_pairs = chk("#adv-samplepairs", true);
-  state.params.use_sample_anchors = chk("#adv-sampleanchors", true);
+  state.params.use_series_term = chk("#adv-seriesterm", true);
+  state.params.use_sample_anchors = chk("#adv-sampleanchors", false);
   state.params.extrapolate = chk("#adv-extrapolate", true);
   const em = $("#adv-extramode");
   state.params.extrapolate_mode = em ? em.value : "linear";
@@ -590,6 +591,20 @@ function renderSection(id, body) {
   } else {
     CK.render(id, host, state.bundle);   // curve (SVG)
   }
+  /* the curve section states its gate decisions in words: the series term's
+     always (it is a per-feature correction, not a curve, so nothing in the SVG
+     shows it), the anchor gate's alongside it when stage 2 ran */
+  if (id === "curve") {
+    const cd = state.bundle.curve || {};
+    const reasons = [];
+    if (cd.series_reason) reasons.push("series term: " + cd.series_reason);
+    if (cd.gate_reason && cd.gate_reason !== "anchors disabled") reasons.push(cd.gate_reason);
+    reasons.forEach(r => {
+      const g = document.createElement("div"); g.className = "fig-note";
+      g.textContent = r;
+      panel.appendChild(g);
+    });
+  }
   const note = state.bundle.notes && state.bundle.notes[id];
   if (note) {
     const n = document.createElement("div"); n.className = "fig-note"; n.innerHTML = note;
@@ -686,7 +701,8 @@ function renderManifest(r) {
 
 /* ---- calibrated-table preview ---- */
 const esc = s => String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
-const NUMERIC_COLS = new Set(["RT", "m/z", "Cal_RT (min)", "Cal_RT ± (min)", "iRT", "iRT ±", "iRT spread"]);
+const NUMERIC_COLS = new Set(["RT", "m/z", "Cal_RT (min)", "Cal_RT ± (min)", "iRT", "iRT ±",
+  "iRT spread", "series corr (min)", "series n"]);
 const TABLE_PAGE_SIZE = 100;
 let _tablePage = 0;
 function renderTable(body) {

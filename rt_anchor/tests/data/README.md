@@ -15,6 +15,25 @@ standards-mixture run from the same column).
 The second axis of every calibration — the reference column — is not here: it
 is bundled with the package in `src/rt_anchor/reference_data/col35/`.
 
+`expected_series_repo_datasets.json` holds the reference implementation's
+stage-1b (homologous-series term) numbers for the three datasets above —
+series counts, gate statistics, and per-row raw corrections — and is asserted
+against in [`../test_series.py`](../test_series.py).
+
+`expected_v121_orbitrap_golden.json` holds the numeric goldens for the two
+v1.2.1-equivalent configurations (series term off, anchors on / off) on the
+Orbitrap dataset: the sampled result columns, value counts of the text
+columns, the anchors table's numbers, the pair counts, and the `curve` /
+`anchors` / `irt` model blocks. Also asserted in `test_series.py` (to 1e-8;
+generated from this tree with the series term off, the configuration the
+reviewer verified reproduces v1.2.1 exactly).
+
+Both files also record a fingerprint of the stage-1 fit as this machine
+produces it: the number of matched pairs, the number kept, and a sha1 of the
+kept pairs' (m/z, RT). Which pairs survive trimming depends on how tied rows
+happen to be ordered, so a platform whose fit legitimately differs skips the
+pinned-number comparison instead of failing.
+
 Copies elsewhere in the repository: `Orbitrap/` is byte-identical to
 [`examples/mix15/`](../../../examples/mix15/), and the `QTOF_full/` aligned
 tables are the desktop app's **Load example** dataset (`RT Anchor Desktop/example/`).

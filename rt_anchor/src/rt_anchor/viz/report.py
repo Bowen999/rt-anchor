@@ -60,6 +60,7 @@ def method_facts(result) -> List[tuple]:
     ref = (result.reference or {}) or m.get("reference", {}) or {}
     irt = m.get("irt", {}) or {}
     cur = m.get("curve", {}) or {}
+    ser = m.get("series", {}) or {}
 
     ref_label = str(ref.get("label") or ref.get("key") or "unknown")
     if ref.get("is_default"):
@@ -90,6 +91,7 @@ def method_facts(result) -> List[tuple]:
         ("Reference column", ref_label),
         ("Standards panel", panel),
         ("Stage 1 curve", pair_txt),
+        ("Series term", str(ser.get("gate_reason") or "not fitted")),
         ("Stage 2 anchors", anchors.verdict_line(anchors.compute_anchors(result))),
         ("iRT scale", irt_txt),
     ]

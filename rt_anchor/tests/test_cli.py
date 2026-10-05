@@ -129,8 +129,10 @@ def test_cli_bad_input_exits_nonzero_subprocess(tmp_path):
 
 @pytest.fixture(scope="module")
 def result(orbitrap_samples, orbitrap_standards):
+    # use_sample_anchors=True: keep this fixture on the full two-stage path
+    # (stage 2 has been opt-in since 1.2.2)
     return calibrate(orbitrap_samples, "positive", standards_table=orbitrap_standards,
-                     panel="mix15", config=CalibrationConfig.orbitrap())
+                     panel="mix15", config=CalibrationConfig.orbitrap(use_sample_anchors=True))
 
 
 def test_write_results_roundtrip(tmp_path, result):
@@ -159,6 +161,22 @@ def test_write_results_json_has_no_raw_nan(tmp_path, result):
     # bare NaN is invalid JSON; the writer must emit null instead
     assert "NaN" not in raw
     json.loads(raw)
+
+
+def test_write_results_log_is_utf8(tmp_path, result):
+    """Pins the run log's encoding to UTF-8.
+
+    Every run's log contains an em dash (the ``reference:`` line). Written
+    with the platform default encoding the log came out as cp1252 on Windows
+    — not valid UTF-8, unlike the same file produced on Linux/macOS — and a
+    log line holding a character the locale cannot encode would have raised
+    outright. The bytes on disk must decode as UTF-8 and keep the em dash.
+    (Fails before the ``encoding="utf-8"`` fix on Windows, passes after.)
+    """
+    prefix = str(tmp_path / "out")
+    paths = write_results(result, prefix, report=False)
+    text = open(paths["log_txt"], "rb").read().decode("utf-8")
+    assert "—" in text
 
 
 def test_a_failing_report_never_costs_the_data(tmp_path, result, monkeypatch):

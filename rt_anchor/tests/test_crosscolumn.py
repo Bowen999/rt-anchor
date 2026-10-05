@@ -169,8 +169,9 @@ def test_gate_engages_on_a_systematic_class_offset(exact_runs):
     x = np.linspace(2.0, 18.0, 12)
     cls = np.array(["SM"] * 6 + ["PC"] * 6)
     anchors = _anchor_frame(x, lambda v: np.where(cls == "SM", 0.5, -0.5), cls)
-    cal = build_calibrator(src, ref, CalibrationConfig(), sample_anchors=anchors,
-                           use_anchors=True, **FLAT)
+    # use_series_term=False: this test's warp_source vocabulary is v1.2.1's
+    cal = build_calibrator(src, ref, CalibrationConfig(use_series_term=False),
+                           sample_anchors=anchors, use_anchors=True, **FLAT)
     assert cal.anchors_used and cal.warp_source == "curve+anchors"
     assert cal.gate_mse_reduction >= 0.2
     assert cal.lam_c > 0, "a pure class offset must be carried by lam_c"
@@ -185,8 +186,8 @@ def test_gate_stays_off_when_the_residuals_are_noise(exact_runs):
     x = np.linspace(2.0, 18.0, 12)
     cls = np.array(["SM", "PC", "CE", "TG"] * 3)
     anchors = _anchor_frame(x, lambda v: rng.normal(0, 0.3, len(v)), cls)
-    cal = build_calibrator(src, ref, CalibrationConfig(), sample_anchors=anchors,
-                           use_anchors=True, **FLAT)
+    cal = build_calibrator(src, ref, CalibrationConfig(use_series_term=False),
+                           sample_anchors=anchors, use_anchors=True, **FLAT)
     assert not cal.anchors_used and cal.warp_source == "curve"
     assert "gated off" in cal.gate_reason
     assert cal.sigma_anchor == 0.0

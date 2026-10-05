@@ -82,14 +82,14 @@ def _tile(label, value, note) -> Dict:
 # --------------------------------------------------------------- KPIs ----------
 
 #: Engine KPI tiles that the app deliberately does not show.
-_REMOVED_TILES = {"Matched pairs", "Anchor gate", "iRT landmarks"}
+_REMOVED_TILES = {"Matched pairs", "Series term", "iRT landmarks"}
 
 
 def kpis(result) -> List[Dict]:
     """The v2 KPI tiles, straight from the engine's own tile builder.
 
-    A few tiles are dropped in the app: the pair census, the stage-2 gate and
-    the iRT landmark count are evidence-level details the results screen no
+    A few tiles are dropped in the app: the pair census, the series-term gate
+    and the iRT landmark count are evidence-level details the results screen no
     longer surfaces.
     """
     from rt_anchor.viz import metrics as _vm
@@ -150,6 +150,8 @@ def curve(result, ngrid: int = 240) -> Dict:
         "anchors": anchors,
         "rt_span": span_src, "ref_span": span_ref,
         "engaged": bool(d["engaged"]),
+        "series_engaged": bool(d.get("series_engaged", False)),
+        "series_reason": _s(d.get("series_reason")),
         "lam_g": _f(d["lam_g"]), "lam_c": _f(d["lam_c"]),
         "class_aware": bool(d["class_aware"]),
         "gate_reduction": _f(d["gate_reduction"]),
@@ -308,6 +310,8 @@ PREVIEW_COLUMNS = [
     ("iRT_reliability", "reliability"),
     ("RI_spread", "iRT spread"),
     ("is_extrapolated", "extrapolated"),
+    ("series_correction_min", "series corr (min)"),
+    ("series_n_members", "series n"),
 ]
 
 
@@ -349,7 +353,8 @@ def _notes(result) -> Dict:
             "runs, <b>diamonds</b> from the two sample runs (serum covers the "
             "sparse early and late ends the mixture cannot). Rings are the "
             "stage-2 plasma-lipid anchors. The strip below is each pair's "
-            "residual about the fit."
+            "residual about the fit. The series term, when its gate engages, is "
+            "a per-feature correction that the curve does not show."
         ),
         "profile": (
             "Reconstructed from the feature table by binning feature intensities "
