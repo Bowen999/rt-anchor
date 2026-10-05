@@ -265,9 +265,10 @@ def series_headline(m: Dict) -> Tuple[str, str]:
     """``(value, note)`` for the series-term tile — the same words everywhere.
 
     The five states the gate can be in, said plainly: engaged (with the LOO MSE
-    reduction), gated off (with the measured gain and the threshold), not
-    needed (self-calibration), disabled by configuration, and not enough series
-    pairs for the gate to read.
+    reduction), gated off (a shortfall is "off · N% below the gate", a measured
+    *loss* is "off" with "N% worse than the curve alone" — never "off · -35%"),
+    not needed (self-calibration), disabled by configuration, and not enough
+    series pairs for the gate to read.
     """
     red = m["series_reduction"]
     pct = f"{100 * red:.0f}%" if np.isfinite(red) else DASH
@@ -280,6 +281,9 @@ def series_headline(m: Dict) -> Tuple[str, str]:
     if m["series_reason"].startswith("no correction needed"):
         return ("not needed", "the stage-1 curve already reproduces the series pairs")
     if np.isfinite(red):
+        if red < 0:
+            return ("off", f"{-100 * red:.0f}% worse than the curve alone "
+                           f"· stage-1 curve only")
         return (f"off · {pct}",
                 f"below the {100 * m['series_threshold']:.0f}% gate · stage-1 curve only")
     return ("off", m["series_reason"])

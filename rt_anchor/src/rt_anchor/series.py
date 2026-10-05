@@ -224,9 +224,16 @@ class SeriesTerm:
             self.gate_reason = (f"series term engaged: leave-own-out MSE {100 * red:.0f}% "
                                 f"below curve-only (threshold {100 * self.gate_threshold:.0f}%)")
         else:
-            self.gate_reason = (f"series term gated off: leave-own-out MSE only "
-                                f"{100 * red:.0f}% below curve-only "
-                                f"(threshold {100 * self.gate_threshold:.0f}%)")
+            p = round(100 * red)
+            if p >= 0:
+                self.gate_reason = (f"series term gated off: leave-own-out MSE only "
+                                    f"{p}% below curve-only "
+                                    f"(threshold {100 * self.gate_threshold:.0f}%)")
+            else:
+                # a measured loss is not "only -35% below" — say it plainly
+                self.gate_reason = (f"series term gated off: leave-own-out MSE "
+                                    f"{-p}% above curve-only "
+                                    f"(threshold: {100 * self.gate_threshold:.0f}% below)")
 
     # --------------------------------------------------------- prediction ---
 

@@ -81,6 +81,9 @@ def test_series_headline_states():
     assert v == "on · 27%" and n == "20 series · 106 of 405 features corrected"
     v, n = metrics.series_headline({**base, "series_reduction": 0.09})
     assert v == "off · 9%" and n == "below the 20% gate · stage-1 curve only"
+    # a measured *loss* (the Orbitrap run: reduction -0.345) is not "off · -35%"
+    v, n = metrics.series_headline({**base, "series_reduction": -0.34535720991053154})
+    assert v == "off" and n == "35% worse than the curve alone · stage-1 curve only"
     v, n = metrics.series_headline({**base, "series_reduction": 0.0,
                                     "series_reason": "no correction needed: the stage-1 "
                                     "curve already reproduces the series pairs"})

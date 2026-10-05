@@ -285,7 +285,8 @@ def _fit_calibrator(ft: FeatureTable, std_ft: FeatureTable, ref, cfg
         _, n_mem = cal.series.correction(ft.mz().to_numpy(dtype=float),
                                          ft.rt_minutes().to_numpy(dtype=float))
         log.append(f"series term: {cal.series.gate_reason}; {cal.series.n_series} "
-                   f"homologous series, {cal.series.n_pairs_covered} pairs; "
+                   f"homologous series ({int(cal.series.member_mask.sum())} pairs, "
+                   f"{cal.series.n_pairs_covered} with a leave-own-out prediction); "
                    f"{int((n_mem > 0).sum())}/{ft.n_features()} features corrected")
 
     if not cfg.use_sample_anchors:
