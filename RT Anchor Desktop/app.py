@@ -64,10 +64,16 @@ def _selftest() -> int:
             print(f"SELFTEST_FAIL self-calibration off by {err:.3g} min "
                   f"(expected < 1e-6)")
             return 1
+        series = res.model.get("series")
+        if not isinstance(series, dict) or "engaged" not in series:
+            print("SELFTEST_FAIL model carries no series block "
+                  "(rt_anchor.series missing from the bundle?)")
+            return 1
         print(f"SELFTEST_OK reference={pair.key} features={len(res.table)} "
               f"pairs={res.model['curve']['n_pairs']} "
               f"landmarks={res.model['irt']['n_landmarks']} "
-              f"self_error={err:.2e}min structures={n_struct}")
+              f"self_error={err:.2e}min structures={n_struct} "
+              f"series={series.get('gate_reason', '')}")
         return 0
     except Exception as e:  # pragma: no cover
         import traceback

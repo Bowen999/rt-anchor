@@ -93,6 +93,7 @@ def compute_metrics(result) -> Dict:
     model = result.model or {}
     curve = model.get("curve", {}) or {}
     anch = model.get("anchors", {}) or {}
+    ser = model.get("series", {}) or {}
     irt = model.get("irt", {}) or {}
     qc = (model.get("detection_qc", {}) or {}).get("user_standards_run", {}) or {}
     ref = model.get("reference", {}) or result.reference or {}
@@ -135,11 +136,22 @@ def compute_metrics(result) -> Dict:
         resid_median=_f((curve.get("residual_min") or {}).get("median_abs")),
         resid_p90=_f((curve.get("residual_min") or {}).get("p90_abs")),
 
+        # ---- stage 1b: the homologous-series term ----
+        series_enabled=bool(ser.get("enabled", False)),
+        series_engaged=bool(ser.get("engaged", False)),
+        series_reduction=_f(ser.get("gate_mse_reduction")),
+        series_threshold=_f(ser.get("gate_threshold"), 0.2),
+        series_reason=str(ser.get("gate_reason", "") or ""),
+        n_series=int(ser.get("n_series", 0) or 0),
+        n_series_pairs=int(ser.get("n_pairs_covered", 0) or 0),
+        n_features_series=int(ser.get("n_features_corrected", 0) or 0),
+
         # ---- stage 2: the anchors and the gate ----
         gate_engaged=bool(anch.get("engaged", False)),
         gate_reduction=_f(anch.get("gate_mse_reduction")),
         gate_threshold=_f(anch.get("gate_threshold"), 0.2),
         gate_reason=str(anch.get("gate_reason", "") or ""),
+        anchors_requested=bool(cfg.get("use_sample_anchors", False)),
         class_aware=bool(anch.get("class_aware", False)),
         n_anchors_used=int(anch.get("n_used", 0) or 0),
         n_anchors_validated=int(anch.get("n_validated", 0) or 0),
@@ -167,7 +179,8 @@ def compute_metrics(result) -> Dict:
         unc_median=_f(unc.median()), irt_unc_median=_f(iunc.median()),
         reliability=conf,
         frac_high=(conf["high"] / n if n else 0.0),
-        warp_source=("curve+anchors" if anch.get("engaged") else "curve"),
+        warp_source=("curve" + ("+series" if ser.get("engaged") else "")
+                     + ("+anchors" if anch.get("engaged") else "")),
 
         # ---- detection QC on the USER's standards run ----
         n_panel=int(qc.get("n_panel", 0) or 0),
@@ -248,16 +261,49 @@ def gate_headline(m: Dict) -> Tuple[str, str]:
     return ("off", "no plasma-lipid anchors · stage-1 curve only")
 
 
+def series_headline(m: Dict) -> Tuple[str, str]:
+    """``(value, note)`` for the series-term tile — the same words everywhere.
+
+    The five states the gate can be in, said plainly: engaged (with the LOO MSE
+    reduction), gated off (with the measured gain and the threshold), not
+    needed (self-calibration), disabled by configuration, and not enough series
+    pairs for the gate to read.
+    """
+    red = m["series_reduction"]
+    pct = f"{100 * red:.0f}%" if np.isfinite(red) else DASH
+    if not m["series_enabled"]:
+        return ("off", "disabled")
+    if m["series_engaged"]:
+        return (f"on · {pct}",
+                f"{m['n_series']} series · {m['n_features_series']} of "
+                f"{m['n_features']} features corrected")
+    if m["series_reason"].startswith("no correction needed"):
+        return ("not needed", "the stage-1 curve already reproduces the series pairs")
+    if np.isfinite(red):
+        return (f"off · {pct}",
+                f"below the {100 * m['series_threshold']:.0f}% gate · stage-1 curve only")
+    return ("off", m["series_reason"])
+
+
 def kpi_tiles(result) -> List[Tuple[str, object, str]]:
     """Six KPI tiles for the v2 method.
 
     A tile is ``(label, value, note)``. ``value`` is either a headline string or
     a list of ``(caption, value)`` pairs rendered as stacked rows (used where two
     quantities belong together — the two runs, the two pair sources, the median
-    and the P90).
+    and the P90). The fourth tile is the series term; when stage-2 anchors were
+    requested for the run, its note also carries the anchor gate's state, so the
+    opt-in stage stays visible without a seventh tile.
     """
     m = compute_metrics(result)
-    gate_v, gate_n = gate_headline(m)
+    ser_v, ser_n = series_headline(m)
+    if m["anchors_requested"]:
+        if m["gate_engaged"]:
+            red = m["gate_reduction"]
+            ser_n += (f" · anchors on {100 * red:.0f}%" if np.isfinite(red)
+                      else " · anchors on")
+        else:
+            ser_n += " · anchors off"
     nf_std = m["n_features_std"]
 
     return [
@@ -270,7 +316,7 @@ def kpi_tiles(result) -> List[Tuple[str, object, str]]:
         ("Curve residual", [("median", _fmt(m["resid_median"], 3)),
                             ("P90", _fmt(m["resid_p90"], 3))],
          "|reference − fitted| (min)"),
-        ("Anchor gate", gate_v, gate_n),
+        ("Series term", ser_v, ser_n),
         ("iRT landmarks", f"{m['n_landmarks']}",
          f"RT {_rng(*m['landmark_rt_span'], d=2)} min on the reference run"),
         ("Output", [("iRT range", _rng(*m["iRT_range"], d=0)),
@@ -290,8 +336,10 @@ def radar_axes(result) -> List[Tuple[str, float]]:
       columns land at 425–566.
     * **Curve fit** — 0.5 min median residual is where a 35-min gradient's
       calibration stops being useful.
-    * **Anchors** — out of the 17-lipid plasma panel, and zero when the gate is
-      off, because an anchor that was not used is not support.
+    * **Series term** — the gate's leave-own-out MSE reduction, clipped to
+      [0, 1], when the term is engaged, else 0. Zero is not "bad": a run whose
+      selectivity already matches the reference has nothing to correct, and the
+      gate declining there is the method working, not failing.
     * **Landmarks** — out of the chosen panel's ionisable standards.
     * **Reliability** — the share of features rated ``high`` (per-project), or
       the inter-injection agreement (per-sample).
@@ -300,7 +348,9 @@ def radar_axes(result) -> List[Tuple[str, float]]:
     pairs = min(m["n_pairs_kept"] / 400.0, 1.0)
     resid = m["resid_median"]
     fit = 1.0 - min((resid if np.isfinite(resid) else 0.5) / 0.5, 1.0)
-    anchors = (min(m["n_anchors_used"] / 17.0, 1.0) if m["gate_engaged"] else 0.0)
+    red = m["series_reduction"]
+    series = (max(min(red, 1.0), 0.0)
+              if m["series_engaged"] and np.isfinite(red) else 0.0)
     denom = max(m["n_panel"] or m["n_standards_panel"], 1)
     landmarks = min(m["n_landmarks"] / denom, 1.0)
 
@@ -312,7 +362,7 @@ def radar_axes(result) -> List[Tuple[str, float]]:
     else:
         consistency, clabel = m["frac_high"], "Reliability"
     return [("Pair support", pairs), ("Curve fit", max(fit, 0.0)),
-            ("Anchors", anchors), ("Landmarks", landmarks),
+            ("Series term", series), ("Landmarks", landmarks),
             (clabel, max(min(consistency, 1.0), 0.0))]
 
 
