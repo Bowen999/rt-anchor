@@ -133,8 +133,8 @@ def main(argv: Optional[List[str]] = None) -> int:
                         "(match_mz_tol_ppm, default 15). This is the window the "
                         "cross-column curve is built with.")
     c.add_argument("--mz-tol-da", dest="mz_tol_da", type=float, default=None,
-                   help="Absolute floor beneath the anonymous matching ppm "
-                        "window, Da (match_mz_tol_da, default 0.008).")
+                   help="Optional absolute floor beneath the anonymous matching "
+                        "ppm window, Da (match_mz_tol_da, default 0 = off).")
     c.add_argument("--mz-tol-ppm", dest="mz_tol_ppm", type=float, default=None,
                    help="m/z tolerance in ppm for TARGETED panel-standard "
                         "identification: landmarks and detection QC (default 15).")

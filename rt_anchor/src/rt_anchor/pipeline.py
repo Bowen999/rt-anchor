@@ -317,10 +317,10 @@ def _fit_calibrator(ft: FeatureTable, std_ft: FeatureTable, ref, cfg
 def _anon_tol(cfg: CalibrationConfig) -> Dict[str, float]:
     """The m/z window used for every anonymous operation (spec §7).
 
-    ``max(ppm, floor)``: the ppm window (``match_mz_tol_ppm``) with the
-    absolute floor (``match_mz_tol_da``) beneath it, so low-m/z pairs keep a
-    sensible minimum width. The ppm window belongs to targeted identification
-    of named standards and is deliberately not applied here.
+    ``max(ppm, floor)`` from ``match_mz_tol_ppm`` / ``match_mz_tol_da`` — 15 ppm
+    and no floor by default. Passed explicitly, because ``mz_window`` would
+    otherwise read the *targeted* pair (``mz_tol_ppm`` / ``mz_tol_min_da``)
+    off the config.
     """
     return {"mz_tol_ppm": float(cfg.match_mz_tol_ppm),
             "mz_tol_min_da": float(cfg.match_mz_tol_da)}

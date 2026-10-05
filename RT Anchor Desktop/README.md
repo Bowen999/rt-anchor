@@ -3,16 +3,16 @@
 A native desktop app (pywebview + the `rt_anchor` engine) for **cross‑column
 retention‑time calibration**: it puts a sample's retention times onto a stated
 **reference column's** time axis (`Cal_RT_min`) and onto a dimensionless 1–100
-**iRT** index. Dark, blue, refined‑brutalist UI. macOS build (`.app` / `.dmg`,
-arm64) and Windows build (`RT Anchor.exe`, onedir zip) ship from the same
-shared source.
+**iRT** index. Light "scientific" UI (warm paper, slate‑blue accents, Inter).
+macOS build (`.app` / `.dmg`, arm64) and Windows build (`RT Anchor.exe`,
+onedir zip) ship from the same shared source.
 
 > **v2 — the method changed.** Earlier versions warped a sample onto iRT using
 > the standard panel found *in that same sample*. The engine now calibrates one
 > column *onto another*: your standards run tells it how your column's time axis
 > maps onto the reference column's, and the sample inherits that map. The
 > outputs, the sections and the advanced inputs all changed accordingly — see
-> `RI_CALIBRATION_SPEC_V2.md`.
+> [`docs/RI_CALIBRATION_SPEC_V2.md`](../docs/RI_CALIBRATION_SPEC_V2.md).
 
 ## Deliverables
 - macOS: `dist/macos/RT Anchor.dmg` — drag‑to‑Applications installer
@@ -51,10 +51,11 @@ The panel cards come from `rt_anchor.mixtures`, not from a copy in the app —
   serum and another lab's standards produces plausible‑looking nonsense.
   Substituting your own pair moves the time axis, so those results are not
   comparable with default‑reference runs.
-- **Matching & fitting** — the two m/z tolerances (an absolute **Da** window for
-  anonymous feature matching, default 0.008; a **ppm** window for identifying
-  named panel standards), the LOESS fraction `curve_frac` (CV‑chosen — rarely a
-  reason to change it), the RT window, min anchors, both stage toggles
+- **Matching & fitting** — the two m/z tolerances, both **15 ppm** by default
+  (the *feature‑match window* for anonymous feature matching, and the *panel
+  m/z tolerance* for identifying named panel standards), the LOESS fraction
+  `curve_frac` (CV‑chosen — rarely a reason to change it), the RT window, min
+  anchors, both stage toggles
   (**use sample pairs in the curve**, **stage‑2 sample anchors**), and
   extrapolation (on by default; out‑of‑span features are still valued and
   flagged).
@@ -64,17 +65,20 @@ A left sidebar switches sections:
 
 | # | Section | Content |
 |---|---|---|
-| 01 | **Overview** | method/provenance band (reference column, panel, pair counts, gate verdict, iRT definition), KPI metrics, quality radar |
+| 01 | **Overview** | KPI metrics (features per run, curve residual median / P90, iRT range and extrapolated share) and the quality radar |
 | 02 | **Detection** | the chosen panel located in **your standards run**, on the reference column's axis — **QC only, it does not drive the calibration** |
-| 03 | **Profile** | intensity‑weighted feature profile, raw RT vs. iRT |
+| 03 | **Profile** | intensity‑weighted feature profile: before vs. after calibration (raw RT vs. `Cal_RT`), then the calibrated profile against the reference |
 | 04 | **Curve** | the stage‑1 cross‑column curve: matched pairs (standards = squares, sample = diamonds, MAD‑trimmed = hollow grey), the fit, the anchor‑refined fit when engaged, the stage‑2 anchors as rings, and the residual strip |
-| 05 | **Anchors** | the stage‑2 endogenous‑plasma‑lipid anchors: residual against the stage‑1 curve vs. the leave‑one‑out residual under the correction, coloured by lipid class, with the gate's verdict and the class median offsets. Disabled when no anchors validated |
-| 06 | **Repeatability** | per‑injection only |
-| 07 | **Table** | preview: your RT and m/z beside `Cal_RT_min`, `iRT`, their uncertainties, reliability and the extrapolation flag |
-| 08 | **Export** | see below |
+| 05 | **Table** | preview: your RT and m/z beside `Cal_RT_min`, `iRT`, their uncertainties, reliability and the extrapolation flag |
+| 06 | **Export** | see below |
 
-Detection and Profile are the engine's own Plotly figures; the radar, curve,
-anchors and repeatability charts are hand‑authored SVG (`web/charts.js`). The
+The stage‑2 anchor table (residuals, class offsets, gate verdict) is not a
+section of its own: it is in the exported `_anchors.csv`, `_model.json` and the
+report. The app has no per‑injection input, so the repeatability view of the
+engine's per‑sample tier is not shown here either.
+
+Detection and Profile are the engine's own Plotly figures; the radar and curve
+charts are hand‑authored SVG (`web/charts.js`). The
 numbers behind all of them come from the same engine helpers the exported
 report uses (`viz.metrics`, `viz.performance.compute_curve`,
 `viz.anchors.compute_anchors`, `viz.report.method_facts`), so the app and the
@@ -95,7 +99,7 @@ Individual exports (calibrated CSV, HTML report, run info) are also available.
 ```bash
 /opt/anaconda3/bin/python "app.py"        # macOS, needs rt_anchor installed
 /opt/anaconda3/bin/python "app.py" --selftest   # headless end-to-end check
-build_venv python app.py                  # Windows (rt_anchor build venv)
+..\rt_anchor\build_venv\Scripts\python app.py   # Windows (the build venv)
 ```
 `--selftest` runs a **real calibration** — the bundled reference pair against
 itself — and asserts `Cal_RT_min == RT` to machine precision, then builds the
@@ -105,7 +109,7 @@ things PyInstaller drops silently, and only a run that produces the right
 number proves they survived.
 
 ```
-SELFTEST_OK reference=col35 features=610 pairs=827 landmarks=21 self_error=1.09e-11min structures=15
+SELFTEST_OK reference=col35 features=610 pairs=825 landmarks=21 self_error=3.92e-11min structures=15
 ```
 
 ## Layout
@@ -150,11 +154,15 @@ Both are handled in `build/macos/RTAnchor.spec`; the `--selftest` above is what
 proves it. arm64‑only build.
 
 ## Rebuild — Windows (exe / zip)
-One command (uses the shared `../rt_anchor/build_venv`, where rt-anchor,
-pywebview, PyInstaller and rdkit are pip‑installed — see `rt_anchor/build.bat`):
+One command. On first use it creates a pip‑only build venv at
+`../rt_anchor/build_venv` (rt-anchor, pywebview, PyInstaller, and rdkit when it
+installs); delete that folder to rebuild it after an engine change:
 ```bat
 build\windows\build_win.bat     :: -> dist\win\"RT Anchor.exe" + RT Anchor-win64.zip
 ```
+The release CI (`.github/workflows/build-windows.yml`) runs the same script on
+every `v*` tag, self‑tests the frozen exe, and attaches the zip to the GitHub
+Release as `RT-Anchor-<version>-Windows-x64.zip`.
 Smoke-test a windowed (no-console) build by exit code:
 ```bat
 "dist\win\RT Anchor\RT Anchor.exe" --selftest && echo OK

@@ -26,7 +26,7 @@ Nothing in your table is dropped or reordered; calibration only appends columns.
 
 **Stage 1 — the anchor-free curve.** Every feature of your standards run is
 matched to the reference standards run by accurate m/z alone (reciprocal best
-match, 0.008 Da), and a robust monotone curve is fitted through the pairs
+match within 15 ppm), and a robust monotone curve is fitted through the pairs
 (LOESS → isotonic → PCHIP, with MAD outlier trimming). m/z-matched features from
 the two *sample* runs are merged in, because the biological sample covers the
 very early and very late elution regions where the mixture is sparse.
@@ -82,7 +82,8 @@ no identities, so calibration proceeds normally; the iRT ruler falls back to
 `irt_landmark_panel` on the reference run, and the model records that it did.
 
 Optional: per-injection files (per-sample tier + `RI_spread` repeatability QC), a
-custom manifest, and the matching parameters (`match_mz_tol_da`, `mz_tol_ppm`,
+custom manifest, and the matching parameters (`match_mz_tol_ppm` for feature
+matching and `mz_tol_ppm` for panel standards — both 15 ppm by default —
 `curve_frac`, `min_anchors`, `extrapolate`).
 
 ```python
@@ -151,21 +152,31 @@ declines it, leaving the Stage-1 result untouched.
 Calibrating the reference column against itself returns the input RT to within
 1e-11 min.
 
+These figures were measured with the validation configuration, a flat 0.008 Da
+matching window (`match_mz_tol_ppm=0, match_mz_tol_da=0.008` reproduces it).
+The default is now 15 ppm, and the table has not been re-measured at that
+width. The spec records that `max(15 ppm, 0.008 Da)` — the same window above
+m/z 533 — turns column 90's gate on (28%) while lowering its held-out error, so
+that row is the one most likely to move.
+
 Two honest caveats. `Cal_RT_min` can show hairline non-monotonicity (observed
 worst case 0.033 min, an order of magnitude below the method's own accuracy)
 where the Stage-2 correction is active, because curve + piecewise-linear
 correction is not monotone by construction. And Stage 2's anchor panel is
 human plasma/serum: other matrices get the Stage-1 curve only.
 
-## Desktop client
+## Desktop app
 
-A native-window client (pywebview) wraps the engine with a sectioned UI —
-Overview · Detection · Profile · Warp · Anchors · Repeatability · Table ·
-Export. See `RT Anchor Desktop/` for the macOS and Windows builds.
+The graphical client is the RT Anchor desktop app — Overview · Detection ·
+Profile · Curve · Table · Export over this engine. Installers for macOS and
+Windows are on the [releases page](https://github.com/Bowen999/rt-anchor/releases/latest);
+the source is `RT Anchor Desktop/` in the
+[repository](https://github.com/Bowen999/rt-anchor), and runs from a checkout:
 
 ```bash
-pip install "rt-anchor[app,report]"
-rt-anchor-gui          # or:  python -m rt_anchor.gui
+git clone https://github.com/Bowen999/rt-anchor && cd rt-anchor
+pip install -e "./rt_anchor[app,report]"     # this engine + pywebview
+python "RT Anchor Desktop/app.py"
 ```
 
 ## License

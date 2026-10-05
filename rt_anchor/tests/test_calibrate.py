@@ -271,7 +271,20 @@ def test_config_presets_differ():
     assert q.mz_tol_ppm == 15.0 and o.mz_tol_ppm == 8.0
     assert q.rt_window_min == 0.5 and o.rt_window_min == 0.3
     # the anonymous window is a method constant, not an instrument setting
-    assert q.match_mz_tol_da == o.match_mz_tol_da == 0.008
+    assert q.match_mz_tol_ppm == o.match_mz_tol_ppm == 15.0
+    assert q.match_mz_tol_da == o.match_mz_tol_da == 0.0
+
+
+def test_default_mz_window_is_15_ppm_for_every_match():
+    """One default m/z threshold — 15 ppm, no absolute floor — for anonymous
+    matching and targeted identification alike, at every layer that has one."""
+    from rt_anchor.crosscolumn import DEFAULTS
+    from rt_anchor.pipeline import _anon_tol
+    c = CalibrationConfig()
+    assert c.match_mz_tol_ppm == c.mz_tol_ppm == 15.0
+    assert c.match_mz_tol_da == c.mz_tol_min_da == 0.0
+    assert DEFAULTS["mz_tol_ppm"] == 15.0 and DEFAULTS["mz_tol_min_da"] == 0.0
+    assert _anon_tol(c) == {"mz_tol_ppm": 15.0, "mz_tol_min_da": 0.0}
 
 
 def test_config_defaults_are_the_validated_ones():

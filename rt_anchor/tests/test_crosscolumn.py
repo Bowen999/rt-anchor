@@ -30,7 +30,7 @@ from rt_anchor.irt import IRTMapper
 
 from conftest import make_table
 
-FLAT = dict(mz_tol_ppm=0.0, mz_tol_min_da=0.008)   # the anonymous window (§7)
+FLAT = dict(mz_tol_ppm=0.0, mz_tol_min_da=0.008)   # flat 0.008 Da (the validation window)
 
 
 # --------------------------------------------------------- m/z matching -------
@@ -54,17 +54,20 @@ def test_match_ranks_candidates_by_sn_not_row_order():
     assert pairs["rt_b"].iloc[0] == 9.0         # the S/N=5000 feature
 
 
-def test_match_window_is_absolute_not_ppm():
-    """The anonymous window must not widen with m/z (spec §7)."""
-    assert mz_window([300.0, 900.0], None, **FLAT).tolist() == [0.008, 0.008]
-    # a 0.01 Da gap is outside the flat window at any mass...
+def test_match_window_is_15_ppm_by_default_and_a_flat_window_is_opt_in():
+    """The default window scales with m/z (15 ppm); a Da floor is opt-in (§7)."""
+    assert np.allclose(mz_window([300.0, 900.0], None), [0.0045, 0.0135])
+    # a 0.01 Da gap is inside 15 ppm at m/z 900 (0.0135 Da)...
     hi = make_table([900.0000], [1.0], sn=[1])
     hi2 = make_table([900.0100], [2.0], sn=[1])
+    assert len(match_features_by_mz(hi, hi2, None)) == 1
+    # ...but outside it at m/z 300 (0.0045 Da)
+    lo = make_table([300.0000], [1.0], sn=[1])
+    lo2 = make_table([300.0100], [2.0], sn=[1])
+    assert len(match_features_by_mz(lo, lo2, None)) == 0
+    # the flat validation window is still one setting away, at any mass
+    assert mz_window([300.0, 900.0], None, **FLAT).tolist() == [0.008, 0.008]
     assert len(match_features_by_mz(hi, hi2, None, **FLAT)) == 0
-    # ...but inside a 15 ppm window at m/z 900 (0.0135 Da) — which is exactly the
-    # behaviour §7 pins down and does not ship.
-    assert len(match_features_by_mz(hi, hi2, None, mz_tol_ppm=15.0,
-                                    mz_tol_min_da=0.0)) == 1
 
 
 def test_exclude_pairs_near_mz_masks_the_anchor_candidates():

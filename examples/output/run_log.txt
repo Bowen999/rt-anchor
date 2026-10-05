@@ -1,5 +1,11 @@
 loaded sample table: {'source_format': 'masscube', 'polarity': 'positive', 'n_features': 22314, 'mz_col': 'm/z', 'rt_col': 'RT', 'rt_unit': 'min', 'rt_min_minutes': 0.013, 'rt_max_minutes': 23.92, 'n_sample_columns': 0, 'sample_columns': [], 'n_total_columns': 2}
-panel: 15 targets in positive mode
-native template built from standards run: 15/15 anchors
-identified 13 anchors (dropped 0 non-monotone)
-fitted warp on 13 anchors, span 2.11-18.42 min
+loaded standards run: 8768 features, RT 0.01-23.89 min
+reference: Column 25 [col35] — sample 610 features, standards 383 features
+panel: mix15 — 15 standards ionisable in positive mode
+sample-run pairs: 441 matched, 422 kept after masking the stage-2 anchor m/z
+stage 1: 595 pairs (173 standards + 422 sample), 421 kept after MAD trimming; source RT span 1.03-23.42 -> reference 2.23-21.56 min
+stage 2: 17/17 plasma lipids validated in both sample runs, 17 usable as anchors; 8 pick(s) moved by curve-assisted isomer refinement
+stage 2 gate: class-aware correction engaged: LOO MSE 29% below no-correction (threshold 20%)
+stage 2 engaged: lam_g=0.6, lam_c=0.5, 15 anchors, sigma_anchor=0.174 min
+iRT (mix15): 14 landmarks, RT 1.46-21.61 min on the reference standards run
+detection QC on the user's standards run: 15/15 panel standards located (reporting only — it does not drive the calibration)
