@@ -66,7 +66,7 @@ from .reference import (
 )
 from .series import CH2_MASS, KENDRICK_FACTOR, PERIOD, SeriesTerm, kendrick_phase
 
-__version__ = "1.2.1"
+__version__ = "1.2.2"
 
 __all__ = [
     # entry points
