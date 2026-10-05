@@ -1,9 +1,15 @@
 """Configuration for the v2 cross-column calibration.
 
 Defaults follow the **validated** method (see ``RI_CALIBRATION_SPEC_V2.md``
-§7 and §9) with one deliberate change since: the default m/z window is
-**15 ppm** for every match. Two values deserve to be read before they are
-changed:
+§7 and §9) with two deliberate changes since:
+
+* the default m/z window is **15 ppm** for every match (details below);
+* from **1.2.2** the homologous-series term (stage 1b) is on by default and
+  the plasma-lipid anchor stage (stage 2) is **opt-in**
+  (``use_sample_anchors=False``) — pass ``use_sample_anchors=True`` or the
+  CLI's ``--sample-anchors`` to enable it.
+
+Two values deserve to be read before they are changed:
 
 * ``curve_frac = 0.1`` was chosen by 5-fold CV on the panel-masked training
   pairs of all five validation columns. Do not change it casually.
@@ -82,8 +88,18 @@ class CalibrationConfig:
     curve_min_points: int = 20          # below this the curve degrades to a line
     use_sample_pairs: bool = True       # merge the sample-run pairs into the fit
 
+    # ---- stage 1b: homologous-series term ----
+    use_series_term: bool = True        # stage 1b on/off (see rt_anchor.series)
+    series_kmd_tol: float = 0.008       # tolerance on the Kendrick phase
+    series_min_members: int = 4         # smallest cluster/chain that counts as a series
+    series_end_reach_ch2: int = 2       # how many CH2 past a series end a query may sit
+    series_exclude_rt_frac: float = 0.0015   # co-elution exclusion, fraction of knot span
+    series_exclude_rt_floor_min: float = 0.03    # ... with this absolute floor, minutes
+    series_gate_min_mse_reduction: float = 0.2   # the "do no harm" gate
+    series_min_covered_pairs: int = 20  # below this the gate declines unread
+
     # ---- stage 2: class-aware sample anchors ----
-    use_sample_anchors: bool = True     # stage 2 on/off
+    use_sample_anchors: bool = False    # stage 2 on/off (opt-in since 1.2.2)
     class_aware: bool = True            # class-offset residual decomposition
     min_anchors: int = 3                # below this stage 2 is skipped (not fatal)
     anchor_gate_min_mse_reduction: float = 0.2   # the "do no harm" gate

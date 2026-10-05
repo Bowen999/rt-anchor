@@ -1,0 +1,179 @@
+{
+  "Orbitrap": {
+    "n_features": 22314,
+    "n_pairs": 595,
+    "n_pairs_kept": 433,
+    "x0": 1.029,
+    "x1": 23.423,
+    "exclude_rt_min": 0.033590999999999996,
+    "n_series": 27,
+    "n_pairs_covered": 148,
+    "gate_mse_reduction": -0.34535720991053154,
+    "engaged": false,
+    "n_features_raw_covered": 698,
+    "sum_abs_raw_correction": 193.2249496549118,
+    "max_abs_raw_correction": 0.9992905437481743,
+    "samples": [
+      {
+        "row": 23,
+        "mz": 875.7885,
+        "rt_min": 17.791,
+        "raw_correction_min": -0.15195421090451908,
+        "n_members": 4
+      },
+      {
+        "row": 2278,
+        "mz": 691.6138,
+        "rt_min": 17.627,
+        "raw_correction_min": -0.2672672600282451,
+        "n_members": 3
+      },
+      {
+        "row": 6017,
+        "mz": 1297.1557,
+        "rt_min": 15.434,
+        "raw_correction_min": -0.2058816982162191,
+        "n_members": 5
+      },
+      {
+        "row": 10604,
+        "mz": 931.8528,
+        "rt_min": 17.791,
+        "raw_correction_min": -0.15195421090451908,
+        "n_members": 4
+      },
+      {
+        "row": 15599,
+        "mz": 858.7444,
+        "rt_min": 16.917,
+        "raw_correction_min": 0.06521543452900723,
+        "n_members": 6
+      },
+      {
+        "row": 22305,
+        "mz": 746.6088,
+        "rt_min": 13.669,
+        "raw_correction_min": 0.10927813324106733,
+        "n_members": 6
+      }
+    ]
+  },
+  "QTOF": {
+    "n_features": 22559,
+    "n_pairs": 602,
+    "n_pairs_kept": 442,
+    "x0": 0.991,
+    "x1": 16.216,
+    "exclude_rt_min": 0.03,
+    "n_series": 23,
+    "n_pairs_covered": 100,
+    "gate_mse_reduction": 0.08757649978435256,
+    "engaged": false,
+    "n_features_raw_covered": 736,
+    "sum_abs_raw_correction": 453.48695536219867,
+    "max_abs_raw_correction": 2.2987537786590835,
+    "samples": [
+      {
+        "row": 0,
+        "mz": 758.5736,
+        "rt_min": 5.929,
+        "raw_correction_min": -0.840006009623109,
+        "n_members": 4
+      },
+      {
+        "row": 2221,
+        "mz": 649.5145,
+        "rt_min": 11.122,
+        "raw_correction_min": -0.296388124923314,
+        "n_members": 5
+      },
+      {
+        "row": 6001,
+        "mz": 840.6495,
+        "rt_min": 9.475,
+        "raw_correction_min": 0.7080733524958364,
+        "n_members": 7
+      },
+      {
+        "row": 10723,
+        "mz": 876.717,
+        "rt_min": 11.497,
+        "raw_correction_min": -2.2890974778532764,
+        "n_members": 5
+      },
+      {
+        "row": 15487,
+        "mz": 719.5899,
+        "rt_min": 4.717,
+        "raw_correction_min": 0.522050777580755,
+        "n_members": 5
+      },
+      {
+        "row": 22474,
+        "mz": 962.7921,
+        "rt_min": 10.217,
+        "raw_correction_min": -0.005432085868074053,
+        "n_members": 7
+      }
+    ]
+  },
+  "QTOF_full": {
+    "n_features": 22559,
+    "n_pairs": 597,
+    "n_pairs_kept": 421,
+    "x0": 1.318,
+    "x1": 15.339,
+    "exclude_rt_min": 0.03,
+    "n_series": 28,
+    "n_pairs_covered": 169,
+    "gate_mse_reduction": 0.19607983205056678,
+    "engaged": false,
+    "n_features_raw_covered": 934,
+    "sum_abs_raw_correction": 99.32550515055773,
+    "max_abs_raw_correction": 0.3625115064258999,
+    "samples": [
+      {
+        "row": 0,
+        "mz": 758.5736,
+        "rt_min": 5.929,
+        "raw_correction_min": 0.003466603198799458,
+        "n_members": 4
+      },
+      {
+        "row": 1239,
+        "mz": 482.3251,
+        "rt_min": 1.411,
+        "raw_correction_min": -0.03793445926309236,
+        "n_members": 4
+      },
+      {
+        "row": 3858,
+        "mz": 919.8519,
+        "rt_min": 15.045,
+        "raw_correction_min": 0.05355175427558549,
+        "n_members": 8
+      },
+      {
+        "row": 9135,
+        "mz": 776.624,
+        "rt_min": 7.947,
+        "raw_correction_min": -0.22546326759676227,
+        "n_members": 11
+      },
+      {
+        "row": 14185,
+        "mz": 825.6878,
+        "rt_min": 10.456,
+        "raw_correction_min": -0.06976603040451211,
+        "n_members": 5
+      },
+      {
+        "row": 22476,
+        "mz": 842.728,
+        "rt_min": 2.385,
+        "raw_correction_min": 0.018299395037693955,
+        "n_members": 4
+      }
+    ]
+  }
+}

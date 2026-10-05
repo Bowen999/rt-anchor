@@ -21,11 +21,14 @@ from ..errors import RTUnitError
 #: ``iRT`` is the dimensionless 1-100 index derived from it. The two are
 #: independent outputs — a run with no detectable landmark panel still gets a
 #: ``Cal_RT_min``, with ``iRT`` NaN and ``iRT_reliability = "none"``.
+#: ``series_correction_min`` / ``series_n_members`` record what the stage-1b
+#: homologous-series term did to the row (0 / 0 where it did nothing).
 RESULT_COLUMNS = [
     "Cal_RT_min", "Cal_RT_uncertainty_min",
     "iRT", "iRT_uncertainty", "iRT_reliability",
     "is_extrapolated", "calibration_scope", "warp_source",
     "RI_spread", "n_contributing",
+    "series_correction_min", "series_n_members",
 ]
 
 

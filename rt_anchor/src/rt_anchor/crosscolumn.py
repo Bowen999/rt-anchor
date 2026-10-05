@@ -21,6 +21,14 @@ every such RT is flagged extrapolated.
 ``curve_frac = 0.1`` is not a guess. It was chosen by 5-fold CV on the
 panel-masked training pairs of all five validation columns. Do not change it.
 
+**Stage 1b — the homologous-series term.** Two methods can retain a double
+bond differently relative to a CH2 group, so the error the curve leaves behind
+is systematic within a homologous series. The series term
+(:mod:`rt_anchor.series`) recognises series from m/z alone through the Kendrick
+mass and corrects a feature with the curve residual of the other matched pairs
+in its own series — never its co-eluting family, and only if that provably
+helps (a leave-own-out gate, the same "do no harm" rule as stage 2).
+
 **Stage 2 — class-aware anchor refinement, gated.** Anchor residuals on long
 gradients are class-systematic: SM and CE sit high while PC and TG sit low, and
 the classes interleave along the RT axis. A single piecewise-linear correction
@@ -60,6 +68,7 @@ from statsmodels.nonparametric.smoothers_lowess import lowess
 
 from .errors import CalibrationError
 from .io.schema import FeatureTable
+from .series import SeriesTerm
 
 # Defaults for the spec §7 fields. They are read off the config when it carries
 # them (which it does from v2 onwards) and used from here otherwise, so this
@@ -76,6 +85,14 @@ DEFAULTS = {
     "anchor_gate_min_mse_reduction": 0.2,
     "sigma_window_pairs": 50,
     "extrapolate_mode": "linear",
+    "use_series_term": True,
+    "series_kmd_tol": 0.008,
+    "series_min_members": 4,
+    "series_end_reach_ch2": 2,
+    "series_exclude_rt_frac": 0.0015,
+    "series_exclude_rt_floor_min": 0.03,
+    "series_gate_min_mse_reduction": 0.2,
+    "series_min_covered_pairs": 20,
 }
 
 #: Shrinkage grid searched by the leave-one-anchor-out lambda selection.
@@ -495,6 +512,7 @@ class ColumnCalibrator:
     curve: MonotoneCurve
     source_label: str = ""
     refiner: Optional[object] = None
+    series: Optional[SeriesTerm] = None
     anchors: pd.DataFrame = field(default_factory=pd.DataFrame)
     anchors_dropped: pd.DataFrame = field(default_factory=pd.DataFrame)  # sanity filter
     pairs: pd.DataFrame = field(default_factory=pd.DataFrame)   # incl. `source`, `kept`
@@ -517,6 +535,10 @@ class ColumnCalibrator:
         return self.refiner is not None
 
     @property
+    def series_used(self) -> bool:
+        return self.series is not None and self.series.engaged
+
+    @property
     def class_aware(self) -> bool:
         return isinstance(self.refiner, ClassAwareRefiner)
 
@@ -527,14 +549,44 @@ class ColumnCalibrator:
 
     @property
     def warp_source(self) -> str:
-        return "curve+anchors" if self.anchors_used else "curve"
+        parts = ["curve"]
+        if self.series_used:
+            parts.append("series")
+        if self.anchors_used:
+            parts.append("anchors")
+        return "+".join(parts)
 
-    def predict(self, rt, classes: Optional[Sequence] = None) -> np.ndarray:
+    def stage1_predict(self, rt, mz=None) -> np.ndarray:
+        """The anchor-free part: the curve, plus the series term when ``mz`` is given.
+
+        This is what stage 2 measures its anchor residuals against whenever the
+        anchors carry their source m/z — the anchors must be judged against what
+        the anchor-free part predicts, or the series term's work would be
+        "corrected" a second time.
+        """
         rt = np.asarray(rt, dtype=float)
         y = self.curve.predict(rt)
+        if mz is not None and self.series_used:
+            y = y + self.series.correction(mz, rt)[0]
+        return y
+
+    def predict(self, rt, classes: Optional[Sequence] = None, mz=None) -> np.ndarray:
+        rt = np.asarray(rt, dtype=float)
+        y = self.stage1_predict(rt, mz=mz)
         if self.refiner is not None:
             y = y + self.refiner.correction(rt, classes)
         return y
+
+    def _stage1_basis(self, frame: pd.DataFrame, rt_src: np.ndarray) -> np.ndarray:
+        """What the anchor-free part predicts for an anchor frame's ``rt_src``.
+
+        The series term is included only when the frame carries the anchors'
+        source m/z (``mz_src``) *and* the term is engaged; otherwise this is the
+        bare curve, exactly as before 1.2.2.
+        """
+        if self.series_used and "mz_src" in frame.columns:
+            return self.stage1_predict(rt_src, mz=frame["mz_src"].to_numpy(dtype=float))
+        return self.curve.predict(rt_src)
 
     def is_extrapolated(self, rt) -> np.ndarray:
         return self.curve.is_extrapolated(rt)
@@ -582,12 +634,12 @@ class ColumnCalibrator:
         return np.sqrt(np.nan_to_num(sc, nan=0.0) ** 2 + self.sigma_anchor ** 2)
 
     def anchor_table(self) -> pd.DataFrame:
-        """The stage-2 anchors with their curve residuals and LOO errors."""
+        """The stage-2 anchors with their stage-1 residuals and LOO errors."""
         if self.anchors is None or self.anchors.empty:
             return pd.DataFrame()
         out = self.anchors.copy()
         rt_src = out["rt_src"].to_numpy(dtype=float)
-        out["residual_min"] = out["rt_ref"].to_numpy(dtype=float) - self.curve.predict(rt_src)
+        out["residual_min"] = out["rt_ref"].to_numpy(dtype=float) - self._stage1_basis(out, rt_src)
         if self.loo_residuals.size == len(out):
             # loo_residuals are computed in RT-sorted order
             order = np.argsort(rt_src)
@@ -659,6 +711,11 @@ def build_calibrator(std_src: FeatureTable,
     is what extends coverage into the elution regions the mixture does not
     reach.
 
+    Stage 1b follows unless disabled (``use_series_term``): a
+    :class:`~rt_anchor.series.SeriesTerm` is fitted on the pairs that survived
+    MAD trimming, gated by its leave-own-out error, and stored on the
+    calibrator; the per-pair membership flag lands in ``pairs["in_series"]``.
+
     Stage 2 is optional. ``sample_anchors`` is a frame of ``label``, ``rt_src``,
     ``rt_ref`` and optionally ``lipid_class`` — endogenous lipids validated in
     both sample runs. With class labels a :class:`ClassAwareRefiner` is fitted,
@@ -709,9 +766,23 @@ def build_calibrator(std_src: FeatureTable,
     kept_flag[order] = keep
     pairs = pairs.assign(kept=kept_flag)
 
+    # -- stage 1b: the homologous-series term, fitted on the kept pairs ------
+    series = None
+    in_series = np.zeros(len(pairs), dtype=bool)
+    if bool(cfg(config, "use_series_term")):
+        kp = kept_flag
+        rt_src_k = pairs["rt_a"].to_numpy(dtype=float)[kp]
+        rt_ref_k = pairs["rt_b"].to_numpy(dtype=float)[kp]
+        series = SeriesTerm.fit(
+            pairs["mz_a"].to_numpy(dtype=float)[kp], rt_src_k, rt_ref_k,
+            rt_ref_k - curve.predict(rt_src_k), curve.x0, curve.x1, config)
+        in_series[kp] = series.member_mask
+    pairs = pairs.assign(in_series=in_series)
+
     cal = ColumnCalibrator(
         curve=curve,
         source_label=source_label,
+        series=series,
         pairs=pairs,
         n_pairs=len(pairs),
         n_pairs_kept=int(keep.sum()),
@@ -738,8 +809,8 @@ def build_calibrator(std_src: FeatureTable,
                            f"(min_anchors={min_anchors}) — stage-1 curve only")
         return cal
 
-    resid = anchors["rt_ref"].to_numpy(dtype=float) - curve.predict(
-        anchors["rt_src"].to_numpy(dtype=float))
+    resid = anchors["rt_ref"].to_numpy(dtype=float) - cal._stage1_basis(
+        anchors, anchors["rt_src"].to_numpy(dtype=float))
     has_class = want_class and "lipid_class" in anchors.columns
 
     # Robust anchor sanity filter: drop anchors the curve cannot explain at all.

@@ -22,9 +22,14 @@ RELIABILITY = {"high", "medium", "low", "none"}
 
 @pytest.fixture(scope="module")
 def proj_result(orbitrap_samples, orbitrap_standards):
-    """A real per-project calibration against the bundled 35-min reference."""
+    """A real per-project calibration against the bundled 35-min reference.
+
+    Stage 2 is opt-in since 1.2.2; this module asserts the full two-stage
+    behaviour, so it enables it explicitly.
+    """
     return calibrate(orbitrap_samples, "positive", standards_table=orbitrap_standards,
-                     panel="mix15", config=CalibrationConfig.orbitrap())
+                     panel="mix15",
+                     config=CalibrationConfig.orbitrap(use_sample_anchors=True))
 
 
 @pytest.fixture(scope="module")
@@ -134,7 +139,8 @@ def test_per_project_scope_and_qc_columns(proj_result):
     assert (t[proj_result.col("calibration_scope")] == "project").all()
     assert proj_result.values("RI_spread").isna().all()
     assert (proj_result.values("n_contributing") == 1).all()
-    assert set(t[proj_result.col("warp_source")]) <= {"curve", "curve+anchors"}
+    assert set(t[proj_result.col("warp_source")]) <= {
+        "curve", "curve+series", "curve+anchors", "curve+series+anchors"}
 
 
 # --------------------------------------------------------------- two tiers ----
@@ -189,7 +195,7 @@ def test_model_records_the_gate_decision(proj_result):
 
 def test_companion_frames_have_their_spec_columns(proj_result):
     assert list(proj_result.pairs.columns) == ["mz_src", "rt_src", "rt_ref",
-                                               "source", "kept"]
+                                               "source", "kept", "in_series"]
     assert set(proj_result.pairs["source"]) <= {"standards", "sample"}
     assert set(proj_result.landmarks.columns) >= {"name", "class", "mz",
                                                   "rt_ref_run_min", "iRT"}
@@ -236,9 +242,16 @@ def test_unknown_panel_raises_config_error(orbitrap_samples, orbitrap_standards)
 # ------------------------------------------ stage 2 absent, on purpose --------
 
 def test_non_plasma_matrix_falls_back_to_stage_one_cleanly(non_plasma_table):
-    """The archaeal-lipid case: no anchors is a result, not an error (spec §2)."""
+    """The archaeal-lipid case: no anchors is a result, not an error (spec §2).
+
+    Stage 2 is opt-in since 1.2.2 — this test is *about* the no-anchors
+    fallback, so it enables stage 2 (and disables the series term, whose own
+    per-row ``warp_source`` values are covered in ``test_series.py``).
+    """
     res = calibrate(non_plasma_table, "positive", standards_table=non_plasma_table,
-                    panel="mix21")
+                    panel="mix21",
+                    config=CalibrationConfig(use_sample_anchors=True,
+                                             use_series_term=False))
     assert res.values("Cal_RT_min").notna().any()
     assert not res.anchors_used
     assert (res.table[res.col("warp_source")] == "curve").all()
@@ -293,6 +306,12 @@ def test_config_defaults_are_the_validated_ones():
     assert c.anchor_gate_min_mse_reduction == 0.2 and c.min_anchors == 3
     assert c.extrapolate is True and c.extrapolate_mode == "linear"
     assert c.irt_landmark_panel == "mix21"
+    # since 1.2.2: the series term (stage 1b) is on, stage 2 is opt-in
+    assert c.use_series_term is True and c.use_sample_anchors is False
+    assert c.series_kmd_tol == 0.008 and c.series_min_members == 4
+    assert c.series_end_reach_ch2 == 2 and c.series_min_covered_pairs == 20
+    assert c.series_exclude_rt_frac == 0.0015 and c.series_exclude_rt_floor_min == 0.03
+    assert c.series_gate_min_mse_reduction == 0.2
 
 
 def test_config_from_dict_rejects_unknown_key():

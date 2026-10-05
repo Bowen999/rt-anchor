@@ -359,10 +359,12 @@ def build_anchor_table(picks: pd.DataFrame,
                        ref_key: str = "reference") -> pd.DataFrame:
     """The stage-2 anchor frame for one source run.
 
-    Columns ``label``, ``rt_src``, ``rt_ref``, ``lipid_class``,
+    Columns ``label``, ``rt_src``, ``rt_ref``, ``mz_src``, ``lipid_class``,
     ``n_isomer_candidates``, ``isomer_rts``, ``pick_refined`` — exactly what
     :func:`rt_anchor.crosscolumn.build_calibrator` consumes and what
-    ``<prefix>_anchors.csv`` reports.
+    ``<prefix>_anchors.csv`` reports. ``mz_src`` is the source-run pick's
+    observed m/z, and is what lets stage 2 measure anchor residuals against
+    the curve-plus-series prediction rather than the bare curve.
     """
     if candidates is None:
         candidates = plasma_lipid_candidates()
@@ -372,8 +374,8 @@ def build_anchor_table(picks: pd.DataFrame,
     sub = picks[picks["lipid"].isin(keep)]
     extra = [c for c in ("n_isomer_candidates", "isomer_rts", "pick_refined")
              if c in sub.columns]
-    src = (sub[sub["column"] == source_key][["lipid", "rt"] + extra]
-           .rename(columns={"rt": "rt_src"}))
+    src = (sub[sub["column"] == source_key][["lipid", "rt", "mz_obs"] + extra]
+           .rename(columns={"rt": "rt_src", "mz_obs": "mz_src"}))
     ref = (sub[sub["column"] == ref_key][["lipid", "rt"]]
            .rename(columns={"rt": "rt_ref"}))
     a = src.merge(ref, on="lipid").rename(columns={"lipid": "label"})

@@ -64,6 +64,7 @@ from .reference import (
     load_reference,
     resolve_reference,
 )
+from .series import CH2_MASS, KENDRICK_FACTOR, PERIOD, SeriesTerm, kendrick_phase
 
 __version__ = "1.2.1"
 
@@ -77,6 +78,8 @@ __all__ = [
     "build_calibrator", "ColumnCalibrator", "MonotoneCurve", "fit_robust_curve",
     "match_features_by_mz", "exclude_pairs_near_mz",
     "AnchorRefiner", "ClassAwareRefiner", "plasma_lipid_candidates",
+    # stage 1b: the homologous-series term
+    "SeriesTerm", "kendrick_phase", "KENDRICK_FACTOR", "CH2_MASS", "PERIOD",
     # the iRT ruler
     "IRTMapper", "build_irt", "detect_landmarks",
     # reference datasets + panels

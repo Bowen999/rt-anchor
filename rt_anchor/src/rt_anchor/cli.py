@@ -4,11 +4,16 @@
     rt-anchor references
     rt-anchor calibrate  --samples S --standards T --polarity positive
                          [--panel {mix15,mix21,none}] [--reference-sample R
-                          --reference-standards RT] [...] --out PREFIX
+                          --reference-standards RT] [--sample-anchors]
+                         [--no-series-term] [...] --out PREFIX
 
 ``calibrate`` writes every companion output of the spec's §5 (calibrated CSV,
 model JSON, anchors / pairs / landmarks CSVs, log) plus the visual report unless
 ``--no-report`` is given.
+
+Since 1.2.2 the homologous-series term (stage 1b) is on by default —
+``--no-series-term`` switches it off — and the stage-2 plasma-lipid anchor
+refinement is opt-in via ``--sample-anchors``.
 """
 
 from __future__ import annotations
@@ -70,8 +75,12 @@ def _build_config(args) -> CalibrationConfig:
         cfg.curve_frac = args.curve_frac
     if args.min_anchors is not None:
         cfg.min_anchors = args.min_anchors
+    if args.sample_anchors:
+        cfg.use_sample_anchors = True
     if args.no_sample_anchors:
         cfg.use_sample_anchors = False
+    if args.no_series_term:
+        cfg.use_series_term = False
     if args.no_sample_pairs:
         cfg.use_sample_pairs = False
     if args.no_extrapolate:
@@ -145,8 +154,17 @@ def main(argv: Optional[List[str]] = None) -> int:
     c.add_argument("--min-anchors", dest="min_anchors", type=int, default=None,
                    help="Minimum stage-2 plasma-lipid anchors (default 3); below this "
                         "the stage-1 curve is used.")
+    c.add_argument("--no-series-term", dest="no_series_term", action="store_true",
+                   help="Skip the stage-1b homologous-series term (stage-1 curve "
+                        "only). The term is on by default; it is gated, so this is "
+                        "rarely needed.")
+    c.add_argument("--sample-anchors", dest="sample_anchors", action="store_true",
+                   help="Enable stage 2: class-aware refinement on endogenous "
+                        "plasma-lipid anchors. Opt-in since 1.2.2 (default off); "
+                        "meaningful only for human plasma/serum matrices.")
     c.add_argument("--no-sample-anchors", dest="no_sample_anchors", action="store_true",
-                   help="Skip stage 2 entirely (stage-1 curve only).")
+                   help="Skip stage 2 entirely (stage-1 curve only). This is the "
+                        "default since 1.2.2; the flag is kept for explicitness.")
     c.add_argument("--no-sample-pairs", dest="no_sample_pairs", action="store_true",
                    help="Do not merge the sample-run m/z pairs into the stage-1 curve.")
     c.add_argument("--no-extrapolate", dest="no_extrapolate", action="store_true",

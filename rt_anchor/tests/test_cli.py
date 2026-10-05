@@ -129,8 +129,10 @@ def test_cli_bad_input_exits_nonzero_subprocess(tmp_path):
 
 @pytest.fixture(scope="module")
 def result(orbitrap_samples, orbitrap_standards):
+    # use_sample_anchors=True: keep this fixture on the full two-stage path
+    # (stage 2 has been opt-in since 1.2.2)
     return calibrate(orbitrap_samples, "positive", standards_table=orbitrap_standards,
-                     panel="mix15", config=CalibrationConfig.orbitrap())
+                     panel="mix15", config=CalibrationConfig.orbitrap(use_sample_anchors=True))
 
 
 def test_write_results_roundtrip(tmp_path, result):
