@@ -55,7 +55,8 @@ A runnable walk-through with bundled data is in
 | *Reference pair* (optional) | defaults to the bundled reference column (`col35`: human serum + Mix 4.4 standards, QTOF, positive mode) |
 
 Outputs (`write_results`): `*_calibrated.csv` (the input table plus `Cal_RT_min`,
-`iRT`, their uncertainties, a reliability tier and an extrapolation flag),
+`iRT`, their uncertainties, a reliability tier, an extrapolation flag, and the
+series-term columns `series_correction_min` / `series_n_members`),
 `*_model.json`, `*_pairs.csv`, `*_landmarks.csv`, `*_anchors.csv`, `*_log.txt`,
 and an `*_report.html` / `*_report.pdf` report.
 
@@ -67,11 +68,23 @@ and an `*_report.html` / `*_report.pdf` report.
    sample-run pairs are merged in to cover the early and late gradient, and a
    robust monotone curve (LOESS → isotonic → PCHIP, MAD outlier trimming) maps
    your RT onto the reference column. No standard identities are needed.
-2. **Stage 2 — gated sample anchors.** Seventeen endogenous plasma lipids found in
-   both sample runs refine the curve with a class-aware correction, applied only
-   when it cuts leave-one-out error by at least 20%. On other matrices Stage 2
-   does not engage and the Stage-1 curve is used.
-3. **iRT.** The chosen panel's standards located on the reference standards run
+2. **Stage 1b — homologous-series term.** Two columns can retain a double bond
+   differently relative to a CH2 group, and the error the curve leaves behind is
+   systematic within a homologous series (same class, same unsaturation,
+   different chain length). Members of a series are recognised from *m/z* alone
+   through the Kendrick mass — they are not identifications — and each feature
+   is corrected with the curve residuals of the *other* matched pairs in its
+   series, never its co-eluting neighbours. Applied only where the series elutes
+   in carbon-number order on both columns, and only when a leave-own-out gate
+   shows at least 20% error reduction — on a matrix with few homologous series
+   the gate simply does not engage.
+3. **Stage 2 — gated sample anchors (opt-in).** Seventeen endogenous plasma
+   lipids found in both sample runs refine the curve with a class-aware
+   correction, applied only when it cuts leave-one-out error by at least 20%.
+   Stage 2 is off by default since 1.2.2 (`use_sample_anchors=True` or
+   `--sample-anchors` enables it); on other matrices it does not engage and the
+   Stage-1 result is used.
+4. **iRT.** The chosen panel's standards located on the reference standards run
    define the scale: the earliest is 1, the latest 100.
 
 Details, accuracy figures and all parameters: [`rt_anchor/README.md`](rt_anchor/README.md).
@@ -84,6 +97,7 @@ rt_anchor/                 Python package "rt-anchor" (PyPI) — engine, CLI, re
 ├── src/rt_anchor/
 │   ├── pipeline.py        calibrate(): orchestrates the stages below
 │   ├── crosscolumn.py     stage 1 — m/z matching + robust monotone curve
+│   ├── series.py          stage 1b — the homologous-series term
 │   ├── plasma_lipids.py   stage 2 — endogenous plasma-lipid anchors
 │   ├── irt.py             the iRT ruler (panel landmarks on the reference run)
 │   ├── reference_data/    bundled reference column (col35) — the default Cal_RT axis

@@ -58,9 +58,11 @@ never drops or reorders an input column):
 | `iRT_reliability` | `high` \| `medium` \| `low` \| `none` |
 | `is_extrapolated` | RT outside the span covered by matched pairs |
 | `calibration_scope` | `project` \| `sample` |
-| `warp_source` | `curve` \| `curve+anchors` |
+| `warp_source` | **per row** since 1.2.2: `curve` \| `curve+series` \| `curve+anchors` \| `curve+series+anchors` — `+series` only where the series term actually corrected the row, `+anchors` on every row when stage 2 engaged (§14) |
 | `RI_spread` | per-injection dispersion of `iRT` (per-sample tier only, else NaN) |
 | `n_contributing` | number of injections contributing (per-sample tier only, else 1) |
+| `series_correction_min` | minutes the homologous-series term added to the curve's prediction; 0 where none was applied (§14) |
+| `series_n_members` | number of series members behind the correction; 0 = not corrected (§14) |
 
 Name collision rule is unchanged: if the input table already has a column of
 that name, the appended one is prefixed `rtanchor_`.
@@ -75,6 +77,9 @@ Two stages, ported from `v2/5 chroms/results/rt_calibration/rt_calibrate.py`
 and `plasma_lipids.py`. **Read those two files before implementing.** The port
 must reproduce their numbers (§9), so port the arithmetic literally; the only
 permitted changes are the generalisations in §3.
+
+v1.2.2 adds a stage between the two — the homologous-series term (stage 1b,
+§14) — and makes stage 2 opt-in (`use_sample_anchors=False` by default, §7).
 
 ### Stage 1 — anchor-free monotone curve `f: RT_source → RT_reference`
 
@@ -111,12 +116,17 @@ permitted changes are the generalisations in §3.
 `curve_frac = 0.1` is not a guess: it was chosen by 5-fold CV on the
 panel-masked training pairs of all five columns. Do not change it.
 
-### Stage 2 — class-aware sample-anchor refinement (optional, gated)
+### Stage 2 — class-aware sample-anchor refinement (optional, gated; opt-in since 1.2.2)
 
 Anchors are **endogenous high-abundance plasma lipids**, not mixture
 standards — the v2 hit-rate table showed most mixture standards are simply
 absent from serum. The 17-lipid panel, its exact masses computed from sum
 composition, and its within-class RT-order rules are in `plasma_lipids.py`.
+Since 1.2.2 the whole stage is opt-in: `use_sample_anchors` defaults to
+`False` (§7). When it runs, the anchor residuals are taken against the
+stage-1 result *after* the series term (curve + series, §14.7) — the anchor
+m/z mask on the sample pairs (stage 1, step 2) is unchanged and applies
+whether or not stage 2 runs.
 
 1. **Validate** each candidate in the user's sample run *and* the reference
    sample run: m/z window → adduct-consistency filter → Fill%/intensity pick →
@@ -150,7 +160,7 @@ composition, and its within-class RT-order rules are in `plasma_lipids.py`.
    residuals are class-incoherent single-lipid deviations that do not
    generalise.
 5. Skipped entirely when fewer than `min_anchors` (3) anchors validate, or
-   when `use_sample_anchors=False`.
+   when `use_sample_anchors=False` — the default since 1.2.2.
 
 **Matrix caveat.** The 17-lipid panel is human plasma/serum. For any other
 matrix Stage 2 will find too few anchors and the engine silently uses the
@@ -228,11 +238,16 @@ Consequences to respect:
 |---|---|
 | `<p>_calibrated.csv` | the output table of §1 |
 | `<p>_model.json` | §5.1 |
-| `<p>_anchors.csv` | the Stage-2 anchors actually used: `label`, `lipid_class`, `rt_src`, `rt_ref`, `residual_min`, `n_isomer_candidates`, `isomer_rts`, `pick_refined`, `dropped_by_sanity_filter` |
-| `<p>_pairs.csv` | **new** — the Stage-1 matched pairs: `mz_src`, `rt_src`, `rt_ref`, `source` (`standards`\|`sample`), `kept` (survived MAD trimming) |
+| `<p>_anchors.csv` | the Stage-2 anchors actually used: `label`, `lipid_class`, `rt_src`, `rt_ref`, `residual_min`, `loo_residual_min`, `n_isomer_candidates`, `isomer_rts`, `pick_refined`, `dropped_by_sanity_filter` |
+| `<p>_pairs.csv` | **new** — the Stage-1 matched pairs: `mz_src`, `rt_src`, `rt_ref`, `source` (`standards`\|`sample`), `kept` (survived MAD trimming), `in_series` (in a validated homologous series — §14) |
 | `<p>_landmarks.csv` | **new** — panel standards located in the reference standards run: `name`, `class`, `mz`, `rt_ref_run_min`, `iRT` |
 | `<p>_log.txt` | the run log |
 | `<p>_report.html` / `.pdf` | the visual report |
+
+Since 1.2.2 `residual_min` (and the gate's own arithmetic) is measured against
+the stage-1 result *after* the series term — curve + series when the term
+engaged, the bare curve otherwise (§14.7). The log gains a `series term: ...`
+line right after the stage-1 line (§14.6).
 
 ### 5.1 `model.json` — required keys
 
@@ -246,6 +261,11 @@ Consequences to respect:
   "curve": { "n_pairs": 0, "n_pairs_kept": 0, "n_pairs_standards": 0, "n_pairs_sample": 0,
              "frac": 0.1, "rt_span_src_min": [0, 0], "rt_span_ref_min": [0, 0],
              "residual_min": { "median_abs": 0, "p90_abs": 0 } },
+  "series": { "enabled": true, "engaged": false, "gate_mse_reduction": null,
+              "gate_threshold": 0.2, "gate_reason": "...", "n_series": 0,
+              "n_pairs_covered": 0, "n_features_corrected": 0,
+              "kmd_tol": 0.008, "min_members": 4, "end_reach_ch2": 2,
+              "exclude_rt_min": 0.03 },
   "anchors": { "engaged": true, "n_validated": 0, "n_used": 0, "lam_g": 0, "lam_c": 0,
                "gate_mse_reduction": 0, "gate_threshold": 0.2,
                "loo_residual_min": { "median": 0, "p90": 0, "max": 0 },
@@ -361,7 +381,15 @@ Add:
 | `curve_mad_k` | `3.0` | |
 | `curve_min_points` | `20` | below this the curve degrades to a line |
 | `use_sample_pairs` | `True` | merge sample-run pairs into the curve |
-| `use_sample_anchors` | `True` | Stage 2 on/off |
+| `use_series_term` | `True` | stage 1b on/off (§14) |
+| `series_kmd_tol` | `0.008` | tolerance on the Kendrick phase |
+| `series_min_members` | `4` | smallest cluster / chain that counts as a series |
+| `series_end_reach_ch2` | `2` | how many CH2 past a series end a query may sit |
+| `series_exclude_rt_frac` | `0.0015` | co-elution exclusion, fraction of the curve's knot span |
+| `series_exclude_rt_floor_min` | `0.03` | ... with this absolute floor, minutes |
+| `series_gate_min_mse_reduction` | `0.2` | the series term's "do no harm" gate |
+| `series_min_covered_pairs` | `20` | below this the series gate declines unread |
+| `use_sample_anchors` | `False` | Stage 2 on/off — opt-in since 1.2.2 (was `True`) |
 | `class_aware` | `True` | class-offset decomposition |
 | `anchor_gate_min_mse_reduction` | `0.2` | the gate |
 | `anchor_tie_tol_min` | `0.15` | isomer re-pick tie window |
@@ -493,6 +521,16 @@ at the end of the run.
 6. **The default m/z window is 15 ppm** (§7), one threshold for anonymous
    matching and panel identification alike — not the flat 0.008 Da window the
    method was validated with.
+7. **Stage 2 is opt-in since 1.2.2** (`use_sample_anchors=False` by default).
+   The plasma-lipid anchor panel is only meaningful on human plasma/serum, and
+   the series term (§14) is the safer default: it is m/z-only, makes no
+   identity claim, and is gated the same way. `--sample-anchors` restores
+   stage 2.
+8. **Validated series cover only part of the features.** A feature outside
+   every validated series keeps the stage-1 curve, and on a matrix with few
+   homologous series the gate does not engage at all — on the validation set
+   about half the points sat in a validated series, and the rest were not
+   corrected.
 
 ---
 
@@ -502,7 +540,8 @@ at the end of the run.
 rt-anchor calibrate --samples S --standards T --polarity positive \
                     --panel {mix15,mix21,none} \
                     [--reference-sample R --reference-standards RT] \
-                    [--single-files ...] [--no-sample-anchors] [--no-sample-pairs] \
+                    [--single-files ...] [--sample-anchors] [--no-sample-anchors] \
+                    [--no-series-term] [--no-sample-pairs] \
                     [--curve-frac F] [--match-mz-tol-ppm P] [--mz-tol-da D] \
                     [--mz-tol-ppm P] \
                     [--min-anchors N] [--no-extrapolate] \
@@ -511,6 +550,12 @@ rt-anchor calibrate --samples S --standards T --polarity positive \
 rt-anchor describe <table>            # unchanged
 rt-anchor references                  # NEW: list bundled reference datasets
 ```
+
+Since 1.2.2 stage 2 is opt-in: `--sample-anchors` enables it, and
+`--no-sample-anchors` — now the default — is kept for explicitness and wins if
+both are given. The stage-1b series term (§14) is on by default;
+`--no-series-term` switches it off. `--no-series-term --sample-anchors`
+reproduces v1.2.1's default output.
 
 Removed flags (`--manifest` keeps working as a `panel` override;
 `--reference` for the old baseline CSV, `--no-stds-fallback` are gone) must
@@ -524,7 +569,7 @@ The report and the in-app charts must reflect the new method. Sections:
 
 | section | v1 content | v2 content |
 |---|---|---|
-| Overview | KPI scorecard + radar | same shape; KPIs become n pairs, curve residual median/P90, anchor gate state, n landmarks, % extrapolated |
+| Overview | KPI scorecard + radar | same shape; KPIs become n pairs, curve residual median/P90, the series-term gate state (the anchor gate rides on that tile's note when stage 2 is requested), n landmarks, % extrapolated |
 | Detection | panel standards found in the sample | panel standards found in the **user's standards run** (`detection_qc`), explicitly labelled "QC only — does not drive the calibration" |
 | Profile | RT/iRT feature profile | unchanged, driven by `iRT` |
 | Warp | the panel warp curve | **the Stage-1 curve**: matched pairs scatter (standards vs sample coloured differently), the fitted curve, the anchor-refined curve when engaged, the Stage-2 anchors as rings, and the residual panel below — i.e. the two panels of `rt_calibration_diagnostics.png` |
@@ -565,3 +610,240 @@ Desktop app (`RT Anchor Desktop`, **macOS source only** — do not touch
 4. Desktop app launches from source on macOS, runs a calibration, and exports.
 5. `rt_anchor/README.md`, `RT Anchor Desktop/README.md` and this spec agree
    with the code.
+
+---
+
+## 14. v1.2.2 — the homologous-series term
+
+Stage 1b, fitted after the stage-1 curve and before the (now opt-in) stage 2.
+Implemented in `series.py`; on by default (`use_series_term=True`, CLI
+`--no-series-term` switches it off).
+
+**Why.** Two methods can differ in how strongly they retain a double bond
+relative to a CH2 group, so two lipids that co-elute on the source column can
+sit more than a minute apart on the reference column, and no single curve can
+place both. The error the curve leaves behind is systematic within a
+**homologous series** (same class, same number of double bonds, different
+chain length): members share it, smoothly along RT. Members of a homologous
+series differ by CH2, so they can be recognised from m/z alone — no
+identities — through the Kendrick mass.
+
+### 14.1 Constants and the Kendrick phase
+
+```
+KENDRICK_FACTOR = 14.0 / 14.01565006
+CH2_MASS        = 14.01565006
+PERIOD          = 14.0
+phase(mz)       = (mz * KENDRICK_FACTOR) mod PERIOD        # in [0, 14)
+circ(p, q)      = min(|p - q|, PERIOD - |p - q|)           # circular distance
+```
+
+Rescaling the mass axis so CH2 is exactly 14.0 makes every member of one
+series share a mass defect — one position on the 14-Da circle (the *phase*).
+
+### 14.2 Fit
+
+Input: the stage-1 pairs that survived MAD trimming — source m/z `mz`, source
+RT `xa`, reference RT `xb`, curve residual `r = xb − f(xa)` — plus the curve's
+source-RT knot span `x0, x1`.
+
+1. Pairs with any non-finite value are dropped; the rest keep their given
+   order, indexed `0..n−1`.
+2. `excl = max(series_exclude_rt_floor_min, series_exclude_rt_frac · (x1 − x0))`
+   is the co-elution exclusion radius; `reach = series_end_reach_ch2 · CH2_MASS
+   + 1.0` is how far past a series end a query may hang (the +1 Da is slack for
+   the mass-defect spread within a cluster).
+3. **Phase clusters.** Pair indices are sorted by `(phase, index)`; a new
+   cluster starts whenever the phase gap exceeds `series_kmd_tol`. If there
+   are at least two clusters and `phase[first of first cluster] + PERIOD −
+   phase[last of last cluster] ≤ series_kmd_tol`, the last cluster is
+   prepended to the first — a cluster straddling the 0/14 seam is rejoined.
+4. **Validated series.** Each cluster with at least `series_min_members`
+   pairs is ordered by `(mz, index)` → `o[0..m−1]`, and its longest chain in
+   which RT rises with carbon number on **both** columns is found by dynamic
+   programming:
+
+   ```
+   best[i] = 1, prev[i] = -1 for all i
+   for i in 0..m-1:
+       for j in 0..i-1:
+           if mz[o[i]] - mz[o[j]] > 7.0 and xa[o[i]] > xa[o[j]] and xb[o[i]] > xb[o[j]] \
+                  and best[j] + 1 > best[i]:
+               best[i] = best[j] + 1; prev[i] = j
+   k     = first index attaining max(best)        # numpy argmax semantics
+   chain = backtrack from k through prev, reversed   # ascending m/z
+   ```
+
+   The `> 7.0` step is "gained at least one carbon" (a CH2 is 14.01565 Da; the
+   half-step admits the mass-defect spread while excluding non-homologues).
+   Tie-breaking: the strict `best[j] + 1 > best[i]` keeps the earliest
+   improving predecessor, and `argmax` the earliest of the longest chains. A
+   chain of at least `series_min_members` pairs is a validated series; its
+   **centre** is `(p0 + median(d)) mod PERIOD`, where `p0` is the phase of the
+   chain's first member and `d` the members' phase offsets from `p0`, each
+   wrapped into `(−7, 7]` (`d > 7 → d − 14`; `d ≤ −7 → d + 14`), so a series
+   straddling the seam centres correctly. One cluster yields at most one
+   series; pairs outside the chain are simply not used; series keep the order
+   they were found in.
+
+### 14.3 Prediction of one query `(mq, xq)`
+
+The **raw** correction — `raw_correction()`, available whether or not the
+gate engages — returns `(correction_min, n_members)` per query; "no
+correction" is `(0.0, 0)`:
+
+1. Non-finite `mq`/`xq`, or no validated series → `(0.0, 0)`.
+2. `pq = phase(mq)`; take the series whose centre has the smallest
+   `circ(centre, pq)` (first on ties). If that distance is
+   `> series_kmd_tol` → `(0.0, 0)`.
+3. `M` = that series' members with `|xa − xq| > excl` — the
+   **leave-own-family-out** rule: a feature is never corrected with pairs that
+   co-elute with it. If `len(M) < series_min_members − 1` → `(0.0, 0)`.
+4. `lo` = members of `M` with `mz < mq − 7.0`; `hi` = members with
+   `mz > mq + 7.0`:
+   - **Both non-empty** (bracketed interpolation): `a` = last of `lo`,
+     `b` = first of `hi`. If not `xa[a] < xq < xa[b]`, the query does not sit
+     in the series' elution order → `(0.0, 0)`. Otherwise
+     `t = (xq − xa[a]) / (xa[b] − xa[a])`, correction
+     `= r[a] + t · (r[b] − r[a])`, `n_members = len(M)`.
+   - **Only `lo`** (past the upper end): `a` = last of `lo`; if
+     `mq − mz[a] ≤ reach` and `xq > xa[a]` → `(r[a], len(M))` — the end
+     member's residual, carried at most `series_end_reach_ch2` CH2 out.
+   - **Only `hi`** (below the first member): symmetric — `b` = first of `hi`;
+     if `mz[b] − mq ≤ reach` and `xq < xa[b]` → `(r[b], len(M))`.
+   - Otherwise `(0.0, 0)`.
+
+The applied `correction()` is the raw correction when the gate engaged and
+all zeros (and `n_members` all zero) otherwise. Queries are grouped by their
+nearest series centre, so correcting a whole feature table is vectorised, not
+a Python loop over features against series.
+
+### 14.4 The gate
+
+Every fitted pair is predicted as a query at its own `(mz, xa)` — the
+co-elution exclusion turns that into a leave-own-family-out prediction —
+giving `pred[i]`, `n[i]`; `cov = n > 0`.
+
+Two counts describe the coverage: the pairs in a validated series (`in_series`
+in `*_pairs.csv`) and the covered pairs (`n_pairs_covered`), those of them
+that get a leave-own-out prediction, which the gate is read on; the covered
+count is the smaller one, because a pair whose co-eluting neighbours are
+excluded can be left with too few members, or not sit in the series' elution
+order (§14.3, rules 3 and 4).
+
+- `n_pairs_covered = cov.sum()`; if `< series_min_covered_pairs` → not
+  engaged, `gate_mse_reduction = NaN`, reason
+  `"only {n} matched pairs sit in a validated homologous series (need {min}) — stage-1 curve only"`.
+- `mse0 = mean(r[cov]²)`; `mse1 = mean((r[cov] − pred[cov])²)`.
+- `mse0 < 1e-12` → not engaged, `gate_mse_reduction = 0.0`, reason
+  `"no correction needed: the stage-1 curve already reproduces the series pairs"`
+  (the self-calibration case; there is genuinely nothing to correct, so no
+  percentage is reported).
+- Otherwise `reduction = 1 − mse1/mse0`, engaged iff
+  `reduction ≥ series_gate_min_mse_reduction`. With `p = round(100 ·
+  reduction)` and `t = round(100 · threshold)`:
+  - engaged: `"series term engaged: leave-own-out MSE {p}% below curve-only (threshold {t}%)"`;
+  - gated off, `p ≥ 0`: `"series term gated off: leave-own-out MSE only {p}% below curve-only (threshold {t}%)"`;
+  - gated off, `p < 0` (a measured *loss*): `"series term gated off: leave-own-out MSE {−p}% above curve-only (threshold: {t}% below)"`.
+
+### 14.5 Parameters and defaults
+
+| field | default | note |
+|---|---|---|
+| `use_series_term` | `True` | stage 1b on/off |
+| `series_kmd_tol` | `0.008` | tolerance on the Kendrick phase |
+| `series_min_members` | `4` | smallest cluster / chain that counts as a series |
+| `series_end_reach_ch2` | `2` | how many CH2 past a series end a query may sit |
+| `series_exclude_rt_frac` | `0.0015` | co-elution exclusion, fraction of the knot span |
+| `series_exclude_rt_floor_min` | `0.03` | ... with this absolute floor, minutes |
+| `series_gate_min_mse_reduction` | `0.2` | the gate |
+| `series_min_covered_pairs` | `20` | below this the gate declines unread |
+
+### 14.6 New outputs
+
+* `*_calibrated.csv` gains, as its last two columns, `series_correction_min`
+  (minutes added to the curve's prediction; 0 when no correction was applied)
+  and `series_n_members` (number of series members behind the correction;
+  0 = not corrected). `warp_source` is per row: `curve`, `curve+series` (only
+  where a correction was actually applied), and with stage 2 engaged
+  `curve+anchors` / `curve+series+anchors` (`+anchors` on every row).
+* `*_pairs.csv` gains `in_series` — the pair sits in a validated series
+  (False for trimmed pairs and non-members; all False when the term is
+  disabled).
+* `*_model.json` gains a `series` block, always present: `enabled`,
+  `engaged`, `gate_mse_reduction`, `gate_threshold`, `gate_reason`,
+  `n_series`, `n_pairs_covered`, `n_features_corrected`, `kmd_tol`,
+  `min_members`, `end_reach_ch2`, `exclude_rt_min`. When the term is disabled:
+  `enabled=False`, `engaged=False`, `gate_reason="disabled
+  (use_series_term=False)"`, counts 0, reduction null.
+* The log gains, right after the stage-1 line,
+  `"series term: {gate_reason}; {n_series} homologous series ({n_in_series} pairs, {n_pairs_covered} with a leave-own-out prediction); {k}/{n} features corrected"`,
+  where `n_in_series` is the number of pairs in a validated series
+  (`int(member_mask.sum())`, §14.4), or
+  `"series term: disabled (use_series_term=False) — stage-1 curve only"`.
+* The report: the fourth KPI tile is "Series term" (with the anchor gate
+  state appended to its note when stage 2 was requested), the radar axis
+  "Anchors" is now "Series term", the method-facts table gains a "Series
+  term" row, and the curve figure annotates the series-term decision.
+* API: `rt_anchor` exports `SeriesTerm`, `kendrick_phase`,
+  `KENDRICK_FACTOR`, `CH2_MASS`, `PERIOD`. `ColumnCalibrator.predict(rt,
+  classes=None, mz=None)` without `mz` returns the curve (plus anchors) only.
+
+### 14.7 Interaction with stage 2, and the `use_sample_anchors` default change
+
+Stage 2 is **opt-in** since 1.2.2: `use_sample_anchors` defaults to `False`;
+CLI `--sample-anchors` turns it on; `--no-sample-anchors` is still accepted
+and wins. When stage 2 runs, the anchor residuals — and with them the sanity
+filter, the `(lam_g, lam_c)` search, the LOO residuals and the gate — are
+measured against `stage1_predict`: curve **plus the series term** when the
+term engaged and the anchor frame carries the anchors' source m/z (`mz_src`,
+which the pipeline's anchor table always does). The series term's work is
+never "corrected" a second time. The anchor m/z mask on the sample pairs
+(stage 1, step 2) is unchanged, and applies whether or not stage 2 runs.
+
+Reproducing 1.2.1: `use_series_term=False, use_sample_anchors=True` (CLI
+`--no-series-term --sample-anchors`) gives v1.2.1's default output;
+`use_series_term=False` alone gives v1.2.1's `--no-sample-anchors` output.
+
+### 14.8 Per-sample tier
+
+When `single_files` are given, each injection fits its own series term from
+its own kept pairs, with the same config and its own gate; the injection's
+prediction is its curve plus its series correction. Rows no injection covers
+fall back to the project-level prediction. The reported
+`series_correction_min` is the median over injections of the applied
+corrections and `series_n_members` the maximum member count.
+
+### 14.9 What it does not do
+
+* The series are recognised from m/z alone (the Kendrick phase) and are
+  **not identifications**; nothing is claimed about a feature's class or
+  identity.
+* Coverage is partial by construction: a feature outside every validated
+  series keeps the stage-1 curve, and on a matrix with few homologous series
+  the gate will simply not engage. On the shipped Mix 15 example (Orbitrap),
+  27 validated series holding 182 of the 433 kept pairs were found; the gate,
+  read on the 148 of them that get a leave-own-out prediction, **declined** —
+  the leave-own-out error would have been 35% *higher* than the curve alone —
+  so the term is not applied; that is the designed behaviour on data where the
+  series carry no consistent selectivity difference, not a failure.
+* The term depends on m/z *and* RT, so it is not a curve: the curve figure
+  keeps drawing the stage-1 curve, and `predict(rt)` without `mz` returns the
+  curve (plus anchors) only, exactly as before.
+* It never corrects a feature with its co-eluting family members
+  (leave-own-family-out), and it extrapolates at most
+  `series_end_reach_ch2` CH2 past a series end.
+
+### 14.10 Measured evidence
+
+On a six-method human-serum validation set (five source methods calibrated
+onto the reference column at the default 15 ppm matching window; 134 lipids
+located from exact mass independently
+of the calibration, 576 lipid-by-method points), the series term lowered the
+median |Cal_RT − reference RT| from 0.106 to 0.064 min and the 90th
+percentile from 0.341 to 0.261 min; the share of points within 0.2 min rose
+from 74% to 82%. The gate engaged on four methods and declined on the one
+whose selectivity already matched the reference. Validated series covered
+about half of the points; a feature outside any validated series keeps the
+stage-1 curve. Every prediction is leave-own-family-out by construction, so
+these are not in-sample figures.

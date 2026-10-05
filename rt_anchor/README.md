@@ -35,19 +35,47 @@ No standard identities are used at this stage. That is deliberate: the
 calibration still works when your mixture is unknown, or when nothing in the
 panel is detectable at all.
 
-**Stage 2 — sample anchors, gated.** Seventeen high-abundance endogenous plasma
-lipids (LPC/PC/SM/CE/TG) are located in both sample runs, validated by adduct
-consistency, within-class elution order, and a curve-assisted isomer re-pick.
-Their residuals against the Stage-1 curve are class-systematic on long
+**Stage 1b — the homologous-series term.** Two methods can differ in how
+strongly they retain a double bond relative to a CH2 group, and the error the
+curve leaves behind is then systematic within a *homologous series* (same
+class, same unsaturation, different chain length): two lipids that co-elute on
+your column can sit more than a minute apart on the reference one, and no
+single curve can place both. Members of a series differ by CH2, so they are
+recognised from *m/z* alone through the Kendrick mass — a shared position on
+the 14-Da mass-defect circle, **not an identification**. Each feature that
+belongs to a validated series is corrected with the curve residuals of the
+*other* matched pairs in its series, interpolated along the series' elution
+order. Three safeguards keep it honest:
+
+* **Carbon-order validation on both columns** — a cluster of same-phase pairs
+  becomes a series only if it elutes in carbon-number order on your column
+  *and* on the reference column; a cluster whose order disagrees is ignored.
+* **Leave-own-family-out** — a feature is never corrected with pairs that
+  co-elute with it, so a pair's own residual (or a mis-assigned co-eluter's)
+  cannot leak into its own correction.
+* **A 20% gate** — the term is applied only if predicting every matched pair
+  this way cuts the pairs' mean squared error by at least 20% below the curve
+  alone, on at least 20 covered pairs; otherwise the stage-1 curve is used
+  untouched.
+
+A feature outside every validated series keeps the stage-1 curve, and on a
+matrix with few homologous series the gate will simply not engage.
+
+**Stage 2 — sample anchors, gated (opt-in since 1.2.2).** Seventeen
+high-abundance endogenous plasma lipids (LPC/PC/SM/CE/TG) are located in both
+sample runs, validated by adduct consistency, within-class elution order, and
+a curve-assisted isomer re-pick. Their residuals against the Stage-1 result
+(curve, plus the series term where it engaged) are class-systematic on long
 gradients, so the correction is decomposed into a class offset plus a
 class-detrended piecewise-linear term, both shrunk by leave-one-anchor-out
 cross-validation.
 
 The correction is then **gated**: it is applied only if it reduces
 leave-one-anchor-out error by at least 20%. Otherwise the pure Stage-1 curve is
-used. On a non-plasma matrix, too few anchors validate and Stage 2 simply does
-not engage — the run succeeds on the curve alone, which is the intended
-behaviour, not a failure.
+used. Since 1.2.2 the whole stage is **off by default** — enable it with
+`use_sample_anchors=True` or the CLI's `--sample-anchors`. On a non-plasma
+matrix, too few anchors validate and Stage 2 simply does not engage — the run
+succeeds on the curve alone, which is the intended behaviour, not a failure.
 
 **iRT.** The chosen panel's standards are located in the *reference* standards
 run; the earliest and latest set the 1 and 100 ends of the scale. Because the
@@ -95,6 +123,11 @@ write_results(res, "out/run1")
 ```bash
 rt-anchor calibrate --samples samples.csv --standards standards.csv \
                     --polarity positive --panel mix21 --out out/run1
+rt-anchor calibrate ... --no-series-term   # skip stage 1b (on by default)
+rt-anchor calibrate ... --sample-anchors   # opt in to stage 2 (plasma/serum only;
+                                           # off by default since 1.2.2)
+rt-anchor calibrate ... --no-series-term --sample-anchors
+                                           # reproduce v1.2.1's default output
 rt-anchor references          # list the bundled reference datasets
 rt-anchor describe table.csv  # detect format + summarise, no calibration
 ```
@@ -123,13 +156,16 @@ reference was used, so a result can always be traced back to its axis.
 | `iRT_reliability` | `high` / `medium` / `low` / `none` |
 | `is_extrapolated` | RT outside the span the matched pairs cover |
 | `calibration_scope` | `project` or `sample` |
-| `warp_source` | `curve` or `curve+anchors` |
+| `warp_source` | per row: `curve`, `curve+series`, `curve+anchors` or `curve+series+anchors` — `+series` only where a series correction was actually applied |
 | `RI_spread`, `n_contributing` | per-injection dispersion (per-sample tier only) |
+| `series_correction_min` | minutes the series term added to the curve's prediction (0 = no correction) |
+| `series_n_members` | number of series members behind the correction (0 = not corrected) |
 
-Companion files: **`*_model.json`** (curve, anchors, gate decision and its
-reason, iRT definition, reference provenance, detection QC),
+Companion files: **`*_model.json`** (curve, the series term's fit and gate
+decision, stage-2 anchors, iRT definition, reference provenance, detection QC),
 **`*_anchors.csv`** (the Stage-2 anchors and their residuals),
-**`*_pairs.csv`** (every matched pair and whether it survived trimming),
+**`*_pairs.csv`** (every matched pair, whether it survived trimming, and
+whether it sits in a validated homologous series),
 **`*_landmarks.csv`** (the panel standards located on the reference run),
 **`*_log.txt`**, and **`*_report.html`** + **`*_report.pdf`**.
 
@@ -158,6 +194,22 @@ The default is now 15 ppm, and the table has not been re-measured at that
 width. The spec records that `max(15 ppm, 0.008 Da)` — the same window above
 m/z 533 — turns column 90's gate on (28%) while lowering its held-out error, so
 that row is the one most likely to move.
+
+The table was measured before 1.2.2, with stage 2 enabled and without the
+series term; `--no-series-term --sample-anchors` reproduces that
+configuration.
+
+The series term was measured separately, on a six-method human-serum
+validation set (five source methods calibrated onto the reference column at
+the default 15 ppm matching window; 134 lipids located from exact mass
+independently of the calibration, 576 lipid-by-method points): it lowered the
+median |Cal_RT − reference RT| from 0.106 to 0.064 min and the 90th percentile
+from 0.341 to 0.261 min, and the share of points within 0.2 min rose from 74%
+to 82%. The gate engaged on four methods and declined on the one whose
+selectivity already matched the reference. Validated series covered about half
+of the points; a feature outside any validated series keeps the stage-1 curve.
+Every prediction is leave-own-family-out by construction, so these are not
+in-sample figures.
 
 Two honest caveats. `Cal_RT_min` can show hairline non-monotonicity (observed
 worst case 0.033 min, an order of magnitude below the method's own accuracy)
