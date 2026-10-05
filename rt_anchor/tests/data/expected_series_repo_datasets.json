@@ -56,7 +56,12 @@
         "raw_correction_min": 0.10927813324106733,
         "n_members": 6
       }
-    ]
+    ],
+    "stage1_fingerprint": {
+      "n_pairs": 595,
+      "n_pairs_kept": 433,
+      "kept_pairs_sha1": "59a1ef6cde1b9b07e599799875cf18ec4b72a3ba"
+    }
   },
   "QTOF": {
     "n_features": 22559,
@@ -115,7 +120,12 @@
         "raw_correction_min": -0.005432085868074053,
         "n_members": 7
       }
-    ]
+    ],
+    "stage1_fingerprint": {
+      "n_pairs": 602,
+      "n_pairs_kept": 442,
+      "kept_pairs_sha1": "424f8e915b8d8ecd9724cd30d6cb3917bb2d1ce8"
+    }
   },
   "QTOF_full": {
     "n_features": 22559,
@@ -174,6 +184,11 @@
         "raw_correction_min": 0.018299395037693955,
         "n_members": 4
       }
-    ]
+    ],
+    "stage1_fingerprint": {
+      "n_pairs": 597,
+      "n_pairs_kept": 421,
+      "kept_pairs_sha1": "79afbfaf1fc8509cf2227a0d3c373f24091be3b2"
+    }
   }
 }

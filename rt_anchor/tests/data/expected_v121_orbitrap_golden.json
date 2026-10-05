@@ -2059,6 +2059,11 @@
       "max": 0.8793060906681379
      }
     }
+   },
+   "stage1_fingerprint": {
+    "n_pairs": 595,
+    "n_pairs_kept": 433,
+    "kept_pairs_sha1": "59a1ef6cde1b9b07e599799875cf18ec4b72a3ba"
    }
   },
   "v121_no_sample_anchors": {
@@ -4004,6 +4009,11 @@
       "max": 0.0
      }
     }
+   },
+   "stage1_fingerprint": {
+    "n_pairs": 595,
+    "n_pairs_kept": 433,
+    "kept_pairs_sha1": "59a1ef6cde1b9b07e599799875cf18ec4b72a3ba"
    }
   }
  }
