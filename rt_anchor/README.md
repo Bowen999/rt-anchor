@@ -204,7 +204,7 @@ validation set (five source methods calibrated onto the reference column at
 the default 15 ppm matching window; 134 lipids located from exact mass
 independently of the calibration, 576 lipid-by-method points): it lowered the
 median |Cal_RT − reference RT| from 0.106 to 0.064 min and the 90th percentile
-from 0.341 to 0.261 min, and the share of points within 0.2 min rose from 74%
+from 0.341 to 0.271 min, and the share of points within 0.2 min rose from 74%
 to 82%. The gate engaged on four methods and declined on the one whose
 selectivity already matched the reference. Validated series covered about half
 of the points; a feature outside any validated series keeps the stage-1 curve.
