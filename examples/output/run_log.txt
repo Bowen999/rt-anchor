@@ -3,9 +3,8 @@ loaded standards run: 8768 features, RT 0.01-23.89 min
 reference: Column 25 [col35] — sample 610 features, standards 383 features
 panel: mix15 — 15 standards ionisable in positive mode
 sample-run pairs: 441 matched, 422 kept after masking the stage-2 anchor m/z
-stage 1: 595 pairs (173 standards + 422 sample), 421 kept after MAD trimming; source RT span 1.03-23.42 -> reference 2.23-21.56 min
-stage 2: 17/17 plasma lipids validated in both sample runs, 17 usable as anchors; 8 pick(s) moved by curve-assisted isomer refinement
-stage 2 gate: class-aware correction engaged: LOO MSE 29% below no-correction (threshold 20%)
-stage 2 engaged: lam_g=0.6, lam_c=0.5, 15 anchors, sigma_anchor=0.174 min
+stage 1: 595 pairs (173 standards + 422 sample), 433 kept after MAD trimming; source RT span 1.03-23.42 -> reference 2.19-21.58 min
+series term: series term gated off: leave-own-out MSE 35% above curve-only (threshold: 20% below); 27 homologous series (182 pairs, 148 with a leave-own-out prediction); 0/22314 features corrected
+stage 2: disabled (use_sample_anchors=False) — stage-1 curve only
 iRT (mix15): 14 landmarks, RT 1.46-21.61 min on the reference standards run
 detection QC on the user's standards run: 15/15 panel standards located (reporting only — it does not drive the calibration)
