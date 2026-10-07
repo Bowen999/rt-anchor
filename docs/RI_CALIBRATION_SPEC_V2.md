@@ -58,11 +58,13 @@ never drops or reorders an input column):
 | `iRT_reliability` | `high` \| `medium` \| `low` \| `none` |
 | `is_extrapolated` | RT outside the span covered by matched pairs |
 | `calibration_scope` | `project` \| `sample` |
-| `warp_source` | **per row** since 1.2.2: `curve` \| `curve+series` \| `curve+anchors` \| `curve+series+anchors` — `+series` only where the series term actually corrected the row, `+anchors` on every row when stage 2 engaged (§14) |
+| `warp_source` | **per row** since 1.2.2: `curve`, then `+series` where the series term actually corrected the row (§14), then — since 1.2.3 — `+lattice` where the lattice term did (§15), then `+anchors` on every row when stage 2 engaged. The values: `curve` \| `curve+series` \| `curve+lattice` \| `curve+series+lattice`, each also with `+anchors`; a row carries both `+series` and `+lattice` only in the per-sample tier (§15.9) |
 | `RI_spread` | per-injection dispersion of `iRT` (per-sample tier only, else NaN) |
 | `n_contributing` | number of injections contributing (per-sample tier only, else 1) |
 | `series_correction_min` | minutes the homologous-series term added to the curve's prediction; 0 where none was applied (§14) |
 | `series_n_members` | number of series members behind the correction; 0 = not corrected (§14) |
+| `lattice_correction_min` | since 1.2.3: minutes the lattice term added to the curve's prediction; 0 where none was applied (§15) |
+| `lattice_n_members` | since 1.2.3: number of lattice-family members in reach behind the correction; 0 = not corrected (§15) |
 
 Name collision rule is unchanged: if the input table already has a column of
 that name, the appended one is prefixed `rtanchor_`.
@@ -80,6 +82,9 @@ permitted changes are the generalisations in §3.
 
 v1.2.2 adds a stage between the two — the homologous-series term (stage 1b,
 §14) — and makes stage 2 opt-in (`use_sample_anchors=False` by default, §7).
+v1.2.3 adds one more right after it — the lattice term (stage 1c, §15), the
+fallback behind the series term: it corrects, from lattice neighbours, the
+features the series term leaves alone.
 
 ### Stage 1 — anchor-free monotone curve `f: RT_source → RT_reference`
 
@@ -124,9 +129,9 @@ absent from serum. The 17-lipid panel, its exact masses computed from sum
 composition, and its within-class RT-order rules are in `plasma_lipids.py`.
 Since 1.2.2 the whole stage is opt-in: `use_sample_anchors` defaults to
 `False` (§7). When it runs, the anchor residuals are taken against the
-stage-1 result *after* the series term (curve + series, §14.7) — the anchor
-m/z mask on the sample pairs (stage 1, step 2) is unchanged and applies
-whether or not stage 2 runs.
+stage-1 result *after* the series and lattice terms (curve + series + lattice,
+§14.7, §15.8) — the anchor m/z mask on the sample pairs (stage 1, step 2) is
+unchanged and applies whether or not stage 2 runs.
 
 1. **Validate** each candidate in the user's sample run *and* the reference
    sample run: m/z window → adduct-consistency filter → Fill%/intensity pick →
@@ -239,15 +244,17 @@ Consequences to respect:
 | `<p>_calibrated.csv` | the output table of §1 |
 | `<p>_model.json` | §5.1 |
 | `<p>_anchors.csv` | the Stage-2 anchors actually used: `label`, `lipid_class`, `rt_src`, `rt_ref`, `residual_min`, `loo_residual_min`, `n_isomer_candidates`, `isomer_rts`, `pick_refined`, `dropped_by_sanity_filter` |
-| `<p>_pairs.csv` | **new** — the Stage-1 matched pairs: `mz_src`, `rt_src`, `rt_ref`, `source` (`standards`\|`sample`), `kept` (survived MAD trimming), `in_series` (in a validated homologous series — §14) |
+| `<p>_pairs.csv` | **new** — the Stage-1 matched pairs: `mz_src`, `rt_src`, `rt_ref`, `source` (`standards`\|`sample`), `kept` (survived MAD trimming), `in_series` (in a validated homologous series — §14), `in_lattice` (in an accepted lattice family — §15) |
 | `<p>_landmarks.csv` | **new** — panel standards located in the reference standards run: `name`, `class`, `mz`, `rt_ref_run_min`, `iRT` |
 | `<p>_log.txt` | the run log |
 | `<p>_report.html` / `.pdf` | the visual report |
 
 Since 1.2.2 `residual_min` (and the gate's own arithmetic) is measured against
 the stage-1 result *after* the series term — curve + series when the term
-engaged, the bare curve otherwise (§14.7). The log gains a `series term: ...`
-line right after the stage-1 line (§14.6).
+engaged, the bare curve otherwise (§14.7); since 1.2.3 after the lattice term
+as well — curve + series + lattice, each as far as it engaged (§15.8). The log
+gains a `series term: ...` line right after the stage-1 line (§14.6) and, since
+1.2.3, a `lattice term: ...` line right after that (§15.7).
 
 ### 5.1 `model.json` — required keys
 
@@ -266,6 +273,12 @@ line right after the stage-1 line (§14.6).
               "n_pairs_covered": 0, "n_features_corrected": 0,
               "kmd_tol": 0.008, "min_members": 4, "end_reach_ch2": 2,
               "exclude_rt_min": 0.03 },
+  "lattice": { "enabled": true, "engaged": false, "gate_mse_reduction": null,
+               "gate_threshold": 0.2, "gate_reason": "...", "n_families": 0,
+               "n_pairs_in_families": 0, "n_pairs_covered": 0,
+               "n_features_corrected": 0, "kmd_tol": 0.008, "min_members": 6,
+               "max_distance": 3.0, "min_neighbours": 2, "max_neighbours": 4,
+               "exclude_rt_min": 0.03 },
   "anchors": { "engaged": true, "n_validated": 0, "n_used": 0, "lam_g": 0, "lam_c": 0,
                "gate_mse_reduction": 0, "gate_threshold": 0.2,
                "loo_residual_min": { "median": 0, "p90": 0, "max": 0 },
@@ -389,6 +402,14 @@ Add:
 | `series_exclude_rt_floor_min` | `0.03` | ... with this absolute floor, minutes |
 | `series_gate_min_mse_reduction` | `0.2` | the series term's "do no harm" gate |
 | `series_min_covered_pairs` | `20` | below this the series gate declines unread |
+| `use_lattice_term` | `True` | stage 1c on/off (§15) |
+| `lattice_kmd_tol` | `0.008` | tolerance: cluster gap, H2 link, lattice-point match |
+| `lattice_min_members` | `6` | smallest lattice family |
+| `lattice_max_distance` | `3.0` | how far (lattice steps) a correction may be borrowed from |
+| `lattice_min_neighbours` | `2` | members needed within that distance (at least 1) |
+| `lattice_max_neighbours` | `4` | nearest members averaged (at least 1) |
+| `lattice_gate_min_mse_reduction` | `0.2` | the lattice term's "do no harm" gate |
+| `lattice_min_covered_pairs` | `20` | below this the lattice gate declines unread |
 | `use_sample_anchors` | `False` | Stage 2 on/off — opt-in since 1.2.2 (was `True`) |
 | `class_aware` | `True` | class-offset decomposition |
 | `anchor_gate_min_mse_reduction` | `0.2` | the gate |
@@ -398,6 +419,10 @@ Add:
 | `irt_landmark_panel` | `"mix21"` | fallback landmarks when `panel="none"` |
 | `extrapolate` | `True` | v2 always assigns a value and flags it |
 | `extrapolate_mode` | `"linear"` | `"linear"` = v2 terminal-slope extension; `"clamp"` = hold the edge value |
+
+The lattice term has no co-elution fields of its own: it uses the series term's
+`series_exclude_rt_frac` / `series_exclude_rt_floor_min` — one notion of
+"co-eluting", one setting (§15.6).
 
 `extrapolate` defaulting to `True` is a **deliberate change from v1** (which
 defaulted to NaN beyond span): the v2 curve extends linearly by construction
@@ -413,6 +438,9 @@ rt_anchor/
   crosscolumn.py   NEW  match_features_by_mz · MonotoneCurve · fit_robust_curve ·
                         AnchorRefiner · ClassAwareRefiner · loo_mse_* ·
                         choose_lambda_loo* · ColumnCalibrator · build_calibrator
+  series.py        NEW  stage 1b, v1.2.2 (§14): SeriesTerm · kendrick_phase ·
+                        KENDRICK_FACTOR · CH2_MASS · PERIOD
+  lattice.py       NEW  stage 1c, v1.2.3 (§15): LatticeTerm · H2_MASS · H2_PHASE
   plasma_lipids.py NEW  plasma_lipid_candidates · RT_ORDER_RULES ·
                         validate_candidates · summarize_picks · refine_picks_with_curves
   irt.py           NEW  IRTMapper · detect_landmarks
@@ -467,7 +495,7 @@ Guard rails to implement as clean `RtAnchorError` subclasses:
 m/z-matched against the reference *sample* run, gets its own curve, and the
 per-feature `iRT` is the median with `RI_spread` = 1.4826·MAD across
 injections; `calibration_scope="sample"`. Features no injection covers fall
-back to the project-level curve.
+back to the project-level prediction (§14.8, §15.9).
 
 ---
 
@@ -530,7 +558,33 @@ at the end of the run.
    every validated series keeps the stage-1 curve, and on a matrix with few
    homologous series the gate does not engage at all — on the validation set
    about half the points sat in a validated series, and the rest were not
-   corrected.
+   corrected. (Under 1.2.2; since 1.2.3 the lattice term, item 9, can reach
+   some of what the series term leaves.)
+9. **The lattice term is a fallback behind the series term** (§15.5), not a
+   peer. A feature the series term corrects keeps that correction untouched,
+   and the lattice gate is judged only on the pairs the series term leaves
+   alone — so `use_lattice_term=False` gives exactly the 1.2.2 output, and
+   with stage 2 off every feature the lattice term does not correct keeps its
+   1.2.2 value. The precedence is fixed: nothing compares, per feature, which
+   of the two would have predicted better, so a feature the series term
+   corrects keeps the series correction even where lattice neighbours might
+   have predicted it better.
+10. **Shared lattices and sodium adducts are corrected as members** (§15.10).
+    The lattice is a property of a formula series, not of a lipid class, and
+    the term is m/z-only: LPC and ether PC share one lattice, and the sodium
+    adduct of a lipid two carbons shorter and three double bonds more saturated
+    sits 2.4 mDa from the protonated lattice point, inside `lattice_kmd_tol`.
+    Such a species is corrected as if it belonged to the family. It is the
+    known weak spot — LPC is the one class that got worse on the validation set
+    (§15.11) — and m/z alone cannot tell these species apart.
+11. **The lattice distance and the reach are fixed, not tuned per data set.**
+    `d = |Δa| / 2 + |Δb|` (one double bond counts like two carbons) is a
+    constant of the method, not a setting, and `lattice_max_distance`,
+    `lattice_min_neighbours` and `lattice_max_neighbours` are defaults, not
+    values fitted to a run. The neighbour rule and its reach were chosen on the
+    same six-method validation set that measures the term's evidence (§15.11),
+    so that evidence is not an out-of-sample test of those choices; the term
+    has not been tested on another matrix or instrument.
 
 ---
 
@@ -541,7 +595,7 @@ rt-anchor calibrate --samples S --standards T --polarity positive \
                     --panel {mix15,mix21,none} \
                     [--reference-sample R --reference-standards RT] \
                     [--single-files ...] [--sample-anchors] [--no-sample-anchors] \
-                    [--no-series-term] [--no-sample-pairs] \
+                    [--no-series-term] [--no-lattice-term] [--no-sample-pairs] \
                     [--curve-frac F] [--match-mz-tol-ppm P] [--mz-tol-da D] \
                     [--mz-tol-ppm P] \
                     [--min-anchors N] [--no-extrapolate] \
@@ -554,8 +608,10 @@ rt-anchor references                  # NEW: list bundled reference datasets
 Since 1.2.2 stage 2 is opt-in: `--sample-anchors` enables it, and
 `--no-sample-anchors` — now the default — is kept for explicitness and wins if
 both are given. The stage-1b series term (§14) is on by default;
-`--no-series-term` switches it off. `--no-series-term --sample-anchors`
-reproduces v1.2.1's default output.
+`--no-series-term` switches it off. Since 1.2.3 the stage-1c lattice term
+(§15) is on by default too; `--no-lattice-term` switches it off, and alone
+reproduces v1.2.2's default output. `--no-series-term --no-lattice-term
+--sample-anchors` reproduces v1.2.1's default output.
 
 Removed flags (`--manifest` keeps working as a `panel` override;
 `--reference` for the old baseline CSV, `--no-stds-fallback` are gone) must
@@ -569,7 +625,7 @@ The report and the in-app charts must reflect the new method. Sections:
 
 | section | v1 content | v2 content |
 |---|---|---|
-| Overview | KPI scorecard + radar | same shape; KPIs become n pairs, curve residual median/P90, the series-term gate state (the anchor gate rides on that tile's note when stage 2 is requested), n landmarks, % extrapolated |
+| Overview | KPI scorecard + radar | same shape; KPIs become n pairs, curve residual median/P90, the series and lattice terms' gate states (one tile, two stacked rows; the anchor gate rides on that tile's note when stage 2 is requested), n landmarks, % extrapolated |
 | Detection | panel standards found in the sample | panel standards found in the **user's standards run** (`detection_qc`), explicitly labelled "QC only — does not drive the calibration" |
 | Profile | RT/iRT feature profile | unchanged, driven by `iRT` |
 | Warp | the panel warp curve | **the Stage-1 curve**: matched pairs scatter (standards vs sample coloured differently), the fitted curve, the anchor-refined curve when engaged, the Stage-2 anchors as rings, and the residual panel below — i.e. the two panels of `rt_calibration_diagnostics.png` |
@@ -594,6 +650,32 @@ Desktop app (`RT Anchor Desktop`, **macOS source only** — do not touch
 * `rtad/api.py`: `_lpc_seed_window` and the mix21lpc special-case are dead
   under the new method — remove them; `run_calibration` passes `panel`,
   `reference_sample`, `reference_standards`.
+
+Since 1.2.2 (series term) and 1.2.3 (lattice term) the report and the app also
+show the stage-1 terms, from the `series` and `lattice` blocks of `model.json` —
+they read the model, they never recompute (§14.6, §15.7):
+
+* Report: the fourth KPI tile is **Series + lattice** — two stacked rows,
+  `series` and `lattice`, each the term's headline (`on · {p}%`,
+  `off · {p}%` for a shortfall against the gate, `off` for a measured loss, for
+  too few covered pairs or when disabled, `not needed` for self-calibration),
+  with the note `{k_series} + {k_lattice} of {n} features corrected` and, when
+  stage 2 was requested, the anchor gate's state appended. The radar axis
+  **Series + lattice** is the larger of the two gates' leave-own-out MSE
+  reductions among the terms that are engaged, clipped to [0, 1], and 0 when
+  neither is engaged — zero is not "bad": where the selectivity already matches
+  the reference there is nothing to correct, and the gates declining is the
+  method working. The method-facts table has a "Series term" and a "Lattice
+  term" row (the gate reason, or "not fitted"), and the curve figure of the PDF
+  prints both decisions, one line each, under its title.
+* Desktop app: the Advanced section has a **Series term** and a **Lattice term**
+  checkbox (both on by default; they send `use_series_term` and
+  `use_lattice_term`); the Curve section lists both gate reasons; the Table
+  preview adds `series corr (min)`, `series n`, `lattice corr (min)` and
+  `lattice n`; `run_info.json` records `results.series` and `results.lattice`
+  (`enabled`, `engaged`, `gate_mse_reduction`, `gate_threshold`, `gate_reason`,
+  the term's count of series or families, `n_pairs_covered`,
+  `n_features_corrected`).
 
 ---
 
@@ -785,6 +867,7 @@ order (§14.3, rules 3 and 4).
   state appended to its note when stage 2 was requested), the radar axis
   "Anchors" is now "Series term", the method-facts table gains a "Series
   term" row, and the curve figure annotates the series-term decision.
+  (Since 1.2.3 the tile and the axis read "Series + lattice", §15.7.)
 * API: `rt_anchor` exports `SeriesTerm`, `kendrick_phase`,
   `KENDRICK_FACTOR`, `CH2_MASS`, `PERIOD`. `ColumnCalibrator.predict(rt,
   classes=None, mz=None)` without `mz` returns the curve (plus anchors) only.
@@ -800,10 +883,13 @@ term engaged and the anchor frame carries the anchors' source m/z (`mz_src`,
 which the pipeline's anchor table always does). The series term's work is
 never "corrected" a second time. The anchor m/z mask on the sample pairs
 (stage 1, step 2) is unchanged, and applies whether or not stage 2 runs.
+(Since 1.2.3 `stage1_predict` adds the applied lattice correction too, §15.8.)
 
 Reproducing 1.2.1: `use_series_term=False, use_sample_anchors=True` (CLI
 `--no-series-term --sample-anchors`) gives v1.2.1's default output;
 `use_series_term=False` alone gives v1.2.1's `--no-sample-anchors` output.
+Since 1.2.3 both recipes also need `use_lattice_term=False` (CLI
+`--no-lattice-term`, §15).
 
 ### 14.8 Per-sample tier
 
@@ -812,7 +898,8 @@ its own kept pairs, with the same config and its own gate; the injection's
 prediction is its curve plus its series correction. Rows no injection covers
 fall back to the project-level prediction. The reported
 `series_correction_min` is the median over injections of the applied
-corrections and `series_n_members` the maximum member count.
+corrections and `series_n_members` the maximum member count. (Since 1.2.3 each
+injection also fits its own lattice term behind its series term, §15.9.)
 
 ### 14.9 What it does not do
 
@@ -826,7 +913,9 @@ corrections and `series_n_members` the maximum member count.
   read on the 148 of them that get a leave-own-out prediction, **declined** —
   the leave-own-out error would have been 35% *higher* than the curve alone —
   so the term is not applied; that is the designed behaviour on data where the
-  series carry no consistent selectivity difference, not a failure.
+  series carry no consistent selectivity difference, not a failure. (Since
+  1.2.3 a feature the series term leaves alone may be corrected by the lattice
+  term behind it, §15.)
 * The term depends on m/z *and* RT, so it is not a curve: the curve figure
   keeps drawing the stage-1 curve, and `predict(rt)` without `mz` returns the
   curve (plus anchors) only, exactly as before.
@@ -847,3 +936,435 @@ whose selectivity already matched the reference. Validated series covered
 about half of the points; a feature outside any validated series keeps the
 stage-1 curve. Every prediction is leave-own-family-out by construction, so
 these are not in-sample figures.
+
+---
+
+## 15. v1.2.3 — the lattice term
+
+Stage 1c, fitted right after the series term (stage 1b) and before the
+(opt-in) stage 2. Implemented in `lattice.py`; on by default
+(`use_lattice_term=True`, CLI `--no-lattice-term` switches it off). It is the
+two-dimensional sibling of the series term (§14): the series term interpolates
+along one CH2 ladder, the lattice term borrows across ladders that differ by
+one double bond.
+
+**Why.** The series term needs at least `series_min_members` (4) members in
+one CH2 ladder — same class, same number of double bonds — and some lipid
+classes never offer that: serum cholesteryl esters have at most three members
+per double-bond count, so the series term never touches them and their
+class-wide offset against the stage-1 curve stays in the calibrated RT. Yet the
+class as a whole has a dozen members, spread over *several* ladders that differ
+by H2 (one double bond). The lattice term uses that: CH2 ladders whose Kendrick
+phases are one H2 step apart (two, across a missing row — rule 4 of §15.2) are
+joined into a **lattice family**, and every member gets integer coordinates
+`(a, b)` — carbons and H2 count, relative to the family's lightest member —
+read straight off its mass,
+`mz = m0 + a · CH2_MASS + b · H2_MASS`. A feature's correction is then a
+distance-weighted mean of the curve residuals of the family's members near its
+own lattice point. Like the series term it is identity-free: it works from m/z
+alone.
+
+**A fallback behind the series term, never a replacement.** A feature the
+series term corrects keeps that correction and is not touched by the lattice
+term; the lattice term fills in where the series term is silent, and its gate
+is judged only on the pairs the series term leaves alone (§15.5). The series
+term interpolates along one ladder, which is the better evidence wherever a
+ladder is long enough to trust; the lattice term borrows across ladders where
+it is not.
+
+### 15.1 Constants
+
+```
+H2_MASS  = CH2_MASS - 12.0                    # 2.01565006: one H2, one double bond
+H2_PHASE = H2_MASS * KENDRICK_FACTOR          # one H2 step on the Kendrick circle, ~2.0134
+circ(d)  = min(d mod PERIOD, PERIOD - (d mod PERIOD))     # circular distance of a phase difference
+wrap(d)  = d - 14 if d > 7;  d + 14 if d <= -7;  else d   # into (-7, 7]
+d        = |Δa| / 2 + |Δb|                    # lattice distance between two lattice points
+```
+
+`KENDRICK_FACTOR`, `CH2_MASS`, `PERIOD` and `phase(mz)` are §14.1's; `circ(d)`
+is §14.1's `circ(p, q)` written for the difference `d = p − q`. `b` counts H2,
+so one more `b` is one double bond fewer, and two species one double bond apart
+differ by `H2_MASS` in m/z and by `H2_PHASE` on the Kendrick circle. The lattice
+distance counts one double bond like two carbons; it is a constant of the
+method, not a setting. `lattice_kmd_tol` is applied as it stands on both axes —
+to the Kendrick phase (cluster gap, H2 link) and to the m/z error in Da (member
+error, lattice-point match); the implementation does not rescale between them.
+
+### 15.2 Fit
+
+Input: the stage-1 pairs that survived MAD trimming — source m/z `mz`, source
+RT `xa`, reference RT `xb`, curve residual `r = xb − f(xa)` — plus the curve's
+source-RT knot span `x0, x1` and `series_covered`, a boolean per pair that is
+True where the **engaged** series term gives that pair a leave-own-out
+correction (`series.correction(mz, xa)[1] > 0`; all False when the series term
+is disabled or gated off). Pairs in `series_covered` may sit in a family and
+donate; only the gate (§15.4) skips them.
+
+1. Pairs with any non-finite `mz`, `xa`, `xb` or `r` are dropped (with the same
+   entries of `series_covered`) and are never members; the rest keep their
+   given order, indexed `0..n−1`.
+2. `excl = max(series_exclude_rt_floor_min, series_exclude_rt_frac · (x1 − x0))`
+   is the co-elution exclusion radius — the series term's (§14.2, rule 2), one
+   setting for both terms.
+3. **Clusters and centres.** Exactly the series term's clustering (§14.2, rule
+   3) with `lattice_kmd_tol`: pair indices are sorted by `(phase, index)`, a new
+   cluster starts whenever the phase gap exceeds `lattice_kmd_tol`, and if there
+   are at least two clusters and `phase[first of first cluster] + PERIOD −
+   phase[last of last cluster] ≤ lattice_kmd_tol`, the last cluster is prepended
+   to the first and removed. Unlike the series term, **every** cluster is kept,
+   whatever its size: a ladder too short to be a series can still be one row of
+   a lattice family. Clusters are numbered `0..K−1` in the resulting order (a
+   seam-rejoined cluster first). The **centre** of a cluster is
+   `(p0 + median(wrap(phase[members] − p0))) mod PERIOD` over all its members,
+   with `p0` the phase of its first member in its stored order — sorted by
+   `(phase, index)`; for a seam-rejoined cluster the former last cluster's
+   members come first. (The series term's centre is taken over a validated
+   chain; there is none yet here.)
+4. **H2 links.** `step(u, v)` is the first `s` in `(+1, +2, −1, −2)` with
+   `circ(centre[v] − centre[u] − s · H2_PHASE) ≤ lattice_kmd_tol`, else none:
+   `±1` links neighbouring ladders of one class, `±2` bridges a ladder whose
+   middle row is missing from the data.
+5. **Components and the H2 index, breadth-first.** `seen` = all False. For `s0`
+   in `0..K−1` ascending, if not seen: mark it seen, `b_cluster[s0] = 0`,
+   `queue = [s0]` (FIFO). While the queue is not empty: pop `u` from the front;
+   for `v` in `0..K−1` ascending, if `v` is not seen and `step(u, v)` is some
+   `s`: mark `v` seen, `b_cluster[v] = b_cluster[u] + s`, append `v` to the
+   queue. The clusters visited from one `s0` are a **component**, and a
+   cluster's H2 index is the one the first path to it assigned. A component with
+   a single cluster is skipped — a lone ladder is the series term's business;
+   every other component goes through rules 6–8, in the order the components
+   are found.
+6. **Members and coordinates.** All pairs of the component's clusters, ordered
+   by `(mz, index)` ascending → `o[0..m−1]`. Each has `b` = its cluster's
+   `b_cluster`; the first (lightest) member's `b` is subtracted from all. Then
+
+   ```
+   root = mz[o[0]]
+   a    = rint((mz[o] - root - b * H2_MASS) / CH2_MASS)       # numpy rint, as int
+   err  = mz[o] - root - a * CH2_MASS - b * H2_MASS
+   keep the members with |err - median(err)| <= lattice_kmd_tol    # order preserved
+   ```
+
+   The coordinates are relative to that lightest pair, which can itself be
+   dropped here or in rule 7: a family need not contain `(0, 0)`, and `b` can
+   be negative.
+7. **Order pruning.** On a reversed-phase column more carbons and/or fewer
+   double bonds elutes later, and `b` counts H2. For the kept members `i, j`:
+
+   ```
+   above(i, j)    = a[i] >= a[j] and b[i] >= b[j] and (a[i] > a[j] or b[i] > b[j])
+   conflict(i, j) = above(i, j) and not (xa[i] > xa[j] and xb[i] > xb[j])   # made symmetric
+   alive = all members
+   loop:
+       v[i] = number of alive members in conflict with alive member i
+       if max(v) == 0: stop
+       cand = the alive members with v == max(v), in member order
+       med  = median of r over the alive members
+       remove the member of cand with the largest |r - med|        # the first on ties
+   ```
+
+   Two members are in conflict when one sits above the other on the lattice but
+   does not elute later than it on **both** columns (the comparisons are strict:
+   an equal RT is a conflict). Members on the same lattice point never conflict
+   with each other — isomers are allowed.
+8. **Acceptance.** The family is kept iff at least `lattice_min_members` members
+   remain **and** they span at least two distinct `b`.
+   `m0 = median(mz − a · CH2_MASS − b · H2_MASS)` over the remaining members. A
+   family stores its members (still in ascending `(mz, index)` order) with
+   their `a`, `b` and `m0`; families keep the order they were found in.
+
+Tie-breaking: `step` takes the first matching `s` in the order given; the
+breadth-first search visits clusters in ascending index; members are in
+`(mz, index)` order; the pruning removes the first of the equally far-off
+candidates. A pair belongs to at most one family; the pairs of the accepted
+families are the **members** (`member_mask`, `in_lattice` in `*_pairs.csv`), and
+pairs outside every family are never donors.
+
+### 15.3 Prediction of one query `(mq, xq)`
+
+The **raw** correction — `raw_correction()`, available whether or not the gate
+engages — returns `(correction_min, n_members)` per query; "no correction" is
+`(0.0, 0)`. `D = lattice_max_distance`; `⌊·⌋` is the floor.
+
+1. Non-finite `mq`/`xq`, or no accepted family → `(0.0, 0)`.
+2. **Locate the lattice point.** For each family `k` in order, and each integer
+   `bq` from `b_min − ⌊D⌋` to `b_max + ⌊D⌋` ascending (`b_min`, `b_max` over the
+   family's members):
+
+   ```
+   aq = rint((mq - m0 - bq * H2_MASS) / CH2_MASS)
+   skip if aq < a_min - floor(2*D) or aq > a_max + floor(2*D)     # a_min, a_max over the members
+   e  = |mq - m0 - aq * CH2_MASS - bq * H2_MASS|
+   a candidate if e <= lattice_kmd_tol
+   ```
+
+   The query's lattice point is the candidate with the **smallest** `e` over all
+   families and rows; on exactly equal `e` the first one found (family order,
+   then ascending `bq`). No candidate → `(0.0, 0)`.
+3. **Donors.** In that family, `d = |a − aq| / 2 + |b − bq|` for each member.
+   The donors are the members with `|xa − xq| > excl` — the
+   **leave-own-family-out** rule: a feature is never corrected with pairs that
+   co-elute with it — **and** `d ≤ D`, in member order. Fewer than
+   `lattice_min_neighbours` donors → `(0.0, 0)`.
+4. **Weights.** The `lattice_max_neighbours` donors with the smallest `d` — a
+   stable sort, so ties keep member order — are averaged with
+   `w = 1 / (d + 0.5)²`: `correction = Σ w · r / Σ w`. `n_members` is the number
+   of donors — all of them in reach, not only the ones averaged.
+
+The applied `correction()` is the raw correction when the gate engaged and all
+zeros (and `n_members` all zero) otherwise. The location step is vectorised over
+the queries per family and H2 row, and the donor step over each family's
+queries, so correcting a whole feature table never loops in Python over
+features.
+
+### 15.4 The gate
+
+Every fitted pair is predicted as a query at its own `(mz, xa)` — the
+co-elution exclusion turns that into a leave-own-family-out prediction —
+giving `pred[i]`, `n[i]`; `cov = (n > 0) and not series_covered`: the pairs the
+lattice term would actually correct.
+
+Two counts describe the coverage, and neither bounds the other: the pairs in an
+accepted family (`in_lattice` in `*_pairs.csv`, `n_pairs_in_families` in the
+model) and the covered pairs (`n_pairs_covered`), which the gate is read on. A
+member can be uncovered — too few donors are left once its co-eluting neighbours
+are excluded, or the engaged series term already corrects it — and a pair that
+is not a member (pruned, or outside the member error band) can still sit on a
+family's lattice point with enough donors, and so be covered.
+
+- `n_pairs_covered = cov.sum()`; if `< lattice_min_covered_pairs` → not
+  engaged, `gate_mse_reduction = NaN`, reason
+  `"only {n} matched pairs the series term leaves alone sit in a lattice family (need {min}) — no lattice correction"`.
+- `mse0 = mean(r[cov]²)`; `mse1 = mean((r[cov] − pred[cov])²)`.
+- `mse0 < 1e-12` → not engaged, `gate_mse_reduction = 0.0`, reason
+  `"no correction needed: the stage-1 curve already reproduces the lattice pairs"`
+  (the self-calibration case; there is genuinely nothing to correct, so no
+  percentage is reported).
+- Otherwise `reduction = 1 − mse1/mse0`, engaged iff
+  `reduction ≥ lattice_gate_min_mse_reduction`. With `p = round(100 ·
+  reduction)` and `t = round(100 · threshold)`:
+  - engaged: `"lattice term engaged: leave-own-out MSE {p}% below curve-only (threshold {t}%)"`;
+  - gated off, `p ≥ 0`: `"lattice term gated off: leave-own-out MSE only {p}% below curve-only (threshold {t}%)"`;
+  - gated off, `p < 0` (a measured *loss*): `"lattice term gated off: leave-own-out MSE {−p}% above curve-only (threshold: {t}% below)"`.
+
+The percentages are rounded for the reason string only; the decision is made on
+the unrounded reduction, so a reduction just under the threshold can read "only
+20% below curve-only (threshold 20%)".
+
+### 15.5 Composition with the series term
+
+The calibrator composes the two terms, not the lattice object. For a feature
+`(rt, mz)`:
+
+```
+s_corr, s_n = series.correction(mz, rt)     # zeros when the series term is absent or gated off
+l_corr, l_n = lattice.correction(mz, rt)    # zeros when the lattice term is absent or gated off
+where s_n > 0:  l_corr = 0.0, l_n = 0       # the series term has precedence
+Cal_RT (anchor-free part) = curve(rt) + s_corr + l_corr
+```
+
+`ColumnCalibrator.stage1_terms(rt, mz)` returns the **applied**
+`(series_corr, series_n, lattice_corr, lattice_n)`: zeros for a term that is
+absent or gated off, and the lattice values zeroed wherever `series_n > 0`.
+`stage1_predict(rt, mz=None)` is the curve plus both applied corrections when
+`mz` is given, and the bare curve without it, exactly as before the terms
+existed; `predict(rt, classes=None, mz=None)` adds the stage-2 refiner on top.
+`lattice_correction_min` and `lattice_n_members` in the output are the applied
+values, so in the per-project tier a row never carries both a series and a
+lattice correction.
+
+The same rule sets `series_covered` at fit time. After the series term is fitted
+on the kept pairs, the lattice term is fitted on the same kept pairs and curve
+residuals with `series_covered = series.correction(mz_kept, rt_src_kept)[1] > 0`
+— all False when there is no series term (disabled) or it was gated off. If the
+series term corrects every pair the lattice term would cover,
+`n_pairs_covered = 0` and the lattice gate cannot engage.
+
+### 15.6 Parameters and defaults
+
+| field | default | note |
+|---|---|---|
+| `use_lattice_term` | `True` | stage 1c on/off |
+| `lattice_kmd_tol` | `0.008` | tolerance: cluster gap, H2 link, member error, lattice-point match |
+| `lattice_min_members` | `6` | smallest lattice family (after pruning) |
+| `lattice_max_distance` | `3.0` | how far (lattice steps, §15.1) a correction may be borrowed from |
+| `lattice_min_neighbours` | `2` | donors needed within that distance; clamped to at least 1 |
+| `lattice_max_neighbours` | `4` | nearest donors averaged; clamped to at least 1 |
+| `lattice_gate_min_mse_reduction` | `0.2` | the gate |
+| `lattice_min_covered_pairs` | `20` | below this the gate declines unread |
+
+A parameter is an explicit override, else the config value, else the default in
+`crosscolumn.DEFAULTS` — the series term's resolution. The co-elution exclusion
+is the series term's `series_exclude_rt_frac` and `series_exclude_rt_floor_min`
+(§14.5): one notion of "co-eluting", one setting. The lattice distance (§15.1)
+is not a setting. `lattice_min_neighbours` and `lattice_max_neighbours` are
+clamped to at least 1 where the term stores them: a correction needs at least
+one donor, and a weighted mean over none would be 0/0; the defaults are
+unaffected, and the model block of a fitted term reports the values it ran
+with. `from_dict` keeps rejecting unknown keys.
+
+### 15.7 New outputs
+
+* `*_calibrated.csv` gains, as its last two columns (after the series ones),
+  `lattice_correction_min` (minutes added to the curve's prediction; 0 when no
+  correction was applied) and `lattice_n_members` (the number of donors behind
+  the correction — family members in reach that do not co-elute with the
+  feature; 0 = not corrected). `warp_source` is per row: `curve`, then
+  `+series` where `series_n_members > 0`, then `+lattice` where
+  `lattice_n_members > 0`, then `+anchors` on every row when stage 2 engaged —
+  so `curve+lattice`, and with stage 2 engaged `curve+lattice+anchors`. In the
+  per-project tier a row has at most one of `+series` and `+lattice` (§15.5); in
+  the per-sample tier, where both columns aggregate over injections, a row may
+  read `curve+series+lattice` (§15.9). At run level
+  `ColumnCalibrator.warp_source` is `curve` + `+series` + `+lattice` +
+  `+anchors`, each part only when that stage is engaged, in that order.
+* `*_pairs.csv` gains `in_lattice`, after `in_series` — the pair is a member of
+  an accepted lattice family (False for trimmed pairs and non-members; all False
+  when the term is disabled).
+* `*_model.json` gains a `lattice` block, always present, right after `series`:
+  `enabled`, `engaged`, `gate_mse_reduction`, `gate_threshold`, `gate_reason`,
+  `n_families`, `n_pairs_in_families`, `n_pairs_covered`, `n_features_corrected`,
+  `kmd_tol`, `min_members`, `max_distance`, `min_neighbours`, `max_neighbours`,
+  `exclude_rt_min`. `n_pairs_in_families` is the number of member pairs
+  (`member_mask.sum()`), `n_pairs_covered` the pairs the gate was read on
+  (§15.4), `n_features_corrected` the number of rows of the result table with
+  `lattice_n_members > 0`. When the term is disabled: `enabled=False`,
+  `engaged=False`, `gate_reason="disabled (use_lattice_term=False)"`, counts 0,
+  reduction null, the parameters from the config. The `config` block records
+  the new fields like any other.
+* The log gains, right after the series-term line,
+  `"lattice term: {gate_reason}; {n_families} lattice families ({n_in_families} pairs, {n_pairs_covered} judged by the gate); {k}/{n} features corrected"`,
+  where `n_in_families` is `int(member_mask.sum())` and `k` the number of the
+  sample table's features that receive a lattice correction, or
+  `"lattice term: disabled (use_lattice_term=False)"`.
+* The report and the app (§12). Report: the fourth KPI tile and the radar axis
+  are "Series + lattice", the method-facts table gains a "Lattice term" row
+  right after "Series term", and the curve figure of the PDF prints the
+  lattice-term decision on the line after the series-term one. App: the radar
+  axis is "Series + lattice" too (the app does not show the tile), the Curve
+  section lists the lattice-term reason after the series-term one, and the app
+  gains the Advanced checkbox "Lattice term" (on by default), the table-preview
+  columns `lattice corr (min)` and `lattice n`, and the `results.lattice` block
+  of `run_info.json`. Both read the model's `lattice` block; neither recomputes
+  it.
+* API: `rt_anchor` exports `LatticeTerm` and `H2_MASS`. `LatticeTerm.fit(mz,
+  rt_src, rt_ref, residual, x0, x1, config=None, series_covered=None,
+  **overrides)` builds the term; it exposes `engaged`, `gate_mse_reduction`,
+  `gate_threshold`, `gate_reason`, `n_families`, `family_sizes`,
+  `family_offsets` (`m0` per family), `n_pairs_covered`, `exclude_rt_min`,
+  `member_mask` (aligned with the arrays passed to `fit`), `raw_correction`,
+  `correction` and `to_model()` (the fit-level part of the model block; the
+  pipeline adds `n_pairs_in_families` and `n_features_corrected`).
+  `ColumnCalibrator` gains `lattice`, `lattice_used` and `stage1_terms(rt, mz)`;
+  `CalibrationResult` gains `lattice_used`.
+* Unchanged: `Cal_RT_uncertainty_min` (§5.2) and `is_extrapolated` do not
+  depend on the lattice term.
+
+### 15.8 Interaction with stage 2
+
+Stage 2 stays opt-in (§14.7). When it runs, the anchor residuals — and with
+them the sanity filter, the `(lam_g, lam_c)` search, the LOO residuals and the
+gate — are measured against `stage1_predict`: the curve **plus the applied
+series and lattice corrections** when at least one of the two terms engaged and
+the anchor frame carries the anchors' source m/z (`mz_src`, which the
+pipeline's anchor table always does); otherwise the bare curve, exactly as
+before 1.2.2. The terms' work is never "corrected" a second time, and
+`residual_min` in `*_anchors.csv` is on the same basis (§5). The anchor m/z mask
+on the sample pairs (stage 1, step 2) is unchanged.
+
+Reproducing 1.2.2: `use_lattice_term=False` (CLI `--no-lattice-term`) gives
+v1.2.2's output; the test suite pins this against numeric snapshots of 1.2.2
+runs. With `use_series_term=False` as well, and `use_sample_anchors=True`, it is
+v1.2.1's default output (§14.7).
+
+### 15.9 Per-sample tier
+
+When `single_files` are given, each injection fits its own series term (when
+enabled) from its own kept pairs and then its own lattice term (when enabled)
+from the same kept pairs and residuals, with the same config, its own
+`series_covered` (the pairs its own series term corrects; all False when that
+term is disabled or gated off) and its own gate. The injection's prediction is
+its curve plus its applied series and lattice corrections, under the same
+precedence: the lattice correction is zeroed wherever that injection's series
+term corrected the feature. The reported `lattice_correction_min` is the median
+over injections of the applied lattice corrections and `lattice_n_members` the
+maximum member count — built exactly like the series columns — so a row may
+show both terms (`curve+series+lattice`), because each pair of columns
+aggregates over injections on its own. Rows no injection covers fall back to the
+project-level values (`stage1_terms` of the project calibrator).
+
+In this tier `model["lattice"]` is the project-level term's fit, while its
+`n_features_corrected` counts the rows of the final table with
+`lattice_n_members > 0`; the log line's `{k}` counts the project-level
+calibrator's corrections.
+
+### 15.10 What it does not do
+
+* The families are recognised from m/z alone — the Kendrick phase and H2 steps —
+  and are **not identifications**; nothing is claimed about a feature's class or
+  identity.
+* A lattice belongs to a formula series, not to a lipid class. A species from
+  another class that shares the family's formula series lands on the same
+  lattice and is corrected as if it belonged: LPC and ether PC do, and so does
+  the sodium adduct of a lipid two carbons shorter and three double bonds more
+  saturated (2.4 mDa from the protonated lattice point, inside
+  `lattice_kmd_tol`). This is the known weak spot (see §15.11, LPC).
+* Coverage is partial by construction. A feature is not corrected by the term if
+  its m/z is not on a family's lattice point, if fewer than
+  `lattice_min_neighbours` family members within `lattice_max_distance` lattice
+  steps are left once its co-eluting neighbours are excluded, or if the series
+  term corrects it; and on a matrix or method where the families carry no
+  consistent selectivity difference the gate does not engage. On the shipped
+  Mix 15 example (Orbitrap) both gates decline — the designed behaviour on data
+  where neither the series nor the lattice families carry a consistent
+  selectivity difference, not a failure (the figures are in `examples/README.md`).
+* The term depends on m/z *and* RT, so it is not a curve: the curve figure keeps
+  drawing the stage-1 curve, and `predict(rt)` without `mz` returns the curve
+  (plus anchors) only, exactly as before.
+* It never corrects a feature with its co-eluting family members
+  (leave-own-family-out), borrows only from members within
+  `lattice_max_distance` lattice steps, and never replaces a series correction.
+* Its distance metric, tolerance and reach are fixed, not tuned per data set
+  (§10, item 11).
+
+### 15.11 Measured evidence
+
+On the same six-method human-serum validation set that was used for the series
+term (five source methods calibrated onto the reference column at the default
+15 ppm matching window; 134 lipids located from exact mass independently of the
+calibration, 576 lipid-by-method points), adding the lattice term to 1.2.2
+lowered the median |Cal_RT − reference RT| from 0.064 to 0.059 min and the 90th
+percentile from 0.271 to 0.218 min; the share of points within 0.2 min rose from
+82% to 87%. The lattice gate engaged on the same four methods as the series gate
+(leave-own-out MSE 46–51% below the curve alone, on the pairs the series term
+leaves alone) and declined on the one whose selectivity already matched the
+reference. On those four methods the series term corrected 301 of the points and
+the lattice term 139 more. The gain sits where the series term could not reach:
+cholesteryl esters (55 points, none of them touched by the series term) went
+from a median of 0.175 to 0.066 min, from 64% to 87% within 0.2 min, and their
+class-wide offset (median signed error) from −0.147 to −0.004 min. Point by
+point, 55 improved by more than 0.1 min and 8 got worse by more than 0.1 min.
+
+Per class (median |Cal_RT − reference RT| in min, and the share within 0.2 min,
+1.2.2 → 1.2.3):
+
+| class | points | median | within 0.2 min |
+|---|---|---|---|
+| CE | 55 | 0.175 → 0.066 | 64% → 87% |
+| DG | 16 | 0.093 → 0.090 | 81% → 94% |
+| LPC | 52 | 0.055 → 0.074 | 83% → 79% |
+| PC | 110 | 0.098 → 0.080 | 76% → 81% |
+| ether PC | 57 | 0.066 → 0.052 | 70% → 79% |
+| SM | 97 | 0.047 → 0.047 | 92% → 93% |
+| TG | 189 | 0.058 → 0.055 | 89% → 92% |
+
+One class got worse: lysophosphatidylcholines (52 points) went from a median of
+0.055 to 0.074 min and from 83% to 79% within 0.2 min; five of the eight points
+that worsened by more than 0.1 min are LPC. LPC shares its lattice with ether PC
+(the same formula series), and the sodium adducts of lighter LPCs land on LPC
+lattice points, so its neighbours on the lattice are not all LPC. Every
+prediction is leave-own-family-out by construction, so these are not in-sample
+figures; but the term's design choices (the neighbour rule and its reach) were
+made on this same data set, and it has not been tested on another matrix or
+instrument.

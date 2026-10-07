@@ -55,20 +55,61 @@ order. Three safeguards keep it honest:
   cannot leak into its own correction.
 * **A 20% gate** — the term is applied only if predicting every matched pair
   this way cuts the pairs' mean squared error by at least 20% below the curve
-  alone, on at least 20 covered pairs; otherwise the stage-1 curve is used
+  alone, on at least 20 covered pairs; otherwise it leaves the stage-1 curve
   untouched.
 
-A feature outside every validated series keeps the stage-1 curve, and on a
-matrix with few homologous series the gate will simply not engage.
+A feature outside every validated series is not corrected by this term, and on
+a matrix with few homologous series the gate will simply not engage; the
+lattice term, next, fills in some of what it leaves.
+
+**Stage 1c — the lattice term (since 1.2.3).** The series term needs at least
+four members in one CH2 ladder (same class, same number of double bonds), and
+some classes never offer that: serum cholesteryl esters have at most three per
+double-bond count, so the series term never touches them and their class-wide
+offset against the curve stays in the calibrated RT. Yet the class as a whole
+has a dozen members, spread over *several* ladders that differ by H2 — one
+double bond. The lattice term uses that. CH2 ladders whose Kendrick phases are
+one H2 step apart (two, across a missing row) are joined into a *lattice
+family*, and every member gets integer coordinates (carbons, H2 count) read off
+its mass. A feature whose m/z sits on a family's lattice point is corrected
+with the weighted mean curve residual of its nearest family members: at most
+four, at least two, no further than three lattice steps away (one double bond
+counts like two carbons). Like the series term it works from *m/z* alone — a
+lattice family is **not an identification**. Four safeguards keep it honest:
+
+* **Order validation on both columns** — a family is kept only if its members
+  elute in the order reversed-phase chromatography demands (more carbons and/or
+  fewer double bonds elutes later) on your column *and* on the reference column;
+  members that break the order are dropped, and a family needs at least six
+  members over at least two double-bond counts.
+* **Leave-own-family-out, with a reach limit** — a feature is never corrected
+  with pairs that co-elute with it, and it borrows only from members within
+  three lattice steps.
+* **A fallback behind the series term, never a replacement** — a feature the
+  series term corrects keeps that correction; the lattice term fills in only
+  where the series term is silent.
+* **A 20% gate, judged behind the series term** — the term is applied only if
+  predicting every matched pair it covers this way, among the pairs the series
+  term leaves alone, cuts their mean squared error by at least 20% below the
+  curve alone, on at least 20 such pairs; otherwise it leaves the stage-1 curve
+  untouched.
+
+Lattice families share a weak spot: a species from another class that shares a
+family's formula series lands on the same lattice and is corrected as if it
+belonged. LPC and ether PC share one, and so does the sodium adduct of a lipid
+two carbons shorter and three double bonds more saturated (2.4 mDa from the
+protonated lattice point); see Accuracy below. And on a matrix or method where
+the families carry no consistent selectivity difference, the gate does not
+engage.
 
 **Stage 2 — sample anchors, gated (opt-in since 1.2.2).** Seventeen
 high-abundance endogenous plasma lipids (LPC/PC/SM/CE/TG) are located in both
 sample runs, validated by adduct consistency, within-class elution order, and
 a curve-assisted isomer re-pick. Their residuals against the Stage-1 result
-(curve, plus the series term where it engaged) are class-systematic on long
-gradients, so the correction is decomposed into a class offset plus a
-class-detrended piecewise-linear term, both shrunk by leave-one-anchor-out
-cross-validation.
+(curve, plus the series and lattice terms where they engaged) are
+class-systematic on long gradients, so the correction is decomposed into a
+class offset plus a class-detrended piecewise-linear term, both shrunk by
+leave-one-anchor-out cross-validation.
 
 The correction is then **gated**: it is applied only if it reduces
 leave-one-anchor-out error by at least 20%. Otherwise the pure Stage-1 curve is
@@ -124,9 +165,12 @@ write_results(res, "out/run1")
 rt-anchor calibrate --samples samples.csv --standards standards.csv \
                     --polarity positive --panel mix21 --out out/run1
 rt-anchor calibrate ... --no-series-term   # skip stage 1b (on by default)
+rt-anchor calibrate ... --no-lattice-term  # skip stage 1c (on by default since
+                                           # 1.2.3); alone, it reproduces v1.2.2's
+                                           # default output
 rt-anchor calibrate ... --sample-anchors   # opt in to stage 2 (plasma/serum only;
                                            # off by default since 1.2.2)
-rt-anchor calibrate ... --no-series-term --sample-anchors
+rt-anchor calibrate ... --no-series-term --no-lattice-term --sample-anchors
                                            # reproduce v1.2.1's default output
 rt-anchor references          # list the bundled reference datasets
 rt-anchor describe table.csv  # detect format + summarise, no calibration
@@ -156,16 +200,18 @@ reference was used, so a result can always be traced back to its axis.
 | `iRT_reliability` | `high` / `medium` / `low` / `none` |
 | `is_extrapolated` | RT outside the span the matched pairs cover |
 | `calibration_scope` | `project` or `sample` |
-| `warp_source` | per row: `curve`, `curve+series`, `curve+anchors` or `curve+series+anchors` — `+series` only where a series correction was actually applied |
+| `warp_source` | per row: `curve`, plus `+series` or `+lattice` where that term actually corrected the row, plus `+anchors` on every row when stage 2 engaged — e.g. `curve+lattice`, `curve+series+anchors`; a row carries both `+series` and `+lattice` only in the per-sample tier |
 | `RI_spread`, `n_contributing` | per-injection dispersion (per-sample tier only) |
 | `series_correction_min` | minutes the series term added to the curve's prediction (0 = no correction) |
 | `series_n_members` | number of series members behind the correction (0 = not corrected) |
+| `lattice_correction_min` | minutes the lattice term added to the curve's prediction (0 = no correction) |
+| `lattice_n_members` | number of lattice-family members in reach behind the correction (0 = not corrected) |
 
-Companion files: **`*_model.json`** (curve, the series term's fit and gate
-decision, stage-2 anchors, iRT definition, reference provenance, detection QC),
-**`*_anchors.csv`** (the Stage-2 anchors and their residuals),
+Companion files: **`*_model.json`** (curve, the series and lattice terms' fit
+and gate decisions, stage-2 anchors, iRT definition, reference provenance,
+detection QC), **`*_anchors.csv`** (the Stage-2 anchors and their residuals),
 **`*_pairs.csv`** (every matched pair, whether it survived trimming, and
-whether it sits in a validated homologous series),
+whether it sits in a validated homologous series or in a lattice family),
 **`*_landmarks.csv`** (the panel standards located on the reference run),
 **`*_log.txt`**, and **`*_report.html`** + **`*_report.pdf`**.
 
@@ -196,8 +242,8 @@ m/z 533 — turns column 90's gate on (28%) while lowering its held-out error, s
 that row is the one most likely to move.
 
 The table was measured before 1.2.2, with stage 2 enabled and without the
-series term; `--no-series-term --sample-anchors` reproduces that
-configuration.
+series term; `--no-series-term --no-lattice-term --sample-anchors` reproduces
+that configuration.
 
 The series term was measured separately, on a six-method human-serum
 validation set (five source methods calibrated onto the reference column at
@@ -210,6 +256,35 @@ selectivity already matched the reference. Validated series covered about half
 of the points; a feature outside any validated series keeps the stage-1 curve.
 Every prediction is leave-own-family-out by construction, so these are not
 in-sample figures.
+
+The lattice term (1.2.3) was measured on the same six-method human-serum
+validation set that was used for the series term (five source methods
+calibrated onto the reference column at the default 15 ppm matching window; 134
+lipids located from exact mass independently of the calibration, 576
+lipid-by-method points). Adding it to 1.2.2 lowered the median |Cal_RT −
+reference RT| from 0.064 to 0.059 min and the 90th percentile from 0.271 to
+0.218 min; the share of points within 0.2 min rose from 82% to 87%. The lattice
+gate engaged on the same four methods as the series gate (leave-own-out MSE
+46–51% below the curve alone, on the pairs the series term leaves alone) and
+declined on the one whose selectivity already matched the reference. On those
+four methods the series term corrected 301 of the points and the lattice term
+139 more. The gain sits where the series term could not reach: cholesteryl
+esters (55 points, none of them touched by the series term) went from a median
+of 0.175 to 0.066 min, from 64% to 87% within 0.2 min, and their class-wide
+offset (median signed error) from −0.147 to −0.004 min. Point by point, 55
+improved by more than 0.1 min and 8 got worse by more than 0.1 min.
+
+One class got worse: lysophosphatidylcholines (52 points) went from a median of
+0.055 to 0.074 min and from 83% to 79% within 0.2 min; five of the eight points
+that worsened by more than 0.1 min are LPC. LPC shares its lattice with ether
+PC (the same formula series), and the sodium adducts of lighter LPCs land on
+LPC lattice points, so its neighbours on the lattice are not all LPC. Lattice
+families are recognised from m/z alone and are not identifications, and where
+the families carry no consistent selectivity difference the gate does not
+engage. Every prediction is leave-own-family-out by construction, so these are
+not in-sample figures; but the term's design choices (the neighbour rule and
+its reach) were made on this same data set, and it has not been tested on
+another matrix or instrument.
 
 Two honest caveats. `Cal_RT_min` can show hairline non-monotonicity (observed
 worst case 0.033 min, an order of magnitude below the method's own accuracy)

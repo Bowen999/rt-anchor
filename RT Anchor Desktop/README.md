@@ -57,12 +57,15 @@ The panel cards come from `rt_anchor.mixtures`, not from a copy in the app —
   `curve_frac` (CV‑chosen — rarely a reason to change it), the RT window, min
   anchors, the stage toggles (**use sample pairs in the curve** — on;
   **series term** — the stage‑1b homologous‑series correction, on by default;
-  **stage‑2 sample anchors (opt‑in)** — off by default since 1.2.2), and
-  extrapolation (on by default; out‑of‑span features are still valued and
-  flagged). A hint under the toggles says what the series term does: it
-  corrects a feature with the curve residuals of its Kendrick homologues —
+  **lattice term** — the stage‑1c cross‑ladder fallback behind it, on by
+  default since 1.2.3; **stage‑2 sample anchors (opt‑in)** — off by default
+  since 1.2.2), and extrapolation (on by default; out‑of‑span features are still
+  valued and flagged). A hint under the toggles says what the series term does:
+  it corrects a feature with the curve residuals of its Kendrick homologues —
   recognised from m/z alone, not identifications — and only where a
-  leave‑own‑out gate shows it helps.
+  leave‑own‑out gate shows it helps. One more sentence says what the lattice
+  term does: it joins homologous series one double bond apart into a class‑wide
+  family and corrects features the series term cannot reach, gated the same way.
 
 ### Output screen
 A left sidebar switches sections:
@@ -72,8 +75,8 @@ A left sidebar switches sections:
 | 01 | **Overview** | KPI metrics (features per run, curve residual median / P90, iRT range and extrapolated share) and the quality radar |
 | 02 | **Detection** | the chosen panel located in **your standards run**, on the reference column's axis — **QC only, it does not drive the calibration** |
 | 03 | **Profile** | intensity‑weighted feature profile: before vs. after calibration (raw RT vs. `Cal_RT`), then the calibrated profile against the reference |
-| 04 | **Curve** | the stage‑1 cross‑column curve: matched pairs (standards = squares, sample = diamonds, MAD‑trimmed = hollow grey), the fit, the anchor‑refined fit when engaged, the stage‑2 anchors as rings, and the residual strip — with the series‑term decision (and the anchor gate's, when stage 2 ran) printed under the figure |
-| 05 | **Table** | preview: your RT and m/z beside `Cal_RT_min`, `iRT`, their uncertainties, reliability, the extrapolation flag and the series‑term columns (`series corr (min)`, `series n`) |
+| 04 | **Curve** | the stage‑1 cross‑column curve: matched pairs (standards = squares, sample = diamonds, MAD‑trimmed = hollow grey), the fit, the anchor‑refined fit when engaged, the stage‑2 anchors as rings, and the residual strip — with the series‑ and lattice‑term decisions (and the anchor gate's, when stage 2 ran) printed under the figure; the series and lattice terms, when engaged, are per‑feature corrections that the curve does not show |
+| 05 | **Table** | preview: your RT and m/z beside `Cal_RT_min`, `iRT`, their uncertainties, reliability, the extrapolation flag, the series‑term columns (`series corr (min)`, `series n`) and the lattice‑term columns (`lattice corr (min)`, `lattice n`) |
 | 06 | **Export** | see below |
 
 The stage‑2 anchor table (residuals, class offsets, gate verdict) is not a
@@ -88,6 +91,11 @@ report uses (`viz.metrics`, `viz.performance.compute_curve`,
 `viz.anchors.compute_anchors`, `viz.report.method_facts`), so the app and the
 PDF a reviewer receives cannot disagree.
 
+The bundled example dataset (**Load example**) is a run on which the series gate
+declines and the lattice gate engages: 12 lattice families holding 319 pairs,
+leave‑own‑out MSE 24% below the curve alone on 321 pairs, 5,035 of 22,559
+features corrected.
+
 ### Export
 **Export all outputs** writes one folder:
 
@@ -101,7 +109,10 @@ Individual exports (calibrated CSV, HTML report, run info) are also available.
 `_run_info.json` records the run's parameters and, since 1.2.2, a
 `results.series` block (the series term's gate decision and counts:
 `enabled`, `engaged`, `gate_mse_reduction`, `gate_threshold`, `gate_reason`,
-`n_series`, `n_pairs_covered`, `n_features_corrected`).
+`n_series`, `n_pairs_covered`, `n_features_corrected`) and, since 1.2.3, a
+`results.lattice` block beside it (the lattice term's: `enabled`, `engaged`,
+`gate_mse_reduction`, `gate_threshold`, `gate_reason`, `n_families`,
+`n_pairs_covered`, `n_features_corrected`).
 
 ## Run from source (dev)
 ```bash
@@ -111,13 +122,15 @@ Individual exports (calibrated CSV, HTML report, run info) are also available.
 ```
 `--selftest` runs a **real calibration** — the bundled reference pair against
 itself — and asserts `Cal_RT_min == RT` to machine precision, then builds the
-full UI payload and checks it is valid JSON. Importing the dependencies is not
-enough: `statsmodels`, `sklearn` and the bundled `reference_data` tree are all
-things PyInstaller drops silently, and only a run that produces the right
-number proves they survived.
+full UI payload and checks it is valid JSON. It also asserts that the result's
+model carries a `series` and a `lattice` block, each with an `engaged` key, and
+prints both gate reasons. Importing the dependencies is not enough:
+`statsmodels`, `sklearn` and the bundled `reference_data` tree are all things
+PyInstaller drops silently, and only a run that produces the right number
+proves they survived.
 
 ```
-SELFTEST_OK reference=col35 features=610 pairs=825 landmarks=21 self_error=3.92e-11min structures=15 series=no correction needed: the stage-1 curve already reproduces the series pairs
+SELFTEST_OK reference=col35 features=610 pairs=825 landmarks=21 self_error=3.92e-11min structures=15 series=no correction needed: the stage-1 curve already reproduces the series pairs lattice=no correction needed: the stage-1 curve already reproduces the lattice pairs
 ```
 
 ## Layout
