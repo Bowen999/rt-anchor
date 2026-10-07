@@ -29,6 +29,15 @@ mass and corrects a feature with the curve residual of the other matched pairs
 in its own series — never its co-eluting family, and only if that provably
 helps (a leave-own-out gate, the same "do no harm" rule as stage 2).
 
+**Stage 1c — the lattice term.** Some classes never offer the four members per
+ladder the series term needs (serum cholesteryl esters have at most three),
+yet spread a dozen members over several ladders one double bond apart. The
+lattice term (:mod:`rt_anchor.lattice`) joins those ladders into one family,
+gives every member integer (carbon, H2) coordinates off its mass, and borrows
+the correction from the family's nearest members. It is a fallback, never a
+replacement: a feature the series term corrects is left untouched, and the
+lattice gate is judged only on the pairs the series term leaves alone.
+
 **Stage 2 — class-aware anchor refinement, gated.** Anchor residuals on long
 gradients are class-systematic: SM and CE sit high while PC and TG sit low, and
 the classes interleave along the RT axis. A single piecewise-linear correction
@@ -68,6 +77,7 @@ from statsmodels.nonparametric.smoothers_lowess import lowess
 
 from .errors import CalibrationError
 from .io.schema import FeatureTable
+from .lattice import LatticeTerm
 from .series import SeriesTerm
 
 # Defaults for the spec §7 fields. They are read off the config when it carries
@@ -93,6 +103,14 @@ DEFAULTS = {
     "series_exclude_rt_floor_min": 0.03,
     "series_gate_min_mse_reduction": 0.2,
     "series_min_covered_pairs": 20,
+    "use_lattice_term": True,
+    "lattice_kmd_tol": 0.008,
+    "lattice_min_members": 6,
+    "lattice_max_distance": 3.0,
+    "lattice_min_neighbours": 2,
+    "lattice_max_neighbours": 4,
+    "lattice_gate_min_mse_reduction": 0.2,
+    "lattice_min_covered_pairs": 20,
 }
 
 #: Shrinkage grid searched by the leave-one-anchor-out lambda selection.
@@ -513,6 +531,7 @@ class ColumnCalibrator:
     source_label: str = ""
     refiner: Optional[object] = None
     series: Optional[SeriesTerm] = None
+    lattice: Optional[LatticeTerm] = None
     anchors: pd.DataFrame = field(default_factory=pd.DataFrame)
     anchors_dropped: pd.DataFrame = field(default_factory=pd.DataFrame)  # sanity filter
     pairs: pd.DataFrame = field(default_factory=pd.DataFrame)   # incl. `source`, `kept`
@@ -539,6 +558,10 @@ class ColumnCalibrator:
         return self.series is not None and self.series.engaged
 
     @property
+    def lattice_used(self) -> bool:
+        return self.lattice is not None and self.lattice.engaged
+
+    @property
     def class_aware(self) -> bool:
         return isinstance(self.refiner, ClassAwareRefiner)
 
@@ -552,22 +575,52 @@ class ColumnCalibrator:
         parts = ["curve"]
         if self.series_used:
             parts.append("series")
+        if self.lattice_used:
+            parts.append("lattice")
         if self.anchors_used:
             parts.append("anchors")
         return "+".join(parts)
 
+    def stage1_terms(self, rt, mz) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """The applied per-feature corrections: ``(series_corr, series_n, lattice_corr, lattice_n)``.
+
+        Zeros for a term that is absent or gated off; the lattice values are
+        additionally zeroed wherever the series term corrected the feature —
+        the series term has precedence, and the lattice term only ever fills
+        in where the series term is silent.
+        """
+        rt = np.asarray(rt, dtype=float)
+        s_corr = np.zeros(rt.shape, dtype=float)
+        s_n = np.zeros(rt.shape, dtype=int)
+        l_corr = np.zeros(rt.shape, dtype=float)
+        l_n = np.zeros(rt.shape, dtype=int)
+        if mz is None:
+            return s_corr, s_n, l_corr, l_n
+        if self.series is not None:
+            s_corr, s_n = self.series.correction(mz, rt)
+            s_n = s_n.astype(int)
+        if self.lattice is not None:
+            l_corr, l_n = self.lattice.correction(mz, rt)
+            l_n = l_n.astype(int)
+            take = s_n > 0                        # the series term has precedence
+            l_corr[take] = 0.0
+            l_n[take] = 0
+        return s_corr, s_n, l_corr, l_n
+
     def stage1_predict(self, rt, mz=None) -> np.ndarray:
-        """The anchor-free part: the curve, plus the series term when ``mz`` is given.
+        """The anchor-free part: the curve, plus both terms when ``mz`` is given.
 
         This is what stage 2 measures its anchor residuals against whenever the
         anchors carry their source m/z — the anchors must be judged against what
-        the anchor-free part predicts, or the series term's work would be
-        "corrected" a second time.
+        the anchor-free part predicts, or the terms' work would be "corrected"
+        a second time. With ``mz=None`` it is the bare curve, exactly as before
+        the terms existed.
         """
         rt = np.asarray(rt, dtype=float)
         y = self.curve.predict(rt)
-        if mz is not None and self.series_used:
-            y = y + self.series.correction(mz, rt)[0]
+        if mz is not None:
+            s_corr, _, l_corr, _ = self.stage1_terms(rt, mz)
+            y = y + s_corr + l_corr
         return y
 
     def predict(self, rt, classes: Optional[Sequence] = None, mz=None) -> np.ndarray:
@@ -580,11 +633,11 @@ class ColumnCalibrator:
     def _stage1_basis(self, frame: pd.DataFrame, rt_src: np.ndarray) -> np.ndarray:
         """What the anchor-free part predicts for an anchor frame's ``rt_src``.
 
-        The series term is included only when the frame carries the anchors'
-        source m/z (``mz_src``) *and* the term is engaged; otherwise this is the
-        bare curve, exactly as before 1.2.2.
+        The series and lattice terms are included only when the frame carries
+        the anchors' source m/z (``mz_src``) *and* the term is engaged;
+        otherwise this is the bare curve, exactly as before 1.2.2.
         """
-        if self.series_used and "mz_src" in frame.columns:
+        if (self.series_used or self.lattice_used) and "mz_src" in frame.columns:
             return self.stage1_predict(rt_src, mz=frame["mz_src"].to_numpy(dtype=float))
         return self.curve.predict(rt_src)
 
@@ -715,6 +768,11 @@ def build_calibrator(std_src: FeatureTable,
     :class:`~rt_anchor.series.SeriesTerm` is fitted on the pairs that survived
     MAD trimming, gated by its leave-own-out error, and stored on the
     calibrator; the per-pair membership flag lands in ``pairs["in_series"]``.
+    Stage 1c follows unless disabled (``use_lattice_term``): a
+    :class:`~rt_anchor.lattice.LatticeTerm` is fitted on the same kept pairs
+    and residuals — its gate judged only on the pairs the engaged series term
+    leaves alone — and stored likewise, with its membership flag in
+    ``pairs["in_lattice"]``.
 
     Stage 2 is optional. ``sample_anchors`` is a frame of ``label``, ``rt_src``,
     ``rt_ref`` and optionally ``lipid_class`` — endogenous lipids validated in
@@ -779,10 +837,30 @@ def build_calibrator(std_src: FeatureTable,
         in_series[kp] = series.member_mask
     pairs = pairs.assign(in_series=in_series)
 
+    # -- stage 1c: the lattice term, the fallback behind the series term -----
+    lattice = None
+    in_lattice = np.zeros(len(pairs), dtype=bool)
+    if bool(cfg(config, "use_lattice_term")):
+        kp = kept_flag
+        mz_k = pairs["mz_a"].to_numpy(dtype=float)[kp]
+        rt_src_k = pairs["rt_a"].to_numpy(dtype=float)[kp]
+        rt_ref_k = pairs["rt_b"].to_numpy(dtype=float)[kp]
+        # the gate is judged only on the pairs the *engaged* series term
+        # leaves alone (all pairs when the series term is absent or gated off)
+        series_covered = (series.correction(mz_k, rt_src_k)[1] > 0
+                          if series is not None else None)
+        lattice = LatticeTerm.fit(mz_k, rt_src_k, rt_ref_k,
+                                  rt_ref_k - curve.predict(rt_src_k),
+                                  curve.x0, curve.x1, config,
+                                  series_covered=series_covered)
+        in_lattice[kp] = lattice.member_mask
+    pairs = pairs.assign(in_lattice=in_lattice)
+
     cal = ColumnCalibrator(
         curve=curve,
         source_label=source_label,
         series=series,
+        lattice=lattice,
         pairs=pairs,
         n_pairs=len(pairs),
         n_pairs_kept=int(keep.sum()),

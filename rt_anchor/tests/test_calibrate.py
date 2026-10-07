@@ -195,7 +195,8 @@ def test_model_records_the_gate_decision(proj_result):
 
 def test_companion_frames_have_their_spec_columns(proj_result):
     assert list(proj_result.pairs.columns) == ["mz_src", "rt_src", "rt_ref",
-                                               "source", "kept", "in_series"]
+                                               "source", "kept", "in_series",
+                                               "in_lattice"]
     assert set(proj_result.pairs["source"]) <= {"standards", "sample"}
     assert set(proj_result.landmarks.columns) >= {"name", "class", "mz",
                                                   "rt_ref_run_min", "iRT"}

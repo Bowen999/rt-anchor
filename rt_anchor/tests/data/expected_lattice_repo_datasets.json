@@ -1,0 +1,437 @@
+{
+ "Orbitrap": {
+  "n_features": 22314,
+  "n_pairs": 595,
+  "n_pairs_kept": 433,
+  "x0": 1.029,
+  "x1": 23.423,
+  "exclude_rt_min": 0.033590999999999996,
+  "series_engaged": false,
+  "n_pairs_series_covered": 0,
+  "n_families": 12,
+  "n_pairs_in_families": 243,
+  "n_pairs_covered": 270,
+  "gate_mse_reduction": -0.015571467329868138,
+  "engaged": false,
+  "family_sizes": [
+   16,
+   49,
+   18,
+   16,
+   33,
+   17,
+   17,
+   41,
+   7,
+   14,
+   8,
+   7
+  ],
+  "family_m0": [
+   435.32009778,
+   413.26839844,
+   429.24569844,
+   512.30382377,
+   476.23729963999995,
+   542.3152488600001,
+   468.30829988,
+   740.6671497,
+   478.3285,
+   612.5623997600001,
+   647.4646241300001,
+   707.4912
+  ],
+  "n_features_raw_covered": 4162,
+  "sum_abs_raw_correction": 1016.6156843287185,
+  "max_abs_raw_correction": 1.0737323423614564,
+  "n_features_corrected": 0,
+  "samples": [
+   {
+    "row": 0,
+    "mz": 758.5694,
+    "rt_min": 7.394,
+    "raw_correction_min": -0.08917046483448758,
+    "n_members": 15
+   },
+   {
+    "row": 1,
+    "mz": 765.6162,
+    "rt_min": 8.434,
+    "raw_correction_min": 0.0,
+    "n_members": 0
+   },
+   {
+    "row": 1568,
+    "mz": 790.6322,
+    "rt_min": 11.071,
+    "raw_correction_min": 0.32283413891092577,
+    "n_members": 14
+   },
+   {
+    "row": 3874,
+    "mz": 766.5365,
+    "rt_min": 8.757,
+    "raw_correction_min": -0.11336778095040068,
+    "n_members": 5
+   },
+   {
+    "row": 6512,
+    "mz": 651.608,
+    "rt_min": 18.229,
+    "raw_correction_min": -0.01597260339920426,
+    "n_members": 5
+   },
+   {
+    "row": 9102,
+    "mz": 854.811,
+    "rt_min": 23.38,
+    "raw_correction_min": 0.07171516499235463,
+    "n_members": 12
+   },
+   {
+    "row": 11317,
+    "mz": 991.1504,
+    "rt_min": 2.221,
+    "raw_correction_min": 0.0,
+    "n_members": 0
+   },
+   {
+    "row": 11694,
+    "mz": 861.6333,
+    "rt_min": 6.41,
+    "raw_correction_min": -0.3827453834692515,
+    "n_members": 3
+   },
+   {
+    "row": 14341,
+    "mz": 718.5655,
+    "rt_min": 7.75,
+    "raw_correction_min": -0.21022357866266198,
+    "n_members": 2
+   },
+   {
+    "row": 16894,
+    "mz": 814.5966,
+    "rt_min": 5.169,
+    "raw_correction_min": 0.1997223705831508,
+    "n_members": 9
+   },
+   {
+    "row": 19569,
+    "mz": 978.8348,
+    "rt_min": 15.597,
+    "raw_correction_min": -0.08458931619052315,
+    "n_members": 2
+   },
+   {
+    "row": 22311,
+    "mz": 791.696,
+    "rt_min": 21.3,
+    "raw_correction_min": -0.07708885445026092,
+    "n_members": 12
+   },
+   {
+    "row": 22313,
+    "mz": 285.2424,
+    "rt_min": 23.451,
+    "raw_correction_min": 0.0,
+    "n_members": 0
+   }
+  ],
+  "stage1_fingerprint": {
+   "n_pairs": 595,
+   "n_pairs_kept": 433,
+   "kept_pairs_sha1": "59a1ef6cde1b9b07e599799875cf18ec4b72a3ba"
+  }
+ },
+ "QTOF": {
+  "n_features": 22559,
+  "n_pairs": 602,
+  "n_pairs_kept": 442,
+  "x0": 0.991,
+  "x1": 16.216,
+  "exclude_rt_min": 0.03,
+  "series_engaged": false,
+  "n_pairs_series_covered": 0,
+  "n_families": 12,
+  "n_pairs_in_families": 186,
+  "n_pairs_covered": 249,
+  "gate_mse_reduction": -0.06397665371517691,
+  "engaged": false,
+  "family_sizes": [
+   8,
+   22,
+   20,
+   8,
+   27,
+   10,
+   48,
+   9,
+   12,
+   9,
+   6,
+   7
+  ],
+  "family_m0": [
+   455.27014736,
+   593.44319922,
+   657.4893483200001,
+   429.35107389,
+   476.2335486199999,
+   542.31564904,
+   468.32312323,
+   478.3301,
+   610.55472479,
+   792.6136,
+   848.9228998799999,
+   512.3106996399999
+  ],
+  "n_features_raw_covered": 3296,
+  "sum_abs_raw_correction": 1916.4042621375888,
+  "max_abs_raw_correction": 2.294530435708786,
+  "n_features_corrected": 0,
+  "samples": [
+   {
+    "row": 0,
+    "mz": 758.5736,
+    "rt_min": 5.929,
+    "raw_correction_min": 0.0,
+    "n_members": 0
+   },
+   {
+    "row": 12,
+    "mz": 666.6218,
+    "rt_min": 14.577,
+    "raw_correction_min": 0.021077632749876514,
+    "n_members": 7
+   },
+   {
+    "row": 1950,
+    "mz": 949.881,
+    "rt_min": 15.677,
+    "raw_correction_min": 0.6279572264243533,
+    "n_members": 5
+   },
+   {
+    "row": 4293,
+    "mz": 792.6468,
+    "rt_min": 6.38,
+    "raw_correction_min": 0.4050678756713747,
+    "n_members": 8
+   },
+   {
+    "row": 6645,
+    "mz": 911.7728,
+    "rt_min": 13.372,
+    "raw_correction_min": 0.1420439179097441,
+    "n_members": 5
+   },
+   {
+    "row": 9348,
+    "mz": 946.7705,
+    "rt_min": 8.078,
+    "raw_correction_min": 2.1105533391599893,
+    "n_members": 2
+   },
+   {
+    "row": 11422,
+    "mz": 720.6086,
+    "rt_min": 11.97,
+    "raw_correction_min": 0.0,
+    "n_members": 0
+   },
+   {
+    "row": 11621,
+    "mz": 856.5756,
+    "rt_min": 4.207,
+    "raw_correction_min": 0.8351764215527335,
+    "n_members": 2
+   },
+   {
+    "row": 14176,
+    "mz": 484.3805,
+    "rt_min": 3.16,
+    "raw_correction_min": -0.4953566557898515,
+    "n_members": 5
+   },
+   {
+    "row": 16682,
+    "mz": 818.6242,
+    "rt_min": 2.355,
+    "raw_correction_min": -1.321510336742324,
+    "n_members": 2
+   },
+   {
+    "row": 19306,
+    "mz": 766.5334,
+    "rt_min": 17.33,
+    "raw_correction_min": -0.6076874301473593,
+    "n_members": 6
+   },
+   {
+    "row": 22550,
+    "mz": 689.6052,
+    "rt_min": 15.346,
+    "raw_correction_min": -0.04179008028405254,
+    "n_members": 3
+   },
+   {
+    "row": 22558,
+    "mz": 985.0193,
+    "rt_min": 12.758,
+    "raw_correction_min": 0.0,
+    "n_members": 0
+   }
+  ],
+  "stage1_fingerprint": {
+   "n_pairs": 602,
+   "n_pairs_kept": 442,
+   "kept_pairs_sha1": "424f8e915b8d8ecd9724cd30d6cb3917bb2d1ce8"
+  }
+ },
+ "QTOF_full": {
+  "n_features": 22559,
+  "n_pairs": 597,
+  "n_pairs_kept": 421,
+  "x0": 1.318,
+  "x1": 15.339,
+  "exclude_rt_min": 0.03,
+  "series_engaged": false,
+  "n_pairs_series_covered": 0,
+  "n_families": 12,
+  "n_pairs_in_families": 319,
+  "n_pairs_covered": 321,
+  "gate_mse_reduction": 0.23822907821916794,
+  "engaged": true,
+  "family_sizes": [
+   17,
+   65,
+   16,
+   16,
+   44,
+   20,
+   43,
+   58,
+   8,
+   16,
+   7,
+   9
+  ],
+  "family_m0": [
+   435.32754765999994,
+   391.28974802000005,
+   663.4613491,
+   597.5440999999998,
+   538.3518991599999,
+   596.40514904,
+   482.32604885999996,
+   740.67837461,
+   478.33017484999993,
+   632.63567515,
+   759.59194958,
+   610.54184994
+  ],
+  "n_features_raw_covered": 5035,
+  "sum_abs_raw_correction": 489.3920568017155,
+  "max_abs_raw_correction": 0.40137474949153773,
+  "n_features_corrected": 5035,
+  "samples": [
+   {
+    "row": 0,
+    "mz": 758.5736,
+    "rt_min": 5.929,
+    "raw_correction_min": -0.09696100121991635,
+    "n_members": 19
+   },
+   {
+    "row": 2,
+    "mz": 765.6203,
+    "rt_min": 7.094,
+    "raw_correction_min": 0.0,
+    "n_members": 0
+   },
+   {
+    "row": 1583,
+    "mz": 833.7434,
+    "rt_min": 13.734,
+    "raw_correction_min": -0.24465565679872842,
+    "n_members": 14
+   },
+   {
+    "row": 3712,
+    "mz": 915.8448,
+    "rt_min": 12.487,
+    "raw_correction_min": 0.10917835467638604,
+    "n_members": 2
+   },
+   {
+    "row": 6188,
+    "mz": 873.7747,
+    "rt_min": 12.758,
+    "raw_correction_min": -0.21652284339250408,
+    "n_members": 16
+   },
+   {
+    "row": 9103,
+    "mz": 671.5733,
+    "rt_min": 12.165,
+    "raw_correction_min": -0.04449253795333645,
+    "n_members": 3
+   },
+   {
+    "row": 11524,
+    "mz": 691.622,
+    "rt_min": 15.631,
+    "raw_correction_min": -0.08749319850823037,
+    "n_members": 10
+   },
+   {
+    "row": 11566,
+    "mz": 603.5719,
+    "rt_min": 8.984,
+    "raw_correction_min": 0.0,
+    "n_members": 0
+   },
+   {
+    "row": 13859,
+    "mz": 690.4793,
+    "rt_min": 4.388,
+    "raw_correction_min": 0.014541775663042602,
+    "n_members": 2
+   },
+   {
+    "row": 16519,
+    "mz": 884.7794,
+    "rt_min": 15.56,
+    "raw_correction_min": 0.07117374551524441,
+    "n_members": 24
+   },
+   {
+    "row": 19267,
+    "mz": 963.8948,
+    "rt_min": 13.007,
+    "raw_correction_min": -0.02848691560768585,
+    "n_members": 4
+   },
+   {
+    "row": 22550,
+    "mz": 689.6052,
+    "rt_min": 15.346,
+    "raw_correction_min": -0.0891106342768844,
+    "n_members": 9
+   },
+   {
+    "row": 22558,
+    "mz": 985.0193,
+    "rt_min": 12.758,
+    "raw_correction_min": 0.0,
+    "n_members": 0
+   }
+  ],
+  "stage1_fingerprint": {
+   "n_pairs": 597,
+   "n_pairs_kept": 421,
+   "kept_pairs_sha1": "79afbfaf1fc8509cf2227a0d3c373f24091be3b2"
+  }
+ }
+}

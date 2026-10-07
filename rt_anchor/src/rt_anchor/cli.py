@@ -5,7 +5,7 @@
     rt-anchor calibrate  --samples S --standards T --polarity positive
                          [--panel {mix15,mix21,none}] [--reference-sample R
                           --reference-standards RT] [--sample-anchors]
-                         [--no-series-term] [...] --out PREFIX
+                         [--no-series-term] [--no-lattice-term] [...] --out PREFIX
 
 ``calibrate`` writes every companion output of the spec's §5 (calibrated CSV,
 model JSON, anchors / pairs / landmarks CSVs, log) plus the visual report unless
@@ -13,7 +13,9 @@ model JSON, anchors / pairs / landmarks CSVs, log) plus the visual report unless
 
 Since 1.2.2 the homologous-series term (stage 1b) is on by default —
 ``--no-series-term`` switches it off — and the stage-2 plasma-lipid anchor
-refinement is opt-in via ``--sample-anchors``.
+refinement is opt-in via ``--sample-anchors``. Since 1.2.3 the lattice term
+(stage 1c), the cross-ladder fallback behind the series term, is likewise on
+by default — ``--no-lattice-term`` switches it off.
 """
 
 from __future__ import annotations
@@ -81,6 +83,8 @@ def _build_config(args) -> CalibrationConfig:
         cfg.use_sample_anchors = False
     if args.no_series_term:
         cfg.use_series_term = False
+    if args.no_lattice_term:
+        cfg.use_lattice_term = False
     if args.no_sample_pairs:
         cfg.use_sample_pairs = False
     if args.no_extrapolate:
@@ -158,6 +162,10 @@ def main(argv: Optional[List[str]] = None) -> int:
                    help="Skip the stage-1b homologous-series term (stage-1 curve "
                         "only). The term is on by default; it is gated, so this is "
                         "rarely needed.")
+    c.add_argument("--no-lattice-term", dest="no_lattice_term", action="store_true",
+                   help="Skip the stage-1c lattice term — the cross-ladder fallback "
+                        "behind the series term. The term is on by default; it is "
+                        "gated, so this is rarely needed.")
     c.add_argument("--sample-anchors", dest="sample_anchors", action="store_true",
                    help="Enable stage 2: class-aware refinement on endogenous "
                         "plasma-lipid anchors. Opt-in since 1.2.2 (default off); "

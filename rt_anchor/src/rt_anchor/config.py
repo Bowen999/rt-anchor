@@ -7,7 +7,11 @@ Defaults follow the **validated** method (see ``RI_CALIBRATION_SPEC_V2.md``
 * from **1.2.2** the homologous-series term (stage 1b) is on by default and
   the plasma-lipid anchor stage (stage 2) is **opt-in**
   (``use_sample_anchors=False``) — pass ``use_sample_anchors=True`` or the
-  CLI's ``--sample-anchors`` to enable it.
+  CLI's ``--sample-anchors`` to enable it;
+* from **1.2.3** the lattice term (stage 1c) is on by default — the
+  cross-ladder fallback that fills in where the series term is silent
+  (``use_lattice_term=False`` or the CLI's ``--no-lattice-term`` switches it
+  off).
 
 Two values deserve to be read before they are changed:
 
@@ -97,6 +101,16 @@ class CalibrationConfig:
     series_exclude_rt_floor_min: float = 0.03    # ... with this absolute floor, minutes
     series_gate_min_mse_reduction: float = 0.2   # the "do no harm" gate
     series_min_covered_pairs: int = 20  # below this the gate declines unread
+
+    # ---- stage 1c: lattice term ----
+    use_lattice_term: bool = True       # stage 1c on/off (see rt_anchor.lattice)
+    lattice_kmd_tol: float = 0.008      # tolerance: cluster gap, H2 link, lattice-point match
+    lattice_min_members: int = 6        # smallest lattice family
+    lattice_max_distance: float = 3.0   # how far (lattice steps) a correction may be borrowed from
+    lattice_min_neighbours: int = 2     # members needed within that distance
+    lattice_max_neighbours: int = 4     # nearest members averaged
+    lattice_gate_min_mse_reduction: float = 0.2   # the "do no harm" gate
+    lattice_min_covered_pairs: int = 20  # below this the gate declines unread
 
     # ---- stage 2: class-aware sample anchors ----
     use_sample_anchors: bool = False    # stage 2 on/off (opt-in since 1.2.2)

@@ -13,12 +13,12 @@ environment produced it (pairs matched, pairs kept, and a sha1 of the kept
 pairs' (m/z, RT)): which pairs survive MAD trimming depends on how tied rows
 happen to be ordered, and numpy/pandas order ties differently across versions
 and CPUs. A platform whose fit legitimately differs skips the pinned-number
-comparison instead of failing.
+comparison instead of failing (the fingerprint helpers live in ``conftest.py``,
+shared with ``test_lattice.py``).
 """
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 
@@ -35,45 +35,9 @@ from rt_anchor.io.schema import RESULT_COLUMNS
 from rt_anchor.pipeline import _series_columns, _warp_rows
 from rt_anchor.series import CH2_MASS, KENDRICK_FACTOR, PERIOD, SeriesTerm, kendrick_phase
 
-from conftest import DATA
+from conftest import DATA, _skip_unless_reference_stage1_fit
 
 EXPECTED_PATH = DATA / "expected_series_repo_datasets.json"
-
-
-# ---------------------------------------------------------------------------
-# The stage-1 fingerprint guard behind every pinned-number golden
-# ---------------------------------------------------------------------------
-
-def _stage1_fingerprint(res) -> dict:
-    """The stage-1 fit as *this* platform produced it.
-
-    Which pairs survive MAD trimming depends on how tied rows happen to be
-    ordered, and numpy/pandas order ties differently across versions and CPUs,
-    so the kept set is legitimately platform-dependent. The fingerprint is the
-    number of matched pairs, the number kept, and a sha1 over the kept pairs'
-    ``(mz_src, rt_src)`` rounded to 6 decimals and sorted.
-    """
-    pairs = res.pairs
-    kept = pairs[pairs["kept"].astype(bool)]
-    pts = sorted(f"{m:.6f},{t:.6f}" for m, t in
-                 zip(kept["mz_src"].to_numpy(dtype=float),
-                     kept["rt_src"].to_numpy(dtype=float)))
-    return {"n_pairs": int(len(pairs)),
-            "n_pairs_kept": int(len(kept)),
-            "kept_pairs_sha1": hashlib.sha1("\n".join(pts).encode("utf-8")).hexdigest()}
-
-
-def _skip_unless_reference_stage1_fit(res, fingerprint: dict) -> None:
-    """Skip (not fail) when this platform's stage-1 fit is not the recorded one.
-
-    The pinned numbers were produced in the reference environment; a different
-    tie ordering changes which pairs survive trimming, and every number that
-    follows from the fit then differs legitimately.
-    """
-    if _stage1_fingerprint(res) != fingerprint:
-        pytest.skip("the stage-1 fit on this platform differs from the reference "
-                    "environment (tied pairs ordered differently) — the pinned "
-                    "numbers apply to the reference environment only")
 
 
 # ---------------------------------------------------------------------------
@@ -419,9 +383,12 @@ def test_shipped_datasets_match_the_reference_implementation(dataset_result):
         assert corr[i] == pytest.approx(row["raw_correction_min"], abs=1e-9)
         assert int(n[i]) == row["n_members"]
 
-    # none of the three engages -> the default calibrated output is the bare curve
+    # none of the three engages the series term -> it corrects nothing: no row
+    # reads "+series" and both series columns are all zero (whether a row
+    # carries "+lattice" — QTOF_full's do — is test_lattice.py's business)
     assert not res.series_used
-    assert set(res.table[res.col("warp_source")]) == {"curve"}
+    assert not res.table[res.col("warp_source")].astype(str).str.contains(
+        "+series", regex=False).any()
     assert (res.values("series_n_members") == 0).all()
     assert (res.values("series_correction_min") == 0.0).all()
 
@@ -509,10 +476,14 @@ def v121_golden():
 
 def test_v121_default_configuration_matches_the_golden_numbers(
         orbitrap_samples, orbitrap_standards, v121_golden):
-    """v1.2.1's default == series term off + stage-2 anchors on (§4 item 1)."""
+    """v1.2.1's default == series term off + stage-2 anchors on (§4 item 1).
+
+    Lattice term off explicitly too: v1.2.1 has no stage 1c, so its gate must not decide this.
+    """
     res = calibrate(orbitrap_samples, "positive", standards_table=orbitrap_standards,
                     panel="mix15", config=CalibrationConfig.orbitrap(
-                        use_sample_anchors=True, use_series_term=False))
+                        use_sample_anchors=True, use_series_term=False,
+                        use_lattice_term=False))
     want = dict(v121_golden["v121_default"])
     _skip_unless_reference_stage1_fit(res, want.pop("stage1_fingerprint"))
     _assert_golden(_golden_snapshot(res), want)
@@ -520,10 +491,14 @@ def test_v121_default_configuration_matches_the_golden_numbers(
 
 def test_v121_no_sample_anchors_configuration_matches_the_golden_numbers(
         orbitrap_samples, orbitrap_standards, v121_golden):
-    """v1.2.1's ``--no-sample-anchors`` == both stages off (§4 item 2)."""
+    """v1.2.1's ``--no-sample-anchors`` == both stages off (§4 item 2).
+
+    Lattice term off explicitly too: v1.2.1 has no stage 1c, so its gate must not decide this.
+    """
     res = calibrate(orbitrap_samples, "positive", standards_table=orbitrap_standards,
                     panel="mix15", config=CalibrationConfig.orbitrap(
-                        use_sample_anchors=False, use_series_term=False))
+                        use_sample_anchors=False, use_series_term=False,
+                        use_lattice_term=False))
     want = dict(v121_golden["v121_no_sample_anchors"])
     _skip_unless_reference_stage1_fit(res, want.pop("stage1_fingerprint"))
     _assert_golden(_golden_snapshot(res), want)
@@ -555,10 +530,12 @@ def test_table_shape_and_series_columns(orbitrap_samples, orbitrap_standards):
     res = calibrate(orbitrap_samples, "positive", standards_table=orbitrap_standards,
                     panel="mix15", config=CalibrationConfig.orbitrap())
     t = res.table
-    assert RESULT_COLUMNS[-2:] == ["series_correction_min", "series_n_members"]
+    # the two series columns are followed by the lattice term's two (stage 1c)
+    assert RESULT_COLUMNS[-4:] == ["series_correction_min", "series_n_members",
+                                   "lattice_correction_min", "lattice_n_members"]
     assert res.col("series_correction_min") in t.columns
     assert res.col("series_n_members") in t.columns
-    # Orbitrap does not engage -> zeros, and the bare-curve warp source
+    # Orbitrap does not engage either term -> zeros, and the bare-curve warp source
     assert (res.values("series_n_members") == 0).all()
     assert (res.values("series_correction_min") == 0.0).all()
     assert set(t[res.col("warp_source")]) == {"curve"}
@@ -590,9 +567,15 @@ def test_per_sample_tier_reports_the_series_columns(qtof_full_samples,
     assert (n_mem >= 0).all()
     assert (corr[n_mem == 0] == 0.0).all()
     ws = res.table[res.col("warp_source")].to_numpy()
-    assert set(ws) <= {"curve", "curve+series", "curve+anchors", "curve+series+anchors"}
-    # stage 2 is off by default: the series flag alone decides the warp source
-    assert np.array_equal(ws == "curve+series", n_mem > 0)
+    # the per-injection columns aggregate, so a row can carry both stage-1
+    # terms ("curve+series+lattice"); "+anchors" is appended on every row when
+    # stage 2 engages
+    assert set(ws) <= {"curve", "curve+series", "curve+lattice", "curve+series+lattice",
+                       "curve+anchors", "curve+series+anchors", "curve+lattice+anchors",
+                       "curve+series+lattice+anchors"}
+    # the series flag decides whether "+series" is there (stage 2 is off by
+    # default; the lattice tag beside it is test_lattice.py's business)
+    assert np.array_equal(np.array(["+series" in w for w in ws]), n_mem > 0)
     assert res.model["series"]["n_features_corrected"] == int((n_mem > 0).sum())
 
 

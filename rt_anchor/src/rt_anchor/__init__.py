@@ -46,6 +46,7 @@ from .helpers import describe_input, setup_logger, which_format, write_results
 from .identify import build_native_template, identify_anchors
 from .io import FeatureTable, detect_format, load_feature_table
 from .irt import IRTMapper, build_irt, detect_landmarks
+from .lattice import H2_MASS, LatticeTerm
 from .mixtures import (
     DEFAULT_MIXTURE,
     get_manifest,
@@ -80,6 +81,8 @@ __all__ = [
     "AnchorRefiner", "ClassAwareRefiner", "plasma_lipid_candidates",
     # stage 1b: the homologous-series term
     "SeriesTerm", "kendrick_phase", "KENDRICK_FACTOR", "CH2_MASS", "PERIOD",
+    # stage 1c: the lattice term
+    "LatticeTerm", "H2_MASS",
     # the iRT ruler
     "IRTMapper", "build_irt", "detect_landmarks",
     # reference datasets + panels

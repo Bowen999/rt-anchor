@@ -20,7 +20,10 @@ What :func:`calibrate` does, in the order it does it, and why the order matters:
    or undetectable mixture. On the kept pairs, **stage 1b** then fits the
    homologous-series term (:mod:`rt_anchor.series`), gated by its leave-own-out
    error — it is applied per feature only where the feature's own m/z places it
-   in a validated series.
+   in a validated series. **Stage 1c** fits the lattice term
+   (:mod:`rt_anchor.lattice`) on the same kept pairs, gated on the pairs the
+   series term leaves alone — a fallback that only ever fills the series
+   term's silences.
 5. **Refine the isomer picks with that curve** — each source-run candidate is
    re-picked as the in-window feature whose *curve-calibrated* RT lands closest
    to the reference-run RT. This step needs the curve, which is why it cannot
@@ -63,6 +66,7 @@ from .identify import build_native_template
 from .io.loader import load_feature_table
 from .io.schema import RESULT_COLUMNS, FeatureTable
 from .irt import IRTMapper, build_irt
+from .lattice import LatticeTerm
 from .panel import Panel, _norm_polarity, build_panel, is_default_manifest
 from .plasma_lipids import (
     build_anchor_table,
@@ -79,7 +83,8 @@ SOURCE_KEY = "source"
 REF_KEY = "reference"
 
 #: Columns of ``<prefix>_pairs.csv`` (spec §5).
-PAIR_COLUMNS = ["mz_src", "rt_src", "rt_ref", "source", "kept", "in_series"]
+PAIR_COLUMNS = ["mz_src", "rt_src", "rt_ref", "source", "kept", "in_series",
+                "in_lattice"]
 
 #: Columns of ``<prefix>_anchors.csv`` (spec §5).
 ANCHOR_COLUMNS = ["label", "lipid_class", "rt_src", "rt_ref", "residual_min",
@@ -126,6 +131,11 @@ class CalibrationResult:
     def series_used(self) -> bool:
         """True when the stage-1b series term passed the gate and is applied."""
         return bool(self.calibrator is not None and self.calibrator.series_used)
+
+    @property
+    def lattice_used(self) -> bool:
+        """True when the stage-1c lattice term passed the gate and is applied."""
+        return bool(self.calibrator is not None and self.calibrator.lattice_used)
 
     def to_model_json(self) -> Dict:
         return self.model
@@ -288,6 +298,15 @@ def _fit_calibrator(ft: FeatureTable, std_ft: FeatureTable, ref, cfg
                    f"homologous series ({int(cal.series.member_mask.sum())} pairs, "
                    f"{cal.series.n_pairs_covered} with a leave-own-out prediction); "
                    f"{int((n_mem > 0).sum())}/{ft.n_features()} features corrected")
+    if cal.lattice is None:
+        log.append("lattice term: disabled (use_lattice_term=False)")
+    else:
+        _, _, _, l_n = cal.stage1_terms(ft.rt_minutes().to_numpy(dtype=float),
+                                        ft.mz().to_numpy(dtype=float))
+        log.append(f"lattice term: {cal.lattice.gate_reason}; {cal.lattice.n_families} "
+                   f"lattice families ({int(cal.lattice.member_mask.sum())} pairs, "
+                   f"{cal.lattice.n_pairs_covered} judged by the gate); "
+                   f"{int((l_n > 0).sum())}/{ft.n_features()} features corrected")
 
     if not cfg.use_sample_anchors:
         log.append("stage 2: disabled (use_sample_anchors=False) — stage-1 curve only")
@@ -382,13 +401,15 @@ def _per_project(rt: np.ndarray, mz: np.ndarray, cal: ColumnCalibrator,
                  cfg: CalibrationConfig, mapper: Optional[IRTMapper]) -> pd.DataFrame:
     cal_rt = cal.predict(rt, mz=mz)
     unc = cal.uncertainty(rt)
-    corr, n_mem = _series_columns(cal, mz, rt)
-    res = _assemble(rt, cal_rt, unc, cal.is_extrapolated(rt), _warp_rows(cal, n_mem),
+    s_corr, s_n, l_corr, l_n = cal.stage1_terms(rt, mz)
+    res = _assemble(rt, cal_rt, unc, cal.is_extrapolated(rt), _warp_rows(cal, s_n, l_n),
                     "project", cfg, mapper)
     res["RI_spread"] = np.nan
     res["n_contributing"] = 1
-    res["series_correction_min"] = corr
-    res["series_n_members"] = n_mem
+    res["series_correction_min"] = s_corr
+    res["series_n_members"] = s_n
+    res["lattice_correction_min"] = l_corr
+    res["lattice_n_members"] = l_n
     return res
 
 
@@ -397,19 +418,23 @@ def _series_columns(cal: ColumnCalibrator, mz: np.ndarray, rt: np.ndarray
     """``(series_correction_min, series_n_members)`` for one prediction pass.
 
     Zeros wherever no correction was applied — which is everywhere when the
-    term is disabled or its gate declined: :meth:`SeriesTerm.correction`
-    already returns zeros then.
+    term is disabled or its gate declined: the applied terms already return
+    zeros then.
     """
-    if cal.series is None:
-        return np.zeros(len(rt), dtype=float), np.zeros(len(rt), dtype=int)
-    corr, n_mem = cal.series.correction(mz, rt)
-    return corr, n_mem.astype(int)
+    s_corr, s_n, _, _ = cal.stage1_terms(rt, mz)
+    return s_corr, s_n.astype(int)
 
 
-def _warp_rows(cal: ColumnCalibrator, n_mem: np.ndarray) -> np.ndarray:
-    """Per-row ``warp_source``: ``curve+series`` only where the series term
+def _warp_rows(cal: ColumnCalibrator, n_series: np.ndarray,
+               n_lattice: Optional[np.ndarray] = None) -> np.ndarray:
+    """Per-row ``warp_source``: ``+series`` / ``+lattice`` only where that term
     actually corrected the row, ``+anchors`` on every row when stage 2 engaged."""
-    ws = np.where(np.asarray(n_mem) > 0, "curve+series", "curve").astype(object)
+    n_series = np.asarray(n_series)
+    n_lattice = (np.zeros(len(n_series), dtype=int) if n_lattice is None
+                 else np.asarray(n_lattice))
+    s_tag = np.where(n_series > 0, "+series", "")
+    l_tag = np.where(n_lattice > 0, "+lattice", "")
+    ws = np.array([f"curve{s}{l}" for s, l in zip(s_tag, l_tag)], dtype=object)
     if cal.anchors_used:
         ws = np.array([f"{w}+anchors" for w in ws], dtype=object)
     return ws
@@ -423,19 +448,24 @@ def _per_sample(rt: np.ndarray, mz: np.ndarray, single_files: Sequence[str], ref
     """One curve per injection against the reference *sample* run.
 
     Each injection also fits its own series term from its own kept pairs, with
-    its own gate, and the injection's prediction is its curve plus its series
-    correction. ``Cal_RT_min`` / ``iRT`` become the median across injections and
+    its own gate, and its own lattice term behind it (its own
+    ``series_covered``, the same precedence rule); the injection's prediction
+    is its curve plus the applied series and lattice corrections.
+    ``Cal_RT_min`` / ``iRT`` become the median across injections and
     ``RI_spread`` their 1.4826·MAD dispersion — the honest inter-injection QC;
-    the series columns are the median of the applied corrections and the
-    maximum ``n_members``. Uncertainty and the extrapolation flag stay on the
-    project-level calibrator: they describe the calibration, and the project
-    curve is the one built from the standards runs as well as the samples.
+    the series and lattice columns are the median of the applied corrections
+    and the maximum ``n_members``. Uncertainty and the extrapolation flag stay
+    on the project-level calibrator: they describe the calibration, and the
+    project curve is the one built from the standards runs as well as the
+    samples.
     """
     log: List[str] = []
     anon = _anon_tol(cfg)
     preds: List[np.ndarray] = []
     series_preds: List[np.ndarray] = []
     series_members: List[np.ndarray] = []
+    lattice_preds: List[np.ndarray] = []
+    lattice_members: List[np.ndarray] = []
     for p in single_files:
         try:
             sf = load_feature_table(p, source_format=source_format, polarity=pol,
@@ -452,19 +482,38 @@ def _per_sample(rt: np.ndarray, mz: np.ndarray, single_files: Sequence[str], ref
             pred = curve.predict(rt)
             corr = np.zeros(len(rt), dtype=float)
             n_mem = np.zeros(len(rt), dtype=int)
-            if cfg.use_series_term:
+            l_corr = np.zeros(len(rt), dtype=float)
+            l_n = np.zeros(len(rt), dtype=int)
+            if cfg.use_series_term or cfg.use_lattice_term:
                 kept = np.zeros(len(pairs), dtype=bool)
                 kept[order] = keep                      # keep mask, input order
+                mz_k = pairs["mz_a"].to_numpy(dtype=float)[kept]
                 xa = pairs["rt_a"].to_numpy(dtype=float)[kept]
                 xb = pairs["rt_b"].to_numpy(dtype=float)[kept]
-                sterm = SeriesTerm.fit(pairs["mz_a"].to_numpy(dtype=float)[kept],
-                                       xa, xb, xb - curve.predict(xa),
-                                       curve.x0, curve.x1, cfg)
-                corr, n_mem = sterm.correction(mz, rt)
-                pred = pred + corr
+                resid = xb - curve.predict(xa)
+                sterm = None
+                if cfg.use_series_term:
+                    sterm = SeriesTerm.fit(mz_k, xa, xb, resid,
+                                           curve.x0, curve.x1, cfg)
+                    corr, n_mem = sterm.correction(mz, rt)
+                    n_mem = n_mem.astype(int)
+                if cfg.use_lattice_term:
+                    scov = (sterm.correction(mz_k, xa)[1] > 0
+                            if sterm is not None else None)
+                    lterm = LatticeTerm.fit(mz_k, xa, xb, resid,
+                                            curve.x0, curve.x1, cfg,
+                                            series_covered=scov)
+                    l_corr, l_n = lterm.correction(mz, rt)
+                    l_n = l_n.astype(int)
+                    take = n_mem > 0                    # the series term has precedence
+                    l_corr[take] = 0.0
+                    l_n[take] = 0
+                pred = pred + corr + l_corr
             preds.append(pred)
             series_preds.append(corr)
             series_members.append(n_mem)
+            lattice_preds.append(l_corr)
+            lattice_members.append(l_n)
             log.append(f"  per-injection curve ok: {os.path.basename(p)} "
                        f"({len(pairs)} pairs)")
         except RtAnchorError as e:
@@ -484,23 +533,29 @@ def _per_sample(rt: np.ndarray, mz: np.ndarray, single_files: Sequence[str], ref
     cal_rt[n_contrib == 0] = np.nan
     series_corr = np.median(np.vstack(series_preds), axis=0)
     series_n = np.max(np.vstack(series_members), axis=0)
+    lattice_corr = np.median(np.vstack(lattice_preds), axis=0)
+    lattice_n = np.max(np.vstack(lattice_members), axis=0)
 
     # features no injection covers -> the project curve, so a row is never blank
     proj = cal.predict(rt, mz=mz)
     fallback = (n_contrib == 0) & np.isfinite(proj)
     if fallback.any():
         cal_rt[fallback] = proj[fallback]
-        proj_corr, proj_n = _series_columns(cal, mz, rt)
-        series_corr[fallback] = proj_corr[fallback]
-        series_n[fallback] = proj_n[fallback]
+        proj_sc, proj_sn, proj_lc, proj_ln = cal.stage1_terms(rt, mz)
+        series_corr[fallback] = proj_sc[fallback]
+        series_n[fallback] = proj_sn[fallback]
+        lattice_corr[fallback] = proj_lc[fallback]
+        lattice_n[fallback] = proj_ln[fallback]
         log.append(f"per-injection fallback: {int(fallback.sum())} features covered "
                    f"by no injection took the project-level curve")
 
     unc = cal.uncertainty(rt)
-    res = _assemble(rt, cal_rt, unc, cal.is_extrapolated(rt), _warp_rows(cal, series_n),
-                    "sample", cfg, mapper)
+    res = _assemble(rt, cal_rt, unc, cal.is_extrapolated(rt),
+                    _warp_rows(cal, series_n, lattice_n), "sample", cfg, mapper)
     res["series_correction_min"] = series_corr
     res["series_n_members"] = series_n.astype(int)
+    res["lattice_correction_min"] = lattice_corr
+    res["lattice_n_members"] = lattice_n.astype(int)
     if mapper is not None:
         with np.errstate(all="ignore"), warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
@@ -522,7 +577,7 @@ def _assemble(rt: np.ndarray, cal_rt: np.ndarray, unc: np.ndarray,
               cfg: CalibrationConfig, mapper: Optional[IRTMapper]) -> pd.DataFrame:
     """The §1 output columns for one set of predictions.
 
-    ``warp_source`` is per row: ``curve+series`` only where the series term
+    ``warp_source`` is per row: ``+series`` / ``+lattice`` only where that term
     actually corrected the row, ``+anchors`` on every row when stage 2 engaged
     (see :func:`_warp_rows`).
     """
@@ -702,6 +757,56 @@ def _series_block(cal: ColumnCalibrator, res: pd.DataFrame, cfg: CalibrationConf
     return {**cal.series.to_model(), "n_features_corrected": n_corrected}
 
 
+def _lattice_block(cal: ColumnCalibrator, res: pd.DataFrame, cfg: CalibrationConfig) -> Dict:
+    """``model["lattice"]`` — always present, also when the term is disabled.
+
+    ``n_pairs_in_families`` counts the kept pairs that ended up in a lattice
+    family; ``n_features_corrected`` counts the rows of the result table that
+    actually received a lattice correction (``lattice_n_members > 0``); the
+    rest of the block is the fit-level record from :meth:`LatticeTerm.to_model`.
+    """
+    n_corrected = int((pd.to_numeric(res["lattice_n_members"]) > 0).sum()) \
+        if "lattice_n_members" in res.columns else 0
+    if cal.lattice is None:
+        return {
+            "enabled": False,
+            "engaged": False,
+            "gate_mse_reduction": None,
+            "gate_threshold": float(cfg.lattice_gate_min_mse_reduction),
+            "gate_reason": "disabled (use_lattice_term=False)",
+            "n_families": 0,
+            "n_pairs_in_families": 0,
+            "n_pairs_covered": 0,
+            "n_features_corrected": 0,
+            "kmd_tol": float(cfg.lattice_kmd_tol),
+            "min_members": int(cfg.lattice_min_members),
+            "max_distance": float(cfg.lattice_max_distance),
+            "min_neighbours": int(cfg.lattice_min_neighbours),
+            "max_neighbours": int(cfg.lattice_max_neighbours),
+            "exclude_rt_min": float(max(
+                cfg.series_exclude_rt_floor_min,
+                cfg.series_exclude_rt_frac * (cal.curve.x1 - cal.curve.x0))),
+        }
+    blk = cal.lattice.to_model()
+    return {
+        "enabled": blk["enabled"],
+        "engaged": blk["engaged"],
+        "gate_mse_reduction": blk["gate_mse_reduction"],
+        "gate_threshold": blk["gate_threshold"],
+        "gate_reason": blk["gate_reason"],
+        "n_families": blk["n_families"],
+        "n_pairs_in_families": int(cal.lattice.member_mask.sum()),
+        "n_pairs_covered": blk["n_pairs_covered"],
+        "n_features_corrected": n_corrected,
+        "kmd_tol": blk["kmd_tol"],
+        "min_members": blk["min_members"],
+        "max_distance": blk["max_distance"],
+        "min_neighbours": blk["min_neighbours"],
+        "max_neighbours": blk["max_neighbours"],
+        "exclude_rt_min": blk["exclude_rt_min"],
+    }
+
+
 def _model_dict(cal: ColumnCalibrator, anchors: pd.DataFrame,
                 mapper: Optional[IRTMapper], panel_used: str, irt_reason: str,
                 ref, panel_key: str, panel_manifest: Optional[pd.DataFrame],
@@ -732,6 +837,7 @@ def _model_dict(cal: ColumnCalibrator, anchors: pd.DataFrame,
         },
         "curve": blocks["curve"],
         "series": _series_block(cal, res, cfg),
+        "lattice": _lattice_block(cal, res, cfg),
         "anchors": {**blocks["anchors"], "table": anchors.to_dict(orient="records")},
         "irt": irt_block,
         "detection_qc": {
