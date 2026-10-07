@@ -164,6 +164,10 @@
               <input class="chk" id="adv-seriesterm" type="checkbox" checked>
               <span class="lbl">Series term</span>
             </label>
+            <label class="chk-field" for="adv-latticeterm">
+              <input class="chk" id="adv-latticeterm" type="checkbox" checked>
+              <span class="lbl">Lattice term</span>
+            </label>
             <label class="chk-field" for="adv-sampleanchors">
               <input class="chk" id="adv-sampleanchors" type="checkbox">
               <span class="lbl">Stage-2 sample anchors (opt-in)</span>
@@ -171,7 +175,9 @@
           </div>
           <div class="hint">The series term corrects a feature with the curve residuals of its
             Kendrick homologues — recognised from m/z alone, not identifications — and only where a
-            leave-own-out gate shows it helps.</div>
+            leave-own-out gate shows it helps. The lattice term joins homologous series one double
+            bond apart into a class-wide family and corrects the features the series term cannot
+            reach, gated the same way.</div>
           <div class="row2">
             <div class="num-field">
               <label class="lbl" for="adv-minanchors">Min anchors</label>

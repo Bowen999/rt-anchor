@@ -314,6 +314,7 @@ class Api:
                 curve = m.get("curve", {}) or {}
                 anch = m.get("anchors", {}) or {}
                 ser = m.get("series", {}) or {}
+                lat = m.get("lattice", {}) or {}
                 irt = m.get("irt", {}) or {}
                 self.run_info = _json_safe({
                     "app": "RT Anchor",
@@ -344,6 +345,10 @@ class Api:
                                    ("enabled", "engaged", "gate_mse_reduction",
                                     "gate_threshold", "gate_reason", "n_series",
                                     "n_pairs_covered", "n_features_corrected")},
+                        "lattice": {k: lat.get(k) for k in
+                                    ("enabled", "engaged", "gate_mse_reduction",
+                                     "gate_threshold", "gate_reason", "n_families",
+                                     "n_pairs_covered", "n_features_corrected")},
                         "anchors": {k: anch.get(k) for k in
                                     ("engaged", "n_validated", "n_used", "lam_g", "lam_c",
                                      "gate_mse_reduction", "gate_threshold", "gate_reason")},
@@ -563,7 +568,7 @@ class Api:
             if v is not None:
                 overrides[key] = v
         for key in ("extrapolate", "use_sample_anchors", "use_sample_pairs",
-                    "use_series_term"):
+                    "use_series_term", "use_lattice_term"):
             v = _flag(key)
             if v is not None:
                 overrides[key] = v

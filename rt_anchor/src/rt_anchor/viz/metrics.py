@@ -1,9 +1,10 @@
 """Module 1 — key metrics: KPI tiles, a quality radar, and the detection ladder.
 
 Everything here reads the v2 model (spec §5.1) rather than the retired v1 warp:
-:func:`compute_metrics` pulls from ``model["curve"]``, ``model["anchors"]``,
-``model["irt"]`` and ``model["detection_qc"]``, plus the appended ``iRT`` /
-``Cal_RT_min`` columns of the result table.
+:func:`compute_metrics` pulls from ``model["curve"]``, ``model["series"]``,
+``model["lattice"]``, ``model["anchors"]``, ``model["irt"]`` and
+``model["detection_qc"]``, plus the appended ``iRT`` / ``Cal_RT_min`` columns
+of the result table.
 
 The **detection ladder** changed meaning with the method. Under v1 it compared a
 panel standard's RT in the samples against a reference baseline, because the
@@ -94,6 +95,7 @@ def compute_metrics(result) -> Dict:
     curve = model.get("curve", {}) or {}
     anch = model.get("anchors", {}) or {}
     ser = model.get("series", {}) or {}
+    lat = model.get("lattice", {}) or {}
     irt = model.get("irt", {}) or {}
     qc = (model.get("detection_qc", {}) or {}).get("user_standards_run", {}) or {}
     ref = model.get("reference", {}) or result.reference or {}
@@ -146,6 +148,16 @@ def compute_metrics(result) -> Dict:
         n_series_pairs=int(ser.get("n_pairs_covered", 0) or 0),
         n_features_series=int(ser.get("n_features_corrected", 0) or 0),
 
+        # ---- stage 1c: the lattice term ----
+        lattice_enabled=bool(lat.get("enabled", False)),
+        lattice_engaged=bool(lat.get("engaged", False)),
+        lattice_reduction=_f(lat.get("gate_mse_reduction")),
+        lattice_threshold=_f(lat.get("gate_threshold"), 0.2),
+        lattice_reason=str(lat.get("gate_reason", "") or ""),
+        n_lattice_families=int(lat.get("n_families", 0) or 0),
+        n_lattice_pairs=int(lat.get("n_pairs_covered", 0) or 0),
+        n_features_lattice=int(lat.get("n_features_corrected", 0) or 0),
+
         # ---- stage 2: the anchors and the gate ----
         gate_engaged=bool(anch.get("engaged", False)),
         gate_reduction=_f(anch.get("gate_mse_reduction")),
@@ -180,6 +192,7 @@ def compute_metrics(result) -> Dict:
         reliability=conf,
         frac_high=(conf["high"] / n if n else 0.0),
         warp_source=("curve" + ("+series" if ser.get("engaged") else "")
+                     + ("+lattice" if lat.get("engaged") else "")
                      + ("+anchors" if anch.get("engaged") else "")),
 
         # ---- detection QC on the USER's standards run ----
@@ -289,25 +302,60 @@ def series_headline(m: Dict) -> Tuple[str, str]:
     return ("off", m["series_reason"])
 
 
+def lattice_headline(m: Dict) -> Tuple[str, str]:
+    """``(value, note)`` for the lattice term — the series term's words, one stage on.
+
+    The same five states, said the same way: engaged (with the LOO MSE
+    reduction), gated off (a shortfall is "off · N% below the gate", a measured
+    *loss* is "off" with "N% worse than the curve alone" — never "off · -14%"),
+    not needed (self-calibration), disabled by configuration, and not enough
+    lattice pairs for the gate to read. The notes end "no lattice correction"
+    rather than "stage-1 curve only": behind an engaged series term the run is
+    not the bare curve, it simply has no lattice correction.
+    """
+    red = m["lattice_reduction"]
+    pct = f"{100 * red:.0f}%" if np.isfinite(red) else DASH
+    if not m["lattice_enabled"]:
+        return ("off", "disabled")
+    if m["lattice_engaged"]:
+        n_fam = m["n_lattice_families"]
+        return (f"on · {pct}",
+                f"{n_fam} {'family' if n_fam == 1 else 'families'} · "
+                f"{m['n_features_lattice']} of {m['n_features']} features corrected")
+    if m["lattice_reason"].startswith("no correction needed"):
+        return ("not needed", "the stage-1 curve already reproduces the lattice pairs")
+    if np.isfinite(red):
+        if red < 0:
+            return ("off", f"{-100 * red:.0f}% worse than the curve alone "
+                           f"· no lattice correction")
+        return (f"off · {pct}",
+                f"below the {100 * m['lattice_threshold']:.0f}% gate · no lattice correction")
+    return ("off", m["lattice_reason"])
+
+
 def kpi_tiles(result) -> List[Tuple[str, object, str]]:
     """Six KPI tiles for the v2 method.
 
     A tile is ``(label, value, note)``. ``value`` is either a headline string or
     a list of ``(caption, value)`` pairs rendered as stacked rows (used where two
     quantities belong together — the two runs, the two pair sources, the median
-    and the P90). The fourth tile is the series term; when stage-2 anchors were
-    requested for the run, its note also carries the anchor gate's state, so the
-    opt-in stage stays visible without a seventh tile.
+    and the P90). The fourth tile pairs the two stage-1 terms, series and
+    lattice, one headline each; when stage-2 anchors were requested for the
+    run, its note also carries the anchor gate's state, so the opt-in stage
+    stays visible without a seventh tile.
     """
     m = compute_metrics(result)
-    ser_v, ser_n = series_headline(m)
+    ser_v, _ = series_headline(m)
+    lat_v, _ = lattice_headline(m)
+    terms_n = (f"{m['n_features_series']:,} + {m['n_features_lattice']:,} of "
+               f"{m['n_features']:,} features corrected")
     if m["anchors_requested"]:
         if m["gate_engaged"]:
             red = m["gate_reduction"]
-            ser_n += (f" · anchors on {100 * red:.0f}%" if np.isfinite(red)
-                      else " · anchors on")
+            terms_n += (f" · anchors on {100 * red:.0f}%" if np.isfinite(red)
+                        else " · anchors on")
         else:
-            ser_n += " · anchors off"
+            terms_n += " · anchors off"
     nf_std = m["n_features_std"]
 
     return [
@@ -320,7 +368,7 @@ def kpi_tiles(result) -> List[Tuple[str, object, str]]:
         ("Curve residual", [("median", _fmt(m["resid_median"], 3)),
                             ("P90", _fmt(m["resid_p90"], 3))],
          "|reference − fitted| (min)"),
-        ("Series term", ser_v, ser_n),
+        ("Series + lattice", [("series", ser_v), ("lattice", lat_v)], terms_n),
         ("iRT landmarks", f"{m['n_landmarks']}",
          f"RT {_rng(*m['landmark_rt_span'], d=2)} min on the reference run"),
         ("Output", [("iRT range", _rng(*m["iRT_range"], d=0)),
@@ -340,10 +388,11 @@ def radar_axes(result) -> List[Tuple[str, float]]:
       columns land at 425–566.
     * **Curve fit** — 0.5 min median residual is where a 35-min gradient's
       calibration stops being useful.
-    * **Series term** — the gate's leave-own-out MSE reduction, clipped to
-      [0, 1], when the term is engaged, else 0. Zero is not "bad": a run whose
-      selectivity already matches the reference has nothing to correct, and the
-      gate declining there is the method working, not failing.
+    * **Series + lattice** — the larger of the two gates' leave-own-out MSE
+      reductions among the terms that are engaged, clipped to [0, 1]; 0 when
+      neither is engaged. Zero is not "bad": a run whose selectivity already
+      matches the reference has nothing to correct, and the gates declining
+      there is the method working, not failing.
     * **Landmarks** — out of the chosen panel's ionisable standards.
     * **Reliability** — the share of features rated ``high`` (per-project), or
       the inter-injection agreement (per-sample).
@@ -352,9 +401,10 @@ def radar_axes(result) -> List[Tuple[str, float]]:
     pairs = min(m["n_pairs_kept"] / 400.0, 1.0)
     resid = m["resid_median"]
     fit = 1.0 - min((resid if np.isfinite(resid) else 0.5) / 0.5, 1.0)
-    red = m["series_reduction"]
-    series = (max(min(red, 1.0), 0.0)
-              if m["series_engaged"] and np.isfinite(red) else 0.0)
+    gates = [red for red, engaged in ((m["series_reduction"], m["series_engaged"]),
+                                      (m["lattice_reduction"], m["lattice_engaged"]))
+             if engaged and np.isfinite(red)]
+    terms = max(min(max(gates), 1.0), 0.0) if gates else 0.0
     denom = max(m["n_panel"] or m["n_standards_panel"], 1)
     landmarks = min(m["n_landmarks"] / denom, 1.0)
 
@@ -366,7 +416,7 @@ def radar_axes(result) -> List[Tuple[str, float]]:
     else:
         consistency, clabel = m["frac_high"], "Reliability"
     return [("Pair support", pairs), ("Curve fit", max(fit, 0.0)),
-            ("Series term", series), ("Landmarks", landmarks),
+            ("Series + lattice", terms), ("Landmarks", landmarks),
             (clabel, max(min(consistency, 1.0), 0.0))]
 
 
@@ -379,9 +429,15 @@ def radar_plotly(result):
         fillcolor=theme.rgba(theme.PRIMARY, 0.22), line=dict(color=theme.PRIMARY, width=2),
         marker=dict(size=6, color=theme.PRIMARY),
         hovertemplate="%{theta}: %{r:.2f}<extra></extra>"))
+    # The angular labels sit outside the circle and Plotly clips them at the
+    # figure's edge, so the side margins have to hold the longest label on each
+    # side: "Series + lattice" on the left, "Pair support" on the right (which 48
+    # px used to clip). At the report's narrower widths the circle is limited by
+    # the width left between the margins, so this also keeps the labels in view
+    # there.
     fig.update_layout(
         paper_bgcolor=theme.PAPER, font=dict(family=theme.FONT_STACK, size=13, color=theme.TXT2),
-        margin=dict(l=48, r=48, t=28, b=28), height=320, showlegend=False,
+        margin=dict(l=80, r=80, t=28, b=28), height=320, showlegend=False,
         polar=dict(bgcolor=theme.PANEL,
                    radialaxis=dict(range=[0, 1], tickvals=[0.25, 0.5, 0.75, 1.0],
                                    tickfont=dict(size=10, color=theme.FAINT), gridcolor=theme.GRID,
