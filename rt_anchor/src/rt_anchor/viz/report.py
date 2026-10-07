@@ -61,6 +61,7 @@ def method_facts(result) -> List[tuple]:
     irt = m.get("irt", {}) or {}
     cur = m.get("curve", {}) or {}
     ser = m.get("series", {}) or {}
+    lat = m.get("lattice", {}) or {}
 
     ref_label = str(ref.get("label") or ref.get("key") or "unknown")
     if ref.get("is_default"):
@@ -92,6 +93,7 @@ def method_facts(result) -> List[tuple]:
         ("Standards panel", panel),
         ("Stage 1 curve", pair_txt),
         ("Series term", str(ser.get("gate_reason") or "not fitted")),
+        ("Lattice term", str(lat.get("gate_reason") or "not fitted")),
         ("Stage 2 anchors", anchors.verdict_line(anchors.compute_anchors(result))),
         ("iRT scale", irt_txt),
     ]
@@ -349,6 +351,7 @@ def _cover_page(result):
         fig.text(0.20, yy, _wrap(theme.mpl_safe(v), 92), fontsize=9, color=theme.TXT, va="top")
         yy -= 0.030 + 0.016 * str(v).count("\n") + 0.016 * (len(str(v)) // 92)
     top = yy - 0.02
+    lowest = top                       # the lowest line any tile reaches
     for i, (lab, val, sub) in enumerate(metrics.kpi_tiles(result)):
         r, c = divmod(i, 3)
         x = 0.06 + c * 0.30
@@ -366,8 +369,12 @@ def _cover_page(result):
                 y -= 0.030
         if sub:
             fig.text(x, y, theme.mpl_safe(sub), fontsize=10, color=theme.TXT2)
-    # radar on the lower half
-    fig.text(0.06, 0.44, "Quality fingerprint", fontsize=13.5, color=theme.TXT, weight="bold")
+        lowest = min(lowest, y)
+    # radar on the lower half. Its title hangs below the last tile row — which
+    # now includes a two-row tile in the first column — in the free corner to
+    # the left of the plot, rather than at a fixed height the tiles can reach.
+    fig.text(0.06, lowest - 0.045, "Quality fingerprint", fontsize=13.5, color=theme.TXT,
+             weight="bold")
     axr = fig.add_axes([0.30, 0.04, 0.4, 0.34], polar=True)
     metrics.radar_mpl(result, ax=axr)
     return fig

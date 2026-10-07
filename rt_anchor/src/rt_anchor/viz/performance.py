@@ -10,8 +10,9 @@ questions (the mixture pins the middle of the gradient, serum pins the sparse
 early and late ends); the pairs MAD-trimming rejected, drawn as hollow grey so
 they are visible as *excluded* rather than quietly deleted; the fitted anchor-free
 curve; the anchor-refined curve when the stage-2 gate engaged; and the stage-2
-anchors as rings. The stage-1b series term is a per-feature correction, not a
-curve, so it is not drawn — its gate decision is annotated under the title.
+anchors as rings. The stage-1b series term and the stage-1c lattice term are
+per-feature corrections, not curves, so they are not drawn — their gate
+decisions are annotated under the title.
 
 **lower panel** — the residuals of those same pairs about the curve, before and
 after the anchor correction. It is the panel that shows whether the correction
@@ -82,10 +83,11 @@ def compute_curve(result, ngrid: int = 400) -> Dict:
     if len(anchors) and "dropped_by_sanity_filter" in anchors.columns:
         anchors = anchors[~anchors["dropped_by_sanity_filter"].astype(bool)]
 
-    # the series term is a per-feature correction, not a curve — it is not
-    # drawn, but its gate decision is annotated (from the model, so the
-    # figure cannot disagree with model.json)
+    # the series and lattice terms are per-feature corrections, not curves —
+    # neither is drawn, but their gate decisions are annotated (from the
+    # model, so the figure cannot disagree with model.json)
     ser = (result.model or {}).get("series", {}) or {}
+    lat = (result.model or {}).get("lattice", {}) or {}
 
     return dict(
         empty=False, grid=grid, fit=fit, refined=refined,
@@ -100,6 +102,8 @@ def compute_curve(result, ngrid: int = 400) -> Dict:
         gate_reason=str(cal.gate_reason or ""),
         series_engaged=bool(ser.get("engaged", False)),
         series_reason=str(ser.get("gate_reason", "") or ""),
+        lattice_engaged=bool(lat.get("engaged", False)),
+        lattice_reason=str(lat.get("gate_reason", "") or ""),
         source_label="your column", ref_label="the reference column",
     )
 
@@ -124,6 +128,16 @@ def fit_legend_label(d: Dict) -> str:
     kind = "class-aware" if d.get("class_aware") else "shrunk"
     return (f"anchor-refined fit · {kind} "
             f"(λg={d['lam_g']:.1f}, λc={d['lam_c']:.1f})")
+
+
+def _term_note(name: str, reason: str) -> str:
+    """``"<name>: <reason>"`` — without saying the name twice.
+
+    The engaged / gated-off reasons already open with "series term ..." or
+    "lattice term ..."; the others (too few pairs, nothing to correct,
+    disabled) do not, and need the name to be read on their own.
+    """
+    return reason if reason.startswith(name) else f"{name}: {reason}"
 
 
 def _resid_limits(r: np.ndarray) -> tuple:
@@ -151,8 +165,25 @@ def figure_mpl(result):
                  ha="center", va="center", color=theme.TXT2, fontsize=theme.FS_AXIS)
         return fig
 
+    # the gate decisions, said out loud: the series and lattice terms' always
+    # (they are not curves, so nothing else on this page shows them), the
+    # anchors' too — unless stage 2 never ran, where "anchors disabled" would
+    # be noise
+    notes = []
+    if d.get("series_reason"):
+        notes.append(_term_note("series term", d["series_reason"]))
+    if d.get("lattice_reason"):
+        notes.append(_term_note("lattice term", d["lattice_reason"]))
+    if d["gate_reason"] and d["gate_reason"] != "anchors disabled":
+        notes.append(d["gate_reason"])
+
+    # The notes hang under the title, one line each (~0.022 of the page height
+    # per line), and the axes start below the last of them. This has to be the
+    # GridSpec's own ``top``: a later ``fig.subplots_adjust(top=...)`` does not
+    # move axes whose GridSpec sets it, so it cannot hold the plot back.
+    top = 0.92 - 0.022 * max(len(notes) - 1, 0)
     gs = GridSpec(2, 1, height_ratios=[2.05, 1.0], hspace=0.16,
-                  left=0.085, right=0.975, top=0.93, bottom=0.085)
+                  left=0.085, right=0.975, top=top, bottom=0.085)
     ax = fig.add_subplot(gs[0])
     axr = fig.add_subplot(gs[1], sharex=ax)
 
@@ -201,18 +232,9 @@ def figure_mpl(result):
 
     fig.suptitle("Cross-column calibration curve  ·  your column -> the reference column",
                  x=0.02, y=0.985, ha="left", fontsize=theme.FS_TITLE, color=theme.TXT)
-    # the gate decisions, said out loud: the series term's always (it is not a
-    # curve, so nothing else on this page shows it), the anchors' too — unless
-    # stage 2 never ran, where "anchors disabled" would be noise
-    notes = []
-    if d.get("series_reason"):
-        notes.append(f"series term: {d['series_reason']}")
-    if d["gate_reason"] and d["gate_reason"] != "anchors disabled":
-        notes.append(d["gate_reason"])
     if notes:
         fig.text(0.02, 0.947, theme.mpl_safe("\n".join(notes)), ha="left", va="top",
                  fontsize=theme.FS_SUB - 1, color=theme.TXT2, style="italic")
-    fig.subplots_adjust(top=0.90)
     return fig
 
 

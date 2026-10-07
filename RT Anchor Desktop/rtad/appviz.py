@@ -82,15 +82,15 @@ def _tile(label, value, note) -> Dict:
 # --------------------------------------------------------------- KPIs ----------
 
 #: Engine KPI tiles that the app deliberately does not show.
-_REMOVED_TILES = {"Matched pairs", "Series term", "iRT landmarks"}
+_REMOVED_TILES = {"Matched pairs", "Series + lattice", "iRT landmarks"}
 
 
 def kpis(result) -> List[Dict]:
     """The v2 KPI tiles, straight from the engine's own tile builder.
 
-    A few tiles are dropped in the app: the pair census, the series-term gate
-    and the iRT landmark count are evidence-level details the results screen no
-    longer surfaces.
+    A few tiles are dropped in the app: the pair census, the series and lattice
+    gates and the iRT landmark count are evidence-level details the results
+    screen no longer surfaces.
     """
     from rt_anchor.viz import metrics as _vm
     return [_tile(label, value, note) for label, value, note in _vm.kpi_tiles(result)
@@ -152,6 +152,8 @@ def curve(result, ngrid: int = 240) -> Dict:
         "engaged": bool(d["engaged"]),
         "series_engaged": bool(d.get("series_engaged", False)),
         "series_reason": _s(d.get("series_reason")),
+        "lattice_engaged": bool(d.get("lattice_engaged", False)),
+        "lattice_reason": _s(d.get("lattice_reason")),
         "lam_g": _f(d["lam_g"]), "lam_c": _f(d["lam_c"]),
         "class_aware": bool(d["class_aware"]),
         "gate_reduction": _f(d["gate_reduction"]),
@@ -312,6 +314,8 @@ PREVIEW_COLUMNS = [
     ("is_extrapolated", "extrapolated"),
     ("series_correction_min", "series corr (min)"),
     ("series_n_members", "series n"),
+    ("lattice_correction_min", "lattice corr (min)"),
+    ("lattice_n_members", "lattice n"),
 ]
 
 
@@ -353,8 +357,9 @@ def _notes(result) -> Dict:
             "runs, <b>diamonds</b> from the two sample runs (serum covers the "
             "sparse early and late ends the mixture cannot). Rings are the "
             "stage-2 plasma-lipid anchors. The strip below is each pair's "
-            "residual about the fit. The series term, when its gate engages, is "
-            "a per-feature correction that the curve does not show."
+            "residual about the fit. The series and lattice terms, when their "
+            "gates engage, are per-feature corrections that the curve does not "
+            "show."
         ),
         "profile": (
             "Reconstructed from the feature table by binning feature intensities "

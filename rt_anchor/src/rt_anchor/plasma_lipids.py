@@ -364,7 +364,8 @@ def build_anchor_table(picks: pd.DataFrame,
     :func:`rt_anchor.crosscolumn.build_calibrator` consumes and what
     ``<prefix>_anchors.csv`` reports. ``mz_src`` is the source-run pick's
     observed m/z, and is what lets stage 2 measure anchor residuals against
-    the curve-plus-series prediction rather than the bare curve.
+    the anchor-free prediction (the curve plus the applied series and lattice
+    corrections) rather than the bare curve.
     """
     if candidates is None:
         candidates = plasma_lipid_candidates()

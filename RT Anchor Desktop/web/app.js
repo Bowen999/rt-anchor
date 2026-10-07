@@ -269,6 +269,7 @@ function collectAdvanced() {
   state.params.min_anchors = v("#adv-minanchors");
   state.params.use_sample_pairs = chk("#adv-samplepairs", true);
   state.params.use_series_term = chk("#adv-seriesterm", true);
+  state.params.use_lattice_term = chk("#adv-latticeterm", true);
   state.params.use_sample_anchors = chk("#adv-sampleanchors", false);
   state.params.extrapolate = chk("#adv-extrapolate", true);
   const em = $("#adv-extramode");
@@ -591,13 +592,17 @@ function renderSection(id, body) {
   } else {
     CK.render(id, host, state.bundle);   // curve (SVG)
   }
-  /* the curve section states its gate decisions in words: the series term's
-     always (it is a per-feature correction, not a curve, so nothing in the SVG
-     shows it), the anchor gate's alongside it when stage 2 ran */
+  /* the curve section states its gate decisions in words: the series and
+     lattice terms' always (they are per-feature corrections, not curves, so
+     nothing in the SVG shows them), the anchor gate's alongside them when stage
+     2 ran. A reason that already opens with the term's name is not prefixed
+     again ("series term: series term gated off ..."). */
   if (id === "curve") {
     const cd = state.bundle.curve || {};
     const reasons = [];
-    if (cd.series_reason) reasons.push("series term: " + cd.series_reason);
+    const named = (term, r) => (r.indexOf(term) === 0 ? r : term + ": " + r);
+    if (cd.series_reason) reasons.push(named("series term", cd.series_reason));
+    if (cd.lattice_reason) reasons.push(named("lattice term", cd.lattice_reason));
     if (cd.gate_reason && cd.gate_reason !== "anchors disabled") reasons.push(cd.gate_reason);
     reasons.forEach(r => {
       const g = document.createElement("div"); g.className = "fig-note";
@@ -702,7 +707,7 @@ function renderManifest(r) {
 /* ---- calibrated-table preview ---- */
 const esc = s => String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
 const NUMERIC_COLS = new Set(["RT", "m/z", "Cal_RT (min)", "Cal_RT ± (min)", "iRT", "iRT ±",
-  "iRT spread", "series corr (min)", "series n"]);
+  "iRT spread", "series corr (min)", "series n", "lattice corr (min)", "lattice n"]);
 const TABLE_PAGE_SIZE = 100;
 let _tablePage = 0;
 function renderTable(body) {

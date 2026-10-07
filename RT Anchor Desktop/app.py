@@ -69,11 +69,17 @@ def _selftest() -> int:
             print("SELFTEST_FAIL model carries no series block "
                   "(rt_anchor.series missing from the bundle?)")
             return 1
+        lattice = res.model.get("lattice")
+        if not isinstance(lattice, dict) or "engaged" not in lattice:
+            print("SELFTEST_FAIL model carries no lattice block "
+                  "(rt_anchor.lattice missing from the bundle?)")
+            return 1
         print(f"SELFTEST_OK reference={pair.key} features={len(res.table)} "
               f"pairs={res.model['curve']['n_pairs']} "
               f"landmarks={res.model['irt']['n_landmarks']} "
               f"self_error={err:.2e}min structures={n_struct} "
-              f"series={series.get('gate_reason', '')}")
+              f"series={series.get('gate_reason', '')} "
+              f"lattice={lattice.get('gate_reason', '')}")
         return 0
     except Exception as e:  # pragma: no cover
         import traceback

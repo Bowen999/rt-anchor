@@ -56,7 +56,8 @@ A runnable walk-through with bundled data is in
 
 Outputs (`write_results`): `*_calibrated.csv` (the input table plus `Cal_RT_min`,
 `iRT`, their uncertainties, a reliability tier, an extrapolation flag, and the
-series-term columns `series_correction_min` / `series_n_members`),
+series- and lattice-term columns `series_correction_min` / `series_n_members`
+and `lattice_correction_min` / `lattice_n_members`),
 `*_model.json`, `*_pairs.csv`, `*_landmarks.csv`, `*_anchors.csv`, `*_log.txt`,
 and an `*_report.html` / `*_report.pdf` report.
 
@@ -78,13 +79,27 @@ and an `*_report.html` / `*_report.pdf` report.
    in carbon-number order on both columns, and only when a leave-own-out gate
    shows at least 20% error reduction — on a matrix with few homologous series
    the gate simply does not engage.
-3. **Stage 2 — gated sample anchors (opt-in).** Seventeen endogenous plasma
+3. **Stage 1c — lattice term (since 1.2.3).** Some classes are too sparse for
+   the series term (serum cholesteryl esters have at most three members per
+   double-bond count) yet spread a dozen members over several ladders one H2
+   step — one double bond — apart. The lattice term joins such ladders into a
+   *lattice family* and gives each member integer (carbons, H2) coordinates
+   from its *m/z* alone; families are not identifications. A feature on a
+   family's lattice point is corrected with the curve residuals of its nearest
+   family members, never its co-eluting neighbours. It is a fallback behind the
+   series term, applied only to families that elute in reversed-phase order on
+   both columns, and only when a leave-own-out gate, judged on the pairs the
+   series term leaves alone, shows at least 20% error reduction — where
+   families carry no consistent selectivity difference it does not engage.
+   Known weak spot: another class on the same lattice (LPC and ether PC share
+   one, and so can a sodium adduct) is corrected as if it belonged.
+4. **Stage 2 — gated sample anchors (opt-in).** Seventeen endogenous plasma
    lipids found in both sample runs refine the curve with a class-aware
    correction, applied only when it cuts leave-one-out error by at least 20%.
    Stage 2 is off by default since 1.2.2 (`use_sample_anchors=True` or
    `--sample-anchors` enables it); on other matrices it does not engage and the
    Stage-1 result is used.
-4. **iRT.** The chosen panel's standards located on the reference standards run
+5. **iRT.** The chosen panel's standards located on the reference standards run
    define the scale: the earliest is 1, the latest 100.
 
 Details, accuracy figures and all parameters: [`rt_anchor/README.md`](rt_anchor/README.md).
@@ -98,6 +113,7 @@ rt_anchor/                 Python package "rt-anchor" (PyPI) — engine, CLI, re
 │   ├── pipeline.py        calibrate(): orchestrates the stages below
 │   ├── crosscolumn.py     stage 1 — m/z matching + robust monotone curve
 │   ├── series.py          stage 1b — the homologous-series term
+│   ├── lattice.py         stage 1c — the lattice term (fallback behind 1b)
 │   ├── plasma_lipids.py   stage 2 — endogenous plasma-lipid anchors
 │   ├── irt.py             the iRT ruler (panel landmarks on the reference run)
 │   ├── reference_data/    bundled reference column (col35) — the default Cal_RT axis

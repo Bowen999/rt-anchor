@@ -5,6 +5,7 @@ panel: mix15 — 15 standards ionisable in positive mode
 sample-run pairs: 441 matched, 422 kept after masking the stage-2 anchor m/z
 stage 1: 595 pairs (173 standards + 422 sample), 433 kept after MAD trimming; source RT span 1.03-23.42 -> reference 2.19-21.58 min
 series term: series term gated off: leave-own-out MSE 35% above curve-only (threshold: 20% below); 27 homologous series (182 pairs, 148 with a leave-own-out prediction); 0/22314 features corrected
+lattice term: lattice term gated off: leave-own-out MSE 2% above curve-only (threshold: 20% below); 12 lattice families (243 pairs, 270 judged by the gate); 0/22314 features corrected
 stage 2: disabled (use_sample_anchors=False) — stage-1 curve only
 iRT (mix15): 14 landmarks, RT 1.46-21.61 min on the reference standards run
 detection QC on the user's standards run: 15/15 panel standards located (reporting only — it does not drive the calibration)
