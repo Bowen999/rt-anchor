@@ -37,6 +37,7 @@ plot/
 *.mzXML
 *.raw
 *.xlsx
+!examples/lipid_vetted_list.xlsx
 *.pkl
 
 # ---- macOS AppleDouble / zip-extraction junk ----

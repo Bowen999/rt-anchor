@@ -9,7 +9,13 @@ standards mixture from the same column — named after the panel to pass as
 |---|---|---|
 | [`mix15/`](mix15/) | Orbitrap, positive mode: `samples.txt` (22,314 features) + `standards.txt` | `mix15` — the 15-standard Caley lipid RT-calibration mix |
 | [`mix21/`](mix21/) | QTOF, positive mode: `samples.txt` (610 features) + `standards.txt` — the bundled reference column's own runs | `mix21` — Mix 4.4, the extended 21-standard panel |
+| [`6_columns/`](6_columns/) | QTOF, positive mode: serum + standards runs of six LC methods (12–90 min) | `mix21` |
+| [`neg_esi_20min/`](neg_esi_20min/) | QTOF, **negative** mode: serum + standards runs of the 20-min method, incl. a lower-threshold standards re-export | `mix21` |
 | [`output/`](output/) | what `write_results` writes for the Mix 15 run | |
+
+[`lipid_vetted_list.xlsx`](lipid_vetted_list.xlsx) is the manually vetted lipid
+list (from MS-DIAL) for the `6_columns/` and `neg_esi_20min/` serum data; the
+m/z-only names inside those tables themselves are unconfirmed guesses.
 
 Under 1.2.3 the Mix 15 example shows **both gates declining**. Stage 1 matches
 595 pairs (173 standards + 422 sample) and keeps 433 after trimming. The series
