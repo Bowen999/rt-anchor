@@ -10,11 +10,11 @@ column.
 
 | folder | serum features | standards features |
 |---|---|---|
-| `column_12` | 405 | 480 |
-| `column_16` | 580 | 405 |
-| `column_20` | 483 | 316 |
-| `column_22` | 610 | 383 |
-| `column_41` | 694 | 405 |
-| `column_85` | 549 | 291 |
+| `column_12` | 2477 | 480 |
+| `column_16` | 3223 | 405 |
+| `column_20` | 2964 | 316 |
+| `column_22` | 3229 | 383 |
+| `column_41` | 4128 | 405 |
+| `column_85` | 3741 | 291 |
 
 Lipid names in the tables are m/z-only MS-DIAL guesses; none is MS/MS-confirmed.
