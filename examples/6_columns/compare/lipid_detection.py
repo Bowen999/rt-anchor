@@ -206,7 +206,7 @@ def rt_check(rows, feats, tol, seed=0):
     """Coarse RT plausibility of the m/z hits, per column.
 
     The vetted RT is mapped onto the column with a robust LOWESS fitted on the
-    unambiguous matches (exactly one feature within 5 ppm). A hit is RT-consistent
+    unambiguous matches (exactly one feature within tol). A hit is RT-consistent
     when one of its candidates lies within +-max(3 sigma, 0.3 min) of the predicted
     RT. The chance rate asks the same of a randomly drawn other row's predicted RT.
     """
@@ -217,8 +217,7 @@ def rt_check(rows, feats, tol, seed=0):
     for j, c in enumerate(COLUMNS):
         mz, rt = feats[c]
         cand = [candidates(mz, ions, tol) for ions in rows.ions]
-        c5 = [candidates(mz, ions, 5.0) for ions in rows.ions]
-        anchors = [(i, f[0]) for i, f in enumerate(c5) if len(f) == 1]
+        anchors = [(i, f[0]) for i, f in enumerate(cand) if len(f) == 1]
         pred, r, w = lowess(x_all[[a for a, _ in anchors]], rt[[f for _, f in anchors]], x_all)
         sigma = 1.4826 * np.median(np.abs(r[w > 0.5]))
         win = max(3 * sigma, 0.3)

@@ -33,7 +33,7 @@ ion. RT plays no part.
 | DMPE/MMPE | 49 | 49 | 48 | 48 | 45 |
 | FA | 14 | 0 | 0 | 0 | 0 |
 | main, distinct target m/z | 356 | 296 | 283 | 273 | 256 |
-| main, m/z + RT-consistent (coarse, below) | 611 | 507 | 488 | 461 | 402 |
+| main, m/z + RT-consistent (coarse, below) | 611 | 509 | 487 | 455 | 393 |
 
 Rows are list rows: isomers and repeated entries share a target, so the 611 main rows
 are 356 distinct target m/z.
@@ -68,10 +68,10 @@ are 356 distinct target m/z.
 - **DMPE/MMPE.** 34 of the 49 co-elute (≤ 0.1 min) with the same-chain PC in the
   negative-mode run: more likely PC `[M−CH3]−` in-source fragments than DMPE.
 - **The RT check is coarse.** Per column, a robust LOWESS maps the vetted RT onto the
-  column, fitted on the unambiguous matches (exactly one feature within 5 ppm); a hit is
+  column, fitted on the unambiguous matches (exactly one feature within 15 ppm); a hit is
   RT-consistent when a candidate lies within ±max(3σ, 0.3 min) of the predicted RT. The
-  window is ±0.5–0.6 min on columns 12–20 and ±1.1 min on 22, but ±2.9 and ±4.8 min on
-  41 and 85, where a random RT passes 31–32% of the time. One curve per column also
+  window is ±0.45–0.62 min on columns 12–20 and ±0.9 min on 22, but ±2.7 and ±4.6 min on
+  41 and 85, where a random RT passes 31% of the time. One curve per column also
   ignores class-specific selectivity — what rt-anchor's cross-column calibration models.
 - **Not detected ≠ absent.** PA, LPA, PI, LPI, PG and sterol sulfates ionize weakly in
   positive mode; short-chain CAR and most LPE are low-abundance in serum.
@@ -83,13 +83,13 @@ are 356 distinct target m/z.
 |---|---|---|---|---|---|---|
 | TG | 94 | 94 | 94 | 94 | 94 | 94 |
 | PC | 88 | 88 | 87 | 86 | 85 | 87 |
-| EtherPE | 81 | 66 | 61 | 61 | 56 | 49 |
+| EtherPE | 81 | 66 | 61 | 61 | 56 | 50 |
 | EtherPC | 66 | 66 | 66 | 64 | 62 | 65 |
 | SM | 39 | 39 | 38 | 38 | 38 | 38 |
 | LPC | 32 | 32 | 32 | 32 | 31 | 32 |
 | PE P- | 27 | 27 | 27 | 27 | 26 | 25 |
-| PE | 24 | 23 | 23 | 21 | 19 | 18 |
-| PI | 20 | 15 | 14 | 14 | 12 | 14 |
+| PE | 24 | 23 | 23 | 21 | 19 | 19 |
+| PI | 20 | 15 | 14 | 14 | 12 | 13 |
 | DG | 20 | 19 | 19 | 19 | 19 | 19 |
 | Cer_NS | 16 | 14 | 12 | 12 | 10 | 14 |
 | LPE | 15 | 8 | 6 | 5 | 3 | 6 |
@@ -101,7 +101,7 @@ are 356 distinct target m/z.
 | LPI | 6 | 1 | 1 | 1 | 0 | 1 |
 | HexCer_HS | 6 | 4 | 4 | 4 | 4 | 4 |
 | EtherLPE | 5 | 4 | 2 | 2 | 0 | 3 |
-| MG | 4 | 3 | 2 | 0 | 0 | 2 |
+| MG | 4 | 3 | 2 | 0 | 0 | 3 |
 | SSulfate | 4 | 0 | 0 | 0 | 0 | 0 |
 | Cer_NDS | 3 | 2 | 2 | 1 | 0 | 2 |
 | BileAcid | 2 | 1 | 0 | 0 | 0 | 0 |

@@ -83,7 +83,7 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 492 lipids MSDial format,92,LPC 22:4,LPC,main,C30H54NO7P,[M+HCOO]-,3.012,[M+H]+ 572.3711,1,1,1,1,1,1,6,3;2;1;1;2;2,1,1,1,1,1,1,6
 492 lipids MSDial format,93,LPI 20:4,LPI,main,C29H49O12P,[M-H]-,1.756,[M+NH4]+ 638.3300,0,0,0,0,0,0,0,0;0;0;0;0;0,0,0,0,0,0,0,0
 492 lipids MSDial format,94,Cer 40:1;O2|Cer 18:1;O2/22:0,Cer_NS,main,C40H79NO3,[M-H]-,17.538,[M+H]+ 622.6133,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,1,1,6
-492 lipids MSDial format,95,Cer 40:1;O2|Cer 18:1;O2/22:0,Cer_NS,main,C40H79NO3,[M-H]-,16.882,[M+H]+ 622.6133,1,1,1,1,1,1,6,1;1;1;1;1;1,0,0,0,1,1,1,3
+492 lipids MSDial format,95,Cer 40:1;O2|Cer 18:1;O2/22:0,Cer_NS,main,C40H79NO3,[M-H]-,16.882,[M+H]+ 622.6133,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,0,1,1,1,5
 492 lipids MSDial format,96,LPI 20:3,LPI,main,C29H51O12P,[M-H]-,2.028,[M+NH4]+ 640.3456,0,0,0,0,0,0,0,0;0;0;0;0;0,0,0,0,0,0,0,0
 492 lipids MSDial format,97,LPC 22:0,LPC,main,C30H62NO7P,[M+HCOO]-,8.462,[M+H]+ 580.4337,1,1,1,1,1,1,6,2;1;1;1;1;1,1,1,1,1,1,1,6
 492 lipids MSDial format,98,Cer 41:1;O2|Cer 18:1;O2/23:0,Cer_NS,main,C41H81NO3,[M-H]-,17.908,[M+H]+ 636.6289,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,1,1,6
@@ -92,7 +92,7 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 492 lipids MSDial format,101,Cer 42:2;O2|Cer 18:1;O2/24:1,Cer_NS,main,C42H81NO3,[M-H]-,17.448,[M+H]+ 648.6289,1,1,1,1,1,1,6,2;1;2;2;2;2,1,1,1,1,1,1,6
 492 lipids MSDial format,102,Cer 42:1;O2|Cer 18:1;O2/24:0,Cer_NS,main,C42H83NO3,[M-H]-,18.251,[M+H]+ 650.6446,1,1,1,1,1,1,6,1;2;1;2;2;1,1,1,1,1,1,1,6
 492 lipids MSDial format,103,Cer 42:0;O2|Cer 18:0;O2/24:0,Cer_NDS,main,C42H85NO3,[M-H]-,18.472,[M+H]+ 652.6602,1,0,1,1,1,1,5,1;0;1;1;1;1,1,0,1,1,1,1,5
-492 lipids MSDial format,104,LPC 24:0,LPC,main,C32H66NO7P,[M+HCOO]-,10.825,[M+H]+ 608.4650,1,1,1,1,1,1,6,2;1;1;1;1;1,1,1,1,1,1,1,6
+492 lipids MSDial format,104,LPC 24:0,LPC,main,C32H66NO7P,[M+HCOO]-,10.825,[M+H]+ 608.4650,1,1,1,1,1,1,6,2;1;1;1;1;1,0,1,1,1,1,1,5
 492 lipids MSDial format,105,Cer 43:1;O2|Cer 19:1;O2/24:0,Cer_NS,main,C43H85NO3,[M-H]-,18.435,[M+H]+ 664.6602,0,1,1,1,1,1,5,0;1;1;1;2;1,0,1,1,1,1,1,5
 492 lipids MSDial format,106,Cer 40:1;O2|Cer 18:1;O2/22:0,Cer_NS,main,C40H79NO3,[M+HCOO]-,17.536,[M+H]+ 622.6133,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,1,1,6
 492 lipids MSDial format,107,PA 34:2|PA 16:0_18:2,PA,main,C37H69O8P,[M-H]-,13.633,[M+NH4]+ 690.5068,0,1,0,0,0,0,1,0;1;0;0;0;0,0,0,0,0,0,0,0
@@ -109,7 +109,7 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 492 lipids MSDial format,122,PE O-34:1|PE O-18:1_16:0,EtherPE,main,C39H78NO7P,[M-H]-,15.149,[M+H]+ 704.5589,0,0,1,1,0,1,3,0;0;1;1;0;1,0,0,0,0,0,1,1
 492 lipids MSDial format,123,PE O-34:1|PE O-18:1_16:0,EtherPE,main,C39H78NO7P,[M-H]-,15.621,[M+H]+ 704.5589,0,0,1,1,0,1,3,0;0;1;1;0;1,0,0,0,0,0,1,1
 492 lipids MSDial format,124,PE O-34:1|PE O-18:1_16:0,EtherPE,main,C39H78NO7P,[M-H]-,16.449,[M+H]+ 704.5589,0,0,1,1,0,1,3,0;0;1;1;0;1,0,0,0,0,0,0,0
-492 lipids MSDial format,125,PE O-34:0|PE O-18:0_16:0,EtherPE,main,C39H80NO7P,[M-H]-,15.315,[M+H]+ 706.5745,1,1,1,1,1,1,6,1;1;1;1;1;1,0,0,0,0,1,1,2
+492 lipids MSDial format,125,PE O-34:0|PE O-18:0_16:0,EtherPE,main,C39H80NO7P,[M-H]-,15.315,[M+H]+ 706.5745,1,1,1,1,1,1,6,1;1;1;1;1;1,1,0,0,0,1,1,3
 492 lipids MSDial format,126,SM 31:1;O2|SM 18:1;O2/13:0,SM,main,C36H73N2O6P,[M+HCOO]-,10.454,[M+H]+ 661.5279,1,1,1,1,1,1,6,4;2;2;4;2;3,1,1,1,1,1,1,6
 492 lipids MSDial format,127,Cer 43:2;O2|Cer 19:1;O2/24:1,Cer_NS,main,C43H83NO3,[M+HCOO]-,17.666,[M+H]+ 662.6446,0,1,0,0,0,0,1,0;1;0;0;0;0,0,1,0,0,0,0,1
 492 lipids MSDial format,128,Cer 43:1;O2|Cer 19:1;O2/24:0,Cer_NS,main,C43H85NO3,[M+HCOO]-,18.436,[M+H]+ 664.6602,0,1,1,1,1,1,5,0;1;1;1;2;1,0,1,1,1,1,1,5
@@ -120,27 +120,27 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 492 lipids MSDial format,133,PE 34:2|PE 16:0_18:2,PE,main,C39H74NO8P,[M-H]-,13.968,[M+H]+ 716.5225,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,1,1,6
 492 lipids MSDial format,134,DMPE 32:1|DMPE 16:0_16:1,DMPE,DMPE/MMPE (separate),C39H76NO8P,[M-H]-,13.378,[M+H]+ 718.5381,0,1,1,1,1,1,5,0;2;1;2;1;1,,,,,,,
 492 lipids MSDial format,135,PE 34:1|PE 16:0_18:1,PE,main,C39H76NO8P,[M-H]-,14.962,[M+H]+ 718.5381,0,1,1,1,1,1,5,0;2;1;2;1;1,0,1,1,1,1,1,5
-492 lipids MSDial format,136,SM 32:2;O2,SM,main,C37H73N2O6P,[M+HCOO]-,9.536,[M+H]+ 673.5279,1,1,1,1,1,1,6,2;1;1;1;1;2,1,1,1,1,1,1,6
+492 lipids MSDial format,136,SM 32:2;O2,SM,main,C37H73N2O6P,[M+HCOO]-,9.536,[M+H]+ 673.5279,1,1,1,1,1,1,6,2;1;1;1;1;2,0,1,1,1,1,1,5
 492 lipids MSDial format,137,DMPE 32:0|DMPE 16:0_16:0,DMPE,DMPE/MMPE (separate),C39H78NO8P,[M-H]-,14.647,[M+H]+ 720.5538,1,1,1,1,1,1,6,1;2;2;3;3;2,,,,,,,
 492 lipids MSDial format,138,PE 34:0|PE 16:0_18:0,PE,main,C39H78NO8P,[M-H]-,15.961,[M+H]+ 720.5538,1,1,1,1,1,1,6,1;2;2;3;3;2,0,0,0,1,0,0,1
-492 lipids MSDial format,139,SM 32:1;O2|SM 16:1;O2/16:0,SM,main,C37H75N2O6P,[M+HCOO]-,11.565,[M+H]+ 675.5436,1,1,1,1,1,1,6,2;1;2;1;1;2,1,1,1,1,1,1,6
+492 lipids MSDial format,139,SM 32:1;O2|SM 16:1;O2/16:0,SM,main,C37H75N2O6P,[M+HCOO]-,11.565,[M+H]+ 675.5436,1,1,1,1,1,1,6,2;1;2;1;1;2,0,1,1,1,1,1,5
 492 lipids MSDial format,140,PE O-36:6|PE O-16:1_20:5,EtherPE,main,C41H72NO7P,[M-H]-,13.342,[M+H]+ 722.5119,1,1,1,1,1,1,6,7;2;4;4;5;2,1,1,1,1,1,0,5
-492 lipids MSDial format,141,SM 32:0;O2,SM,main,C37H77N2O6P,[M+HCOO]-,12.221,[M+H]+ 677.5592,1,1,1,1,1,1,6,1;2;2;2;1;3,1,1,1,1,1,1,6
+492 lipids MSDial format,141,SM 32:0;O2,SM,main,C37H77N2O6P,[M+HCOO]-,12.221,[M+H]+ 677.5592,1,1,1,1,1,1,6,1;2;2;2;1;3,0,1,1,1,1,1,5
 492 lipids MSDial format,142,PE O-36:5|PE O-18:3_18:2,EtherPE,main,C41H74NO7P,[M-H]-,13.553,[M+H]+ 724.5276,1,1,1,1,1,1,6,1;2;1;2;1;1,1,1,0,1,1,1,5
 492 lipids MSDial format,143,PE O-36:5|PE O-16:1_20:4,EtherPE,main,C41H74NO7P,[M-H]-,14.28,[M+H]+ 724.5276,1,1,1,1,1,1,6,1;2;1;2;1;1,1,1,1,1,1,1,6
 492 lipids MSDial format,144,PE O-36:4|PE O-16:0_20:4,EtherPE,main,C41H76NO7P,[M-H]-,14.52,[M+H]+ 726.5432,1,1,1,1,1,1,6,1;3;2;3;2;3,1,1,1,1,1,1,6
-492 lipids MSDial format,145,PE O-36:3|PE O-18:1_18:2,EtherPE,main,C41H78NO7P,[M-H]-,14.196,[M+H]+ 728.5589,1,1,1,1,1,1,6,1;3;1;2;1;1,0,0,0,0,1,1,2
+492 lipids MSDial format,145,PE O-36:3|PE O-18:1_18:2,EtherPE,main,C41H78NO7P,[M-H]-,14.196,[M+H]+ 728.5589,1,1,1,1,1,1,6,1;3;1;2;1;1,0,0,0,0,0,1,1
 492 lipids MSDial format,146,PE O-36:3|PE O-18:1_18:2,EtherPE,main,C41H78NO7P,[M-H]-,15.651,[M+H]+ 728.5589,1,1,1,1,1,1,6,1;3;1;2;1;1,1,1,1,1,1,1,6
-492 lipids MSDial format,147,PE O-36:3|PE O-16:0_20:3,EtherPE,main,C41H78NO7P,[M-H]-,15.001,[M+H]+ 728.5589,1,1,1,1,1,1,6,1;3;1;2;1;1,1,0,1,1,1,1,5
+492 lipids MSDial format,147,PE O-36:3|PE O-16:0_20:3,EtherPE,main,C41H78NO7P,[M-H]-,15.001,[M+H]+ 728.5589,1,1,1,1,1,1,6,1;3;1;2;1;1,1,1,0,1,1,1,5
 492 lipids MSDial format,148,DMPE 33:2|DMPE 15:0_18:2,DMPE,DMPE/MMPE (separate),C40H76NO8P,[M-H]-,12.909,[M+H]+ 730.5381,1,1,1,1,1,1,6,1;1;1;1;1;1,,,,,,,
 492 lipids MSDial format,149,PE O-36:2|PE O-18:0_18:2,EtherPE,main,C41H80NO7P,[M-H]-,14.401,[M+H]+ 730.5745,1,1,1,1,1,1,6,1;2;2;2;2;2,0,0,0,1,1,1,3
-492 lipids MSDial format,150,PE O-36:2|PE O-18:0_18:2,EtherPE,main,C41H80NO7P,[M-H]-,15.817,[M+H]+ 730.5745,1,1,1,1,1,1,6,1;2;2;2;2;2,1,0,1,1,1,1,5
+492 lipids MSDial format,150,PE O-36:2|PE O-18:0_18:2,EtherPE,main,C41H80NO7P,[M-H]-,15.817,[M+H]+ 730.5745,1,1,1,1,1,1,6,1;2;2;2;2;2,1,0,0,1,1,1,4
 492 lipids MSDial format,151,PE O-36:2|PE O-18:1_18:1,EtherPE,main,C41H80NO7P,[M-H]-,16.452,[M+H]+ 730.5745,1,1,1,1,1,1,6,1;2;2;2;2;2,1,1,1,1,1,1,6
 492 lipids MSDial format,152,PE O-36:2|PE O-18:1_18:1,EtherPE,main,C41H80NO7P,[M-H]-,15.174,[M+H]+ 730.5745,1,1,1,1,1,1,6,1;2;2;2;2;2,0,0,0,0,1,1,2
 492 lipids MSDial format,153,PE O-36:1|PE O-20:1_16:0,EtherPE,main,C41H82NO7P,[M-H]-,15.323,[M+H]+ 732.5902,0,1,1,1,1,1,5,0;1;1;1;2;3,0,1,1,1,1,1,5
-492 lipids MSDial format,154,SM 33:2;O2,SM,main,C38H75N2O6P,[M+HCOO]-,10.761,[M+H]+ 687.5436,1,1,1,1,1,1,6,3;2;2;4;1;4,1,1,1,1,1,1,6
+492 lipids MSDial format,154,SM 33:2;O2,SM,main,C38H75N2O6P,[M+HCOO]-,10.761,[M+H]+ 687.5436,1,1,1,1,1,1,6,3;2;2;4;1;4,0,1,1,1,1,1,5
 492 lipids MSDial format,155,SM 33:1;O2,SM,main,C38H77N2O6P,[M+HCOO]-,12.173,[M+H]+ 689.5592,1,1,1,1,1,1,6,3;2;4;2;2;5,1,1,1,1,1,1,6
-492 lipids MSDial format,156,SM 33:1;O2|SM 17:1;O2/16:0,SM,main,C38H77N2O6P,[M+HCOO]-,12.452,[M+H]+ 689.5592,1,1,1,1,1,1,6,3;2;4;2;2;5,1,1,1,1,1,1,6
+492 lipids MSDial format,156,SM 33:1;O2|SM 17:1;O2/16:0,SM,main,C38H77N2O6P,[M+HCOO]-,12.452,[M+H]+ 689.5592,1,1,1,1,1,1,6,3;2;4;2;2;5,1,1,1,1,1,0,5
 492 lipids MSDial format,157,PE 36:5|PE 16:0_20:5,PE,main,C41H72NO8P,[M-H]-,12.704,[M+H]+ 738.5068,0,1,1,1,1,0,4,0;1;1;1;1;0,0,0,0,0,1,0,1
 492 lipids MSDial format,158,PE O-37:5|PE O-17:1_20:4,EtherPE,main,C42H76NO7P,[M-H]-,14.671,[M+H]+ 738.5432,1,1,0,1,1,1,5,2;2;0;2;2;2,1,1,0,1,1,1,5
 492 lipids MSDial format,159,PC O-30:0|PC O-16:0_14:0,EtherPC,main,C38H78NO7P,[M+HCOO]-,14.144,[M+H]+ 692.5589,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,1,1,6
@@ -156,13 +156,13 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 492 lipids MSDial format,169,DMPE 34:1|DMPE 16:0_18:1,DMPE,DMPE/MMPE (separate),C41H80NO8P,[M-H]-,14.656,[M+H]+ 746.5694,1,1,1,1,1,1,6,3;3;3;3;2;2,,,,,,,
 492 lipids MSDial format,170,PE 36:1|PE 18:0_18:1,PE,main,C41H80NO8P,[M-H]-,15.992,[M+H]+ 746.5694,1,1,1,1,1,1,6,3;3;3;3;2;2,1,1,1,1,1,1,6
 492 lipids MSDial format,171,PG 34:2|PG 16:0_18:2,PG,main,C40H75O10P,[M-H]-,12.378,[M+NH4]+ 764.5436,0,0,0,0,0,0,0,0;0;0;0;0;0,0,0,0,0,0,0,0
-492 lipids MSDial format,172,SM 34:2;O2,SM,main,C39H77N2O6P,[M+HCOO]-,12.041,[M+H]+ 701.5592,1,1,1,1,1,1,6,4;3;4;1;1;4,1,1,1,1,1,1,6
-492 lipids MSDial format,173,SM 34:2;O2|SM 18:2;O2/16:0,SM,main,C39H77N2O6P,[M+HCOO]-,11.735,[M+H]+ 701.5592,1,1,1,1,1,1,6,4;3;4;1;1;4,1,1,1,1,1,1,6
-492 lipids MSDial format,174,PE O-38:7|PE O-18:2_20:5,EtherPE,main,C43H74NO7P,[M-H]-,13.404,[M+H]+ 748.5276,1,1,1,1,1,1,6,1;1;1;1;1;1,1,0,1,1,1,1,5
+492 lipids MSDial format,172,SM 34:2;O2,SM,main,C39H77N2O6P,[M+HCOO]-,12.041,[M+H]+ 701.5592,1,1,1,1,1,1,6,4;3;4;1;1;4,0,1,1,1,1,1,5
+492 lipids MSDial format,173,SM 34:2;O2|SM 18:2;O2/16:0,SM,main,C39H77N2O6P,[M+HCOO]-,11.735,[M+H]+ 701.5592,1,1,1,1,1,1,6,4;3;4;1;1;4,0,1,1,1,1,1,5
+492 lipids MSDial format,174,PE O-38:7|PE O-18:2_20:5,EtherPE,main,C43H74NO7P,[M-H]-,13.404,[M+H]+ 748.5276,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,1,1,6
 492 lipids MSDial format,175,PE O-38:7|PE O-16:1_22:6,EtherPE,main,C43H74NO7P,[M-H]-,13.84,[M+H]+ 748.5276,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,1,1,6
 492 lipids MSDial format,176,PE O-38:7|PE O-18:3_20:4,EtherPE,main,C43H74NO7P,[M-H]-,13.227,[M+H]+ 748.5276,1,1,1,1,1,1,6,1;1;1;1;1;1,1,0,0,1,1,1,4
 492 lipids MSDial format,177,DMPE 34:0|DMPE 16:0_18:0,DMPE,DMPE/MMPE (separate),C41H82NO8P,[M-H]-,15.697,[M+H]+ 748.5851,1,1,1,1,1,1,6,2;2;2;2;2;2,,,,,,,
-492 lipids MSDial format,178,SM 34:1;O2,SM,main,C39H79N2O6P,[M+HCOO]-,13.278,[M+H]+ 703.5749,1,1,1,1,1,1,6,2;3;4;4;2;3,1,1,1,1,1,1,6
+492 lipids MSDial format,178,SM 34:1;O2,SM,main,C39H79N2O6P,[M+HCOO]-,13.278,[M+H]+ 703.5749,1,1,1,1,1,1,6,2;3;4;4;2;3,1,1,1,1,0,0,4
 492 lipids MSDial format,179,SM 34:1;O2|SM 18:1;O2/16:0,SM,main,C39H79N2O6P,[M+HCOO]-,13.037,[M+H]+ 703.5749,1,1,1,1,1,1,6,2;3;4;4;2;3,1,1,1,1,1,1,6
 492 lipids MSDial format,180,PE O-38:6|PE O-18:1_20:5,EtherPE,main,C43H76NO7P,[M-H]-,14.649,[M+H]+ 750.5432,1,1,1,1,1,1,6,1;4;3;5;4;5,1,1,1,1,1,1,6
 492 lipids MSDial format,181,PE O-38:6|PE O-18:2_20:4,EtherPE,main,C43H76NO7P,[M-H]-,14.311,[M+H]+ 750.5432,1,1,1,1,1,1,6,1;4;3;5;4;5,1,1,1,1,1,1,6
@@ -190,16 +190,16 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 492 lipids MSDial format,203,DMPE 35:1|DMPE 17:0_18:1,DMPE,DMPE/MMPE (separate),C42H82NO8P,[M-H]-,15.203,[M+H]+ 760.5851,1,1,1,1,1,1,6,2;2;1;1;1;3,,,,,,,
 492 lipids MSDial format,204,SM 35:2;O2,SM,main,C40H79N2O6P,[M+HCOO]-,12.683,[M+H]+ 715.5749,1,1,1,1,1,1,6,2;1;2;1;2;2,1,1,1,1,1,1,6
 492 lipids MSDial format,205,PC O-32:2|PC O-16:1_16:1,EtherPC,main,C40H78NO7P,[M+HCOO]-,14.014,[M+H]+ 716.5589,1,1,1,1,0,0,4,1;1;1;1;0;0,1,0,0,0,0,0,1
-492 lipids MSDial format,206,SM 34:2;O3,SM,main,C39H77N2O7P,[M+HCOO]-,11.186,[M+H]+ 717.5541,1,1,1,1,1,1,6,2;1;1;1;1;3,1,1,1,1,1,1,6
+492 lipids MSDial format,206,SM 34:2;O3,SM,main,C39H77N2O7P,[M+HCOO]-,11.186,[M+H]+ 717.5541,1,1,1,1,1,1,6,2;1;1;1;1;3,0,1,1,1,1,1,5
 492 lipids MSDial format,207,SM 35:1;O2|SM 17:1;O2/18:0,SM,main,C40H81N2O6P,[M+HCOO]-,13.972,[M+H]+ 717.5905,1,1,1,1,1,1,6,2;2;3;3;3;3,1,1,1,1,1,1,6
 492 lipids MSDial format,208,SM 35:1;O2|SM 18:1;O2/17:0,SM,main,C40H81N2O6P,[M+HCOO]-,14.054,[M+H]+ 717.5905,1,1,1,1,1,1,6,2;2;3;3;3;3,1,1,1,1,1,1,6
 492 lipids MSDial format,209,SM 35:1;O2,SM,main,C40H81N2O6P,[M+HCOO]-,13.783,[M+H]+ 717.5905,1,1,1,1,1,1,6,2;2;3;3;3;3,1,1,1,1,1,1,6
 492 lipids MSDial format,210,PE 38:6|PE 16:0_22:6,PE,main,C43H74NO8P,[M-H]-,13.29,[M+H]+ 764.5225,1,1,1,1,1,1,6,1;1;2;2;1;1,1,1,1,1,1,1,6
-492 lipids MSDial format,211,PE 38:6|PE 18:2_20:4,PE,main,C43H74NO8P,[M-H]-,12.476,[M+H]+ 764.5225,1,1,1,1,1,1,6,1;1;2;2;1;1,1,0,1,1,1,1,5
-492 lipids MSDial format,212,PE 38:6|PE 18:2_20:4,PE,main,C43H74NO8P,[M-H]-,12.585,[M+H]+ 764.5225,1,1,1,1,1,1,6,1;1;2;2;1;1,1,0,1,1,1,1,5
+492 lipids MSDial format,211,PE 38:6|PE 18:2_20:4,PE,main,C43H74NO8P,[M-H]-,12.476,[M+H]+ 764.5225,1,1,1,1,1,1,6,1;1;2;2;1;1,1,1,1,1,1,1,6
+492 lipids MSDial format,212,PE 38:6|PE 18:2_20:4,PE,main,C43H74NO8P,[M-H]-,12.585,[M+H]+ 764.5225,1,1,1,1,1,1,6,1;1;2;2;1;1,1,1,1,1,1,1,6
 492 lipids MSDial format,213,PC O-32:1|PC O-16:0_16:1,EtherPC,main,C40H80NO7P,[M+HCOO]-,14.199,[M+H]+ 718.5745,1,1,1,1,1,1,6,2;2;3;3;2;3,1,1,1,1,1,1,6
 492 lipids MSDial format,214,PC O-32:1|PC O-16:1_16:0,EtherPC,main,C40H80NO7P,[M+HCOO]-,15.184,[M+H]+ 718.5745,1,1,1,1,1,1,6,2;2;3;3;2;3,1,1,1,1,1,1,6
-492 lipids MSDial format,215,SM 34:1;O3,SM,main,C39H79N2O7P,[M+HCOO]-,12.861,[M+H]+ 719.5698,1,1,1,1,1,1,6,2;5;2;6;2;2,1,1,1,1,1,1,6
+492 lipids MSDial format,215,SM 34:1;O3,SM,main,C39H79N2O7P,[M+HCOO]-,12.861,[M+H]+ 719.5698,1,1,1,1,1,1,6,2;5;2;6;2;2,1,1,1,1,0,0,4
 492 lipids MSDial format,216,SM 35:0;O2,SM,main,C40H83N2O6P,[M+HCOO]-,14.494,[M+H]+ 719.6062,0,1,0,0,1,1,3,0;1;0;0;1;1,0,0,0,0,1,1,2
 492 lipids MSDial format,217,DMPE 36:5|DMPE 16:0_20:5,DMPE,DMPE/MMPE (separate),C43H76NO8P,[M-H]-,14.135,[M+H]+ 766.5381,1,1,1,1,1,1,6,3;5;3;6;4;4,,,,,,,
 492 lipids MSDial format,218,DMPE 36:5|DMPE 16:1_20:4,DMPE,DMPE/MMPE (separate),C43H76NO8P,[M-H]-,11.84,[M+H]+ 766.5381,1,1,1,1,1,1,6,3;5;3;6;4;4,,,,,,,
@@ -209,7 +209,7 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 492 lipids MSDial format,222,PE O-39:5|PE O-19:1_20:4,EtherPE,main,C44H80NO7P,[M-H]-,15.895,[M+H]+ 766.5745,1,1,1,1,1,1,6,3;3;4;4;4;4,0,0,0,0,1,1,2
 492 lipids MSDial format,223,PC O-32:0|PC O-16:0_16:0,EtherPC,main,C40H82NO7P,[M+HCOO]-,15.29,[M+H]+ 720.5902,1,1,1,1,1,1,6,1;2;1;2;1;1,1,1,1,1,1,1,6
 492 lipids MSDial format,224,PC O-32:0|PC O-16:0_16:0,EtherPC,main,C40H82NO7P,[M+HCOO]-,15.354,[M+H]+ 720.5902,1,1,1,1,1,1,6,1;2;1;2;1;1,1,1,1,1,1,1,6
-492 lipids MSDial format,225,SM 34:0;O3,SM,main,C39H81N2O7P,[M+HCOO]-,12.511,[M+H]+ 721.5854,1,1,1,1,1,1,6,2;1;2;2;2;2,1,1,1,1,1,1,6
+492 lipids MSDial format,225,SM 34:0;O3,SM,main,C39H81N2O7P,[M+HCOO]-,12.511,[M+H]+ 721.5854,1,1,1,1,1,1,6,2;1;2;2;2;2,1,1,1,1,1,0,5
 492 lipids MSDial format,226,PE 38:4|PE 18:0_20:4,PE,main,C43H78NO8P,[M-H]-,14.877,[M+H]+ 768.5538,1,1,1,1,1,1,6,2;2;3;2;3;3,1,1,1,1,1,1,6
 492 lipids MSDial format,227,DMPE 36:4|DMPE 18:2_18:2,DMPE,DMPE/MMPE (separate),C43H78NO8P,[M-H]-,14.28,[M+H]+ 768.5538,1,1,1,1,1,1,6,2;2;3;2;3;3,,,,,,,
 492 lipids MSDial format,228,PE 38:4|PE 18:0_20:4,PE,main,C43H78NO8P,[M-H]-,14.946,[M+H]+ 768.5538,1,1,1,1,1,1,6,2;2;3;2;3;3,1,1,1,1,1,1,6
@@ -221,7 +221,7 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 492 lipids MSDial format,234,DMPE 36:3|DMPE 18:1_18:2,DMPE,DMPE/MMPE (separate),C43H80NO8P,[M-H]-,13.624,[M+H]+ 770.5694,1,1,1,1,1,1,6,3;2;4;2;3;3,,,,,,,
 492 lipids MSDial format,235,DMPE 36:3|DMPE 18:1_18:2,DMPE,DMPE/MMPE (separate),C43H80NO8P,[M-H]-,13.72,[M+H]+ 770.5694,1,1,1,1,1,1,6,3;2;4;2;3;3,,,,,,,
 492 lipids MSDial format,236,DMPE 36:3|DMPE 16:0_20:3,DMPE,DMPE/MMPE (separate),C43H80NO8P,[M-H]-,13.965,[M+H]+ 770.5694,1,1,1,1,1,1,6,3;2;4;2;3;3,,,,,,,
-492 lipids MSDial format,237,PE O-40:9|PE O-18:3_22:6,EtherPE,main,C45H74NO7P,[M-H]-,12.793,[M+H]+ 772.5276,0,0,0,0,0,1,1,0;0;0;0;0;1,0,0,0,0,0,0,0
+492 lipids MSDial format,237,PE O-40:9|PE O-18:3_22:6,EtherPE,main,C45H74NO7P,[M-H]-,12.793,[M+H]+ 772.5276,0,0,0,0,0,1,1,0;0;0;0;0;1,0,0,0,0,0,1,1
 492 lipids MSDial format,238,DMPE 36:2|DMPE 18:1_18:1,DMPE,DMPE/MMPE (separate),C43H82NO8P,[M-H]-,14.892,[M+H]+ 772.5851,1,1,1,1,1,1,6,1;2;3;2;2;2,,,,,,,
 492 lipids MSDial format,239,DMPE 36:2|DMPE 18:1_18:1,DMPE,DMPE/MMPE (separate),C43H82NO8P,[M-H]-,16.035,[M+H]+ 772.5851,1,1,1,1,1,1,6,1;2;3;2;2;2,,,,,,,
 492 lipids MSDial format,240,SM 36:3;O2,SM,main,C41H79N2O6P,[M+HCOO]-,12.304,[M+H]+ 727.5749,1,1,1,1,1,1,6,2;3;4;4;8;4,1,1,1,1,1,1,6
@@ -248,12 +248,12 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 492 lipids MSDial format,261,PE O-40:5|PE O-20:1_20:4,EtherPE,main,C45H82NO7P,[M-H]-,16.353,[M+H]+ 780.5902,1,1,1,1,1,1,6,2;4;5;5;3;3,1,1,1,1,1,1,6
 492 lipids MSDial format,262,PE O-40:5|PE O-20:1_20:4,EtherPE,main,C45H82NO7P,[M-H]-,14.17,[M+H]+ 780.5902,1,1,1,1,1,1,6,2;4;5;5;3;3,1,1,1,1,1,1,6
 492 lipids MSDial format,263,PC O-33:0|PC O-17:0_16:0,EtherPC,main,C41H84NO7P,[M+HCOO]-,15.794,[M+H]+ 734.6058,0,1,1,1,0,1,4,0;2;2;2;0;2,0,1,1,1,0,1,4
-492 lipids MSDial format,264,PE 39:4|PE 19:0_20:4,PE,main,C44H80NO8P,[M-H]-,15.39,[M+H]+ 782.5694,1,1,1,1,1,1,6,5;9;9;8;10;9,0,0,0,0,1,1,2
+492 lipids MSDial format,264,PE 39:4|PE 19:0_20:4,PE,main,C44H80NO8P,[M-H]-,15.39,[M+H]+ 782.5694,1,1,1,1,1,1,6,5;9;9;8;10;9,1,0,0,0,1,1,3
 492 lipids MSDial format,265,DMPE 37:4|DMPE 17:0_20:4,DMPE,DMPE/MMPE (separate),C44H80NO8P,[M-H]-,13.835,[M+H]+ 782.5694,1,1,1,1,1,1,6,5;9;9;8;10;9,,,,,,,
 492 lipids MSDial format,266,DMPE 37:4|DMPE 17:0_20:4,DMPE,DMPE/MMPE (separate),C44H80NO8P,[M-H]-,14.015,[M+H]+ 782.5694,1,1,1,1,1,1,6,5;9;9;8;10;9,,,,,,,
 492 lipids MSDial format,267,PE O-40:4|PE O-18:0_22:4,EtherPE,main,C45H84NO7P,[M-H]-,14.961,[M+H]+ 782.6058,1,1,1,1,1,1,6,1;2;2;3;1;2,1,1,1,1,1,1,6
 492 lipids MSDial format,268,PE O-40:4|PE O-18:0_22:4,EtherPE,main,C45H84NO7P,[M-H]-,16.741,[M+H]+ 782.6058,1,1,1,1,1,1,6,1;2;2;3;1;2,0,0,0,0,0,0,0
-492 lipids MSDial format,269,PE O-40:4|PE O-20:0_20:4,EtherPE,main,C45H84NO7P,[M-H]-,16.487,[M+H]+ 782.6058,1,1,1,1,1,1,6,1;2;2;3;1;2,0,0,0,0,0,1,1
+492 lipids MSDial format,269,PE O-40:4|PE O-20:0_20:4,EtherPE,main,C45H84NO7P,[M-H]-,16.487,[M+H]+ 782.6058,1,1,1,1,1,1,6,1;2;2;3;1;2,0,0,0,0,0,0,0
 492 lipids MSDial format,270,PE O-40:4|PE O-20:0_20:4,EtherPE,main,C45H84NO7P,[M-H]-,15.254,[M+H]+ 782.6058,1,1,1,1,1,1,6,1;2;2;3;1;2,1,0,0,1,1,1,4
 492 lipids MSDial format,271,PE O-40:4|PE O-20:0_20:4,EtherPE,main,C45H84NO7P,[M-H]-,15.318,[M+H]+ 782.6058,1,1,1,1,1,1,6,1;2;2;3;1;2,1,0,0,1,1,1,4
 492 lipids MSDial format,272,DMPE 37:3|DMPE 17:0_20:3,DMPE,DMPE/MMPE (separate),C44H82NO8P,[M-H]-,14.317,[M+H]+ 784.5851,1,1,1,1,1,1,6,7;10;7;10;9;10,,,,,,,
@@ -275,7 +275,7 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 492 lipids MSDial format,288,DMPE 38:6|DMPE 18:2_20:4,DMPE,DMPE/MMPE (separate),C45H78NO8P,[M-H]-,12.267,[M+H]+ 792.5538,1,1,1,1,1,1,6,2;2;2;3;5;5,,,,,,,
 492 lipids MSDial format,289,DMPE 38:6|DMPE 16:0_22:6,DMPE,DMPE/MMPE (separate),C45H78NO8P,[M-H]-,12.965,[M+H]+ 792.5538,1,1,1,1,1,1,6,2;2;2;3;5;5,,,,,,,
 492 lipids MSDial format,290,DMPE 38:6|DMPE 18:2_20:4,DMPE,DMPE/MMPE (separate),C45H78NO8P,[M-H]-,12.149,[M+H]+ 792.5538,1,1,1,1,1,1,6,2;2;2;3;5;5,,,,,,,
-492 lipids MSDial format,291,PE 40:6|PE 18:0_22:6,PE,main,C45H78NO8P,[M-H]-,12.867,[M+H]+ 792.5538,1,1,1,1,1,1,6,2;2;2;3;5;5,1,1,0,1,1,1,5
+492 lipids MSDial format,291,PE 40:6|PE 18:0_22:6,PE,main,C45H78NO8P,[M-H]-,12.867,[M+H]+ 792.5538,1,1,1,1,1,1,6,2;2;2;3;5;5,1,0,0,1,1,1,4
 492 lipids MSDial format,292,PC 33:1|PC 16:0_17:1,PC,main,C41H80NO8P,[M+HCOO]-,14.807,[M+H]+ 746.5694,1,1,1,1,1,1,6,3;3;3;3;2;2,1,1,1,1,1,1,6
 492 lipids MSDial format,293,PC 33:1|PC 17:0_16:1,PC,main,C41H80NO8P,[M+HCOO]-,14.001,[M+H]+ 746.5694,1,1,1,1,1,1,6,3;3;3;3;2;2,1,1,1,1,1,1,6
 492 lipids MSDial format,294,PC 33:1|PC 15:0_18:1,PC,main,C41H80NO8P,[M+HCOO]-,14.082,[M+H]+ 746.5694,1,1,1,1,1,1,6,3;3;3;3;2;2,1,1,1,1,1,1,6
@@ -299,7 +299,7 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 492 lipids MSDial format,312,PC O-35:4|PC O-15:0_20:4,EtherPC,main,C43H80NO7P,[M+HCOO]-,13.457,[M+H]+ 754.5745,1,1,1,1,1,1,6,1;3;3;3;2;2,0,1,1,1,0,1,4
 492 lipids MSDial format,313,DMPE 38:2|DMPE 18:0_20:2,DMPE,DMPE/MMPE (separate),C45H86NO8P,[M-H]-,15.789,[M+H]+ 800.6164,1,1,1,1,1,1,6,1;2;2;2;2;3,,,,,,,
 492 lipids MSDial format,314,SM 38:3;O2,SM,main,C43H83N2O6P,[M+HCOO]-,13.426,[M+H]+ 755.6062,1,1,1,1,1,1,6,1;2;1;2;1;2,1,1,1,1,1,1,6
-492 lipids MSDial format,320,PC 34:3|PC 14:0_20:3,PC,main,C42H78NO8P,[M+HCOO]-,11.822,[M+H]+ 756.5538,1,1,1,1,1,1,6,6;5;7;7;5;7,1,1,1,1,1,1,6
+492 lipids MSDial format,320,PC 34:3|PC 14:0_20:3,PC,main,C42H78NO8P,[M+HCOO]-,11.822,[M+H]+ 756.5538,1,1,1,1,1,1,6,6;5;7;7;5;7,1,1,0,1,1,1,5
 492 lipids MSDial format,321,PC 34:3|PC 16:1_18:2,PC,main,C42H78NO8P,[M+HCOO]-,12.294,[M+H]+ 756.5538,1,1,1,1,1,1,6,6;5;7;7;5;7,1,1,1,1,1,1,6
 492 lipids MSDial format,322,PE O-42:8|PE O-20:2_22:6,EtherPE,main,C47H80NO7P,[M-H]-,14.975,[M+H]+ 802.5745,0,0,0,0,1,1,2,0;0;0;0;2;2,0,0,0,0,1,1,2
 492 lipids MSDial format,323,PC O-35:3|PC O-17:1_18:2,EtherPC,main,C43H82NO7P,[M+HCOO]-,14.708,[M+H]+ 756.5902,1,1,1,1,1,1,6,1;3;3;3;2;2,0,1,1,1,1,1,5
@@ -378,7 +378,7 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 492 lipids MSDial format,396,PI 34:2|PI 16:0_18:2,PI,main,C43H79O13P,[M-H]-,12.035,[M+NH4]+ 852.5597,0,1,1,1,1,1,5,0;1;1;1;2;2,0,1,1,1,1,1,5
 492 lipids MSDial format,397,PC O-38:7|PC O-16:1_22:6,EtherPC,main,C46H80NO7P,[M+HCOO]-,13.51,[M+H]+ 790.5745,1,1,1,1,1,1,6,3;4;4;4;4;5,1,1,1,1,1,1,6
 492 lipids MSDial format,398,PC O-38:7|PC O-18:3_20:4,EtherPC,main,C46H80NO7P,[M+HCOO]-,12.911,[M+H]+ 790.5745,1,1,1,1,1,1,6,3;4;4;4;4;5,1,1,1,1,1,1,6
-492 lipids MSDial format,399,PC O-38:7|PC O-18:3_20:4,EtherPC,main,C46H80NO7P,[M+HCOO]-,12.799,[M+H]+ 790.5745,1,1,1,1,1,1,6,3;4;4;4;4;5,1,1,1,1,0,1,5
+492 lipids MSDial format,399,PC O-38:7|PC O-18:3_20:4,EtherPC,main,C46H80NO7P,[M+HCOO]-,12.799,[M+H]+ 790.5745,1,1,1,1,1,1,6,3;4;4;4;4;5,1,1,1,1,1,1,6
 492 lipids MSDial format,400,PC 36:0|PC 18:0_18:0,PC,main,C44H88NO8P,[M+HCOO]-,16.627,[M+H]+ 790.6320,1,0,0,0,1,1,3,1;0;0;0;1;1,1,0,0,0,1,1,3
 492 lipids MSDial format,401,PE O-44:5|PE O-24:1_20:4,EtherPE,main,C49H90NO7P,[M-H]-,17.854,[M+H]+ 836.6528,0,0,0,0,0,0,0,0;0;0;0;0;0,0,0,0,0,0,0,0
 492 lipids MSDial format,402,PI 34:1|PI 16:0_18:1,PI,main,C43H81O13P,[M-H]-,13.226,[M+NH4]+ 854.5753,1,1,1,1,1,1,6,2;2;3;3;5;5,1,1,1,1,1,1,6
@@ -412,7 +412,7 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 492 lipids MSDial format,430,PI 35:2|PI 17:0_18:2,PI,main,C44H81O13P,[M-H]-,12.773,[M+NH4]+ 866.5753,0,0,0,0,0,0,0,0;0;0;0;0;0,0,0,0,0,0,0,0
 492 lipids MSDial format,431,PC 38:7|PC 16:1_22:6,PC,main,C46H78NO8P,[M+HCOO]-,11.99,[M+H]+ 804.5538,1,1,1,1,1,1,6,6;8;8;8;6;5,1,1,1,1,1,1,6
 492 lipids MSDial format,432,PC 38:7|PC 16:1_22:6,PC,main,C46H78NO8P,[M+HCOO]-,11.447,[M+H]+ 804.5538,1,1,1,1,1,1,6,6;8;8;8;6;5,1,1,1,1,1,1,6
-492 lipids MSDial format,433,PC 38:7|PC 18:2_20:5,PC,main,C46H78NO8P,[M+HCOO]-,11.048,[M+H]+ 804.5538,1,1,1,1,1,1,6,6;8;8;8;6;5,1,1,1,1,1,0,5
+492 lipids MSDial format,433,PC 38:7|PC 18:2_20:5,PC,main,C46H78NO8P,[M+HCOO]-,11.048,[M+H]+ 804.5538,1,1,1,1,1,1,6,6;8;8;8;6;5,1,1,1,1,1,1,6
 492 lipids MSDial format,434,PI 35:1|PI 17:0_18:1,PI,main,C44H83O13P,[M-H]-,13.82,[M+NH4]+ 868.5910,0,0,0,0,0,0,0,0;0;0;0;0;0,0,0,0,0,0,0,0
 492 lipids MSDial format,435,PC 38:6|PC 16:0_22:6,PC,main,C46H80NO8P,[M+HCOO]-,12.944,[M+H]+ 806.5694,1,1,1,1,1,1,6,3;5;7;6;6;6,1,1,1,1,1,1,6
 492 lipids MSDial format,436,PC 38:6|PC 18:2_20:4,PC,main,C46H80NO8P,[M+HCOO]-,12.24,[M+H]+ 806.5694,1,1,1,1,1,1,6,3;5;7;6;6;6,1,1,1,1,1,1,6
@@ -434,16 +434,16 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 492 lipids MSDial format,452,SM 42:1;O2|SM 18:1;O2/24:0,SM,main,C47H95N2O6P,[M+HCOO]-,17.505,[M+H]+ 815.7001,1,1,1,1,1,1,6,4;2;3;4;4;5,1,1,1,1,1,1,6
 492 lipids MSDial format,453,PC 38:1|PC 18:0_20:1,PC,main,C46H90NO8P,[M+HCOO]-,16.559,[M+H]+ 816.6477,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,1,1,6
 492 lipids MSDial format,454,PE O-46:6|PE O-26:2_20:4,EtherPE,main,C51H92NO7P,[M-H]-,16.298,[M+H]+ 862.6684,0,0,0,0,0,0,0,0;0;0;0;0;0,0,0,0,0,0,0,0
-492 lipids MSDial format,455,PC O-40:7|PC O-18:1_22:6,EtherPC,main,C48H84NO7P,[M+HCOO]-,14.736,[M+H]+ 818.6058,1,1,1,1,1,1,6,3;3;4;3;3;5,1,1,1,1,1,1,6
+492 lipids MSDial format,455,PC O-40:7|PC O-18:1_22:6,EtherPC,main,C48H84NO7P,[M+HCOO]-,14.736,[M+H]+ 818.6058,1,1,1,1,1,1,6,3;3;4;3;3;5,1,1,0,1,1,1,5
 492 lipids MSDial format,456,PC O-40:7|PC O-18:1_22:6,EtherPC,main,C48H84NO7P,[M+HCOO]-,13.755,[M+H]+ 818.6058,1,1,1,1,1,1,6,3;3;4;3;3;5,1,1,1,1,1,1,6
 492 lipids MSDial format,457,PE O-46:5|PE O-26:1_20:4,EtherPE,main,C51H94NO7P,[M-H]-,17.126,[M+H]+ 864.6841,0,0,0,0,0,0,0,0;0;0;0;0;0,0,0,0,0,0,0,0
-492 lipids MSDial format,458,PI 36:1|PI 18:0_18:1,PI,main,C45H85O13P,[M-H]-,14.437,[M+NH4]+ 882.6066,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,0,1,5
+492 lipids MSDial format,458,PI 36:1|PI 18:0_18:1,PI,main,C45H85O13P,[M-H]-,14.437,[M+NH4]+ 882.6066,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,0,0,4
 492 lipids MSDial format,459,PC 39:6|PC 17:0_22:6,PC,main,C47H82NO8P,[M+HCOO]-,13.626,[M+H]+ 820.5851,1,1,1,1,1,1,6,2;3;2;3;4;5,1,1,1,1,1,1,6
 492 lipids MSDial format,460,PC 39:6|PC 17:0_22:6,PC,main,C47H82NO8P,[M+HCOO]-,13.394,[M+H]+ 820.5851,1,1,1,1,1,1,6,2;3;2;3;4;5,1,1,1,1,1,1,6
 492 lipids MSDial format,461,PC O-40:6|PC O-18:0_22:6,EtherPC,main,C48H86NO7P,[M+HCOO]-,14.94,[M+H]+ 820.6215,1,1,1,1,1,1,6,3;4;5;4;4;5,1,1,1,1,1,1,6
-492 lipids MSDial format,462,PC O-40:6|PC O-18:1_22:5,EtherPC,main,C48H86NO7P,[M+HCOO]-,14.289,[M+H]+ 820.6215,1,1,1,1,1,1,6,3;4;5;4;4;5,1,0,1,1,1,1,5
+492 lipids MSDial format,462,PC O-40:6|PC O-18:1_22:5,EtherPC,main,C48H86NO7P,[M+HCOO]-,14.289,[M+H]+ 820.6215,1,1,1,1,1,1,6,3;4;5;4;4;5,1,1,1,1,1,1,6
 492 lipids MSDial format,463,PC 39:5|PC 17:0_22:5,PC,main,C47H84NO8P,[M+HCOO]-,13.815,[M+H]+ 822.6007,1,1,1,1,1,1,6,1;2;2;4;1;3,1,1,1,1,1,1,6
-492 lipids MSDial format,464,PC O-40:5|PC O-18:0_22:5,EtherPC,main,C48H88NO7P,[M+HCOO]-,15.256,[M+H]+ 822.6371,1,1,1,1,1,1,6,2;3;4;3;1;4,1,1,1,1,1,1,6
+492 lipids MSDial format,464,PC O-40:5|PC O-18:0_22:5,EtherPC,main,C48H88NO7P,[M+HCOO]-,15.256,[M+H]+ 822.6371,1,1,1,1,1,1,6,2;3;4;3;1;4,1,1,1,1,0,1,5
 492 lipids MSDial format,465,PC O-40:5|PC O-20:1_20:4,EtherPC,main,C48H88NO7P,[M+HCOO]-,16.09,[M+H]+ 822.6371,1,1,1,1,1,1,6,2;3;4;3;1;4,1,1,1,1,1,1,6
 492 lipids MSDial format,466,PC 39:4|PC 19:0_20:4,PC,main,C47H86NO8P,[M+HCOO]-,15.188,[M+H]+ 824.6164,1,1,1,1,1,1,6,1;4;1;5;3;3,1,1,1,1,1,1,6
 492 lipids MSDial format,467,PC O-40:4|PC O-20:0_20:4,EtherPC,main,C48H90NO7P,[M+HCOO]-,16.255,[M+H]+ 824.6528,1,1,1,1,1,1,6,2;3;3;3;2;3,1,1,1,1,1,1,6
@@ -453,38 +453,38 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 492 lipids MSDial format,471,HexCer 42:2;O3|HexCer 18:1;O2/24:1;O,HexCer_HS,main,C48H91NO9,[M+HCOO]-,16.622,[M+H]+ 826.6767,1,1,1,1,1,1,6,2;2;2;2;1;2,1,1,1,1,1,1,6
 492 lipids MSDial format,472,SM 43:2;O2|SM 19:1;O2/24:1,SM,main,C48H95N2O6P,[M+HCOO]-,16.865,[M+H]+ 827.7001,1,1,1,1,1,1,6,3;4;4;4;5;4,1,1,1,1,1,1,6
 492 lipids MSDial format,473,HexCer 42:1;O3|HexCer 18:1;O2/24:0;O,HexCer_HS,main,C48H93NO9,[M+HCOO]-,17.492,[M+H]+ 828.6923,1,1,1,1,1,1,6,1;1;3;2;1;2,1,1,1,1,1,1,6
-492 lipids MSDial format,474,PC 40:8|PC 18:2_22:6,PC,main,C48H80NO8P,[M+HCOO]-,11.819,[M+H]+ 830.5694,1,1,1,1,1,1,6,3;3;4;3;4;4,1,1,1,1,0,0,4
+492 lipids MSDial format,474,PC 40:8|PC 18:2_22:6,PC,main,C48H80NO8P,[M+HCOO]-,11.819,[M+H]+ 830.5694,1,1,1,1,1,1,6,3;3;4;3;4;4,1,1,1,1,1,1,6
 492 lipids MSDial format,475,HexCer 42:0;O3|HexCer 17:0;O2/25:0;O,HexCer_HDS,main,C48H95NO9,[M+HCOO]-,17.278,[M+H]+ 830.7080,0,0,0,0,0,0,0,0;0;0;0;0;0,0,0,0,0,0,0,0
 492 lipids MSDial format,476,PC 40:7|PC 18:1_22:6,PC,main,C48H82NO8P,[M+HCOO]-,13.003,[M+H]+ 832.5851,1,1,1,1,1,1,6,5;6;7;8;6;8,1,1,1,1,1,1,6
 492 lipids MSDial format,477,PC 40:7|PC 18:2_22:5,PC,main,C48H82NO8P,[M+HCOO]-,12.292,[M+H]+ 832.5851,1,1,1,1,1,1,6,5;6;7;8;6;8,1,1,1,1,1,1,6
-492 lipids MSDial format,478,Hex2Cer 32:1;O2,Hex2Cer,main,C44H83NO13,[M+HCOO]-,11.667,[M+H]+ 834.5937,1,1,1,1,1,1,6,3;9;6;7;6;8,0,1,0,0,0,0,1
+492 lipids MSDial format,478,Hex2Cer 32:1;O2,Hex2Cer,main,C44H83NO13,[M+HCOO]-,11.667,[M+H]+ 834.5937,1,1,1,1,1,1,6,3;9;6;7;6;8,1,1,0,0,0,0,2
 492 lipids MSDial format,479,PC 40:6|PC 20:2_20:4,PC,main,C48H84NO8P,[M+HCOO]-,13.565,[M+H]+ 834.6007,1,1,1,1,1,1,6,3;9;6;7;6;8,1,1,1,1,1,1,6
 492 lipids MSDial format,480,PC 40:6|PC 16:0_24:6,PC,main,C48H84NO8P,[M+HCOO]-,13.791,[M+H]+ 834.6007,1,1,1,1,1,1,6,3;9;6;7;6;8,1,1,1,1,1,1,6
 492 lipids MSDial format,481,PC 40:6|PC 18:0_22:6,PC,main,C48H84NO8P,[M+HCOO]-,14.265,[M+H]+ 834.6007,1,1,1,1,1,1,6,3;9;6;7;6;8,1,1,1,1,1,1,6
 492 lipids MSDial format,482,PC 40:5|PC 18:0_22:5,PC,main,C48H86NO8P,[M+HCOO]-,15.066,[M+H]+ 836.6164,1,1,1,1,1,1,6,2;2;2;2;5;7,1,1,0,1,1,1,5
-492 lipids MSDial format,483,PI 38:6|PI 16:0_22:6,PI,main,C47H79O13P,[M-H]-,11.292,[M+NH4]+ 900.5597,1,1,1,1,1,1,6,1;2;1;1;3;2,0,1,0,0,0,0,1
-492 lipids MSDial format,484,PC 40:4|PC 20:0_20:4,PC,main,C48H88NO8P,[M+HCOO]-,14.737,[M+H]+ 838.6320,1,1,1,1,1,1,6,2;2;3;2;2;3,1,0,1,1,1,1,5
+492 lipids MSDial format,483,PI 38:6|PI 16:0_22:6,PI,main,C47H79O13P,[M-H]-,11.292,[M+NH4]+ 900.5597,1,1,1,1,1,1,6,1;2;1;1;3;2,1,1,0,0,0,0,2
+492 lipids MSDial format,484,PC 40:4|PC 20:0_20:4,PC,main,C48H88NO8P,[M+HCOO]-,14.737,[M+H]+ 838.6320,1,1,1,1,1,1,6,2;2;3;2;2;3,1,0,1,0,1,1,4
 492 lipids MSDial format,485,PC 40:4|PC 18:0_22:4,PC,main,C48H88NO8P,[M+HCOO]-,15.4,[M+H]+ 838.6320,1,1,1,1,1,1,6,2;2;3;2;2;3,1,1,1,1,1,1,6
-492 lipids MSDial format,486,PI 38:5|PI 18:1_20:4,PI,main,C47H81O13P,[M-H]-,11.839,[M+NH4]+ 902.5753,1,1,1,1,1,1,6,1;2;2;2;2;2,0,1,1,1,0,0,3
+492 lipids MSDial format,486,PI 38:5|PI 18:1_20:4,PI,main,C47H81O13P,[M-H]-,11.839,[M+NH4]+ 902.5753,1,1,1,1,1,1,6,1;2;2;2;2;2,0,1,0,1,0,0,2
 492 lipids MSDial format,487,PI 38:5|PI 18:0_20:5,PI,main,C47H81O13P,[M-H]-,12.087,[M+NH4]+ 902.5753,1,1,1,1,1,1,6,1;2;2;2;2;2,0,1,1,1,0,0,3
 492 lipids MSDial format,488,PC 40:3|PC 20:0_20:3,PC,main,C48H90NO8P,[M+HCOO]-,16.114,[M+H]+ 840.6477,1,1,1,1,1,1,6,1;1;1;1;1;2,1,1,1,1,1,1,6
-492 lipids MSDial format,489,PI 38:4|PI 18:0_20:4,PI,main,C47H83O13P,[M-H]-,13.237,[M+NH4]+ 904.5910,1,1,1,1,1,1,6,1;1;1;2;2;2,1,1,1,1,1,1,6
-492 lipids MSDial format,490,PI 38:4|PI 18:1_20:3,PI,main,C47H83O13P,[M-H]-,12.466,[M+NH4]+ 904.5910,1,1,1,1,1,1,6,1;1;1;2;2;2,1,0,0,1,1,1,4
+492 lipids MSDial format,489,PI 38:4|PI 18:0_20:4,PI,main,C47H83O13P,[M-H]-,13.237,[M+NH4]+ 904.5910,1,1,1,1,1,1,6,1;1;1;2;2;2,1,1,1,1,0,0,4
+492 lipids MSDial format,490,PI 38:4|PI 18:1_20:3,PI,main,C47H83O13P,[M-H]-,12.466,[M+NH4]+ 904.5910,1,1,1,1,1,1,6,1;1;1;2;2;2,1,1,0,1,1,1,5
 492 lipids MSDial format,491,PC 40:2|PC 22:0_18:2,PC,main,C48H92NO8P,[M+HCOO]-,16.735,[M+H]+ 842.6633,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,1,1,6
 492 lipids MSDial format,492,PI 38:3|PI 18:0_20:3,PI,main,C47H85O13P,[M-H]-,14.183,[M+NH4]+ 906.6066,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,0,0,4
-492 lipids MSDial format,493,PI 38:3|PI 18:0_20:3,PI,main,C47H85O13P,[M-H]-,13.783,[M+NH4]+ 906.6066,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,1,1,6
+492 lipids MSDial format,493,PI 38:3|PI 18:0_20:3,PI,main,C47H85O13P,[M-H]-,13.783,[M+NH4]+ 906.6066,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,0,1,5
 492 lipids MSDial format,494,PI 38:2|PI 18:0_20:2,PI,main,C47H87O13P,[M-H]-,14.523,[M+NH4]+ 908.6223,0,0,0,0,0,0,0,0;0;0;0;0;0,0,0,0,0,0,0,0
 492 lipids MSDial format,495,PC O-42:6|PC O-22:2_20:4,EtherPC,main,C50H90NO7P,[M+HCOO]-,15.315,[M+H]+ 848.6528,1,1,1,1,1,1,6,2;2;2;1;4;3,1,0,1,0,1,1,4
 492 lipids MSDial format,496,PC O-42:6|PC O-20:0_22:6,EtherPC,main,C50H90NO7P,[M+HCOO]-,16.001,[M+H]+ 848.6528,1,1,1,1,1,1,6,2;2;2;1;4;3,1,1,1,1,1,1,6
 492 lipids MSDial format,497,PC O-42:5|PC O-22:1_20:4,EtherPC,main,C50H92NO7P,[M+HCOO]-,16.169,[M+H]+ 850.6684,1,1,1,1,1,1,6,2;1;3;3;1;4,1,1,1,1,1,1,6
-492 lipids MSDial format,498,PC O-42:4|PC O-24:2_18:2,EtherPC,main,C50H94NO7P,[M+HCOO]-,16.407,[M+H]+ 852.6841,1,1,1,1,1,1,6,2;2;4;3;2;4,1,0,1,1,1,1,5
+492 lipids MSDial format,498,PC O-42:4|PC O-24:2_18:2,EtherPC,main,C50H94NO7P,[M+HCOO]-,16.407,[M+H]+ 852.6841,1,1,1,1,1,1,6,2;2;4;3;2;4,1,1,1,1,1,1,6
 492 lipids MSDial format,499,PC O-42:4|PC O-22:0_20:4,EtherPC,main,C50H94NO7P,[M+HCOO]-,17.067,[M+H]+ 852.6841,1,1,1,1,1,1,6,2;2;4;3;2;4,1,1,1,1,1,1,6
 492 lipids MSDial format,500,PC 42:10|PC 20:4_22:6,PC,main,C50H80NO8P,[M+HCOO]-,11.386,[M+H]+ 854.5694,1,1,1,1,1,1,6,2;2;3;2;4;5,1,0,1,1,1,1,5
 492 lipids MSDial format,501,PC O-42:3|PC O-24:1_18:2,EtherPC,main,C50H96NO7P,[M+HCOO]-,17.145,[M+H]+ 854.6997,1,0,1,1,1,1,5,1;0;1;1;1;1,1,0,1,1,1,1,5
 492 lipids MSDial format,502,PC O-42:2|PC O-24:1_18:1,EtherPC,main,C50H98NO7P,[M+HCOO]-,17.765,[M+H]+ 856.7154,1,1,1,1,1,1,6,2;1;2;2;1;2,1,1,1,1,1,1,6
 492 lipids MSDial format,503,PC 42:8|PC 20:4_22:4,PC,main,C50H84NO8P,[M+HCOO]-,12.972,[M+H]+ 858.6007,1,1,1,1,1,1,6,3;5;4;4;4;4,1,1,1,1,1,1,6
 492 lipids MSDial format,504,PC 42:7|PC 20:1_22:6,PC,main,C50H86NO8P,[M+HCOO]-,14.222,[M+H]+ 860.6164,1,1,1,1,1,1,6,2;3;2;4;3;3,1,1,1,1,1,1,6
-492 lipids MSDial format,505,Hex2Cer 34:1;O2,Hex2Cer,main,C46H87NO13,[M+HCOO]-,13.32,[M+H]+ 862.6250,1,1,1,1,1,1,6,2;3;3;3;3;3,1,1,1,1,1,0,5
+492 lipids MSDial format,505,Hex2Cer 34:1;O2,Hex2Cer,main,C46H87NO13,[M+HCOO]-,13.32,[M+H]+ 862.6250,1,1,1,1,1,1,6,2;3;3;3;3;3,1,0,1,1,0,0,3
 492 lipids MSDial format,506,PI 40:6|PI 18:0_22:6,PI,main,C49H83O13P,[M-H]-,12.842,[M+NH4]+ 928.5910,1,1,1,0,1,1,5,1;1;1;0;2;1,1,1,1,0,1,0,4
 492 lipids MSDial format,507,PI 40:5|PI 18:0_22:5,PI,main,C49H85O13P,[M-H]-,13.236,[M+NH4]+ 930.6066,0,1,1,1,0,0,3,0;1;1;1;0;0,0,1,1,1,0,0,3
 492 lipids MSDial format,508,PI 40:4|PI 18:0_22:4,PI,main,C49H87O13P,[M-H]-,14.103,[M+NH4]+ 932.6223,0,0,0,0,0,0,0,0;0;0;0;0;0,0,0,0,0,0,0,0
@@ -516,10 +516,10 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 182 Holpie manuscript SI format,37,CAR 18:1 | CAR 18:1,CAR,main,C25H47NO4,,2.79,[M+H]+ 426.3578,1,1,1,1,1,1,6,2;1;1;1;1;1,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,38,CAR 18:2 | CAR 18:2,CAR,main,C25H45NO4,,2.18,[M+H]+ 424.3421,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,45,MG 16:0 | MG 16:0_0:0_0:0,MG,main,C19H38O4,,4.58,[M+Na]+ 353.2662; [M+H-H2O]+ 313.2737,0,1,0,1,1,1,4,0;1;0;1;1;1,0,1,0,1,1,1,4
-182 Holpie manuscript SI format,46,MG 18:0 | MG 18:0_0:0_0:0,MG,main,C21H42O4,,6.54,[M+Na]+ 381.2975; [M+H-H2O]+ 341.3050,1,0,0,0,1,1,3,1;0;0;0;1;1,0,0,0,0,1,1,2
+182 Holpie manuscript SI format,46,MG 18:0 | MG 18:0_0:0_0:0,MG,main,C21H42O4,,6.54,[M+Na]+ 381.2975; [M+H-H2O]+ 341.3050,1,0,0,0,1,1,3,1;0;0;0;1;1,1,0,0,0,1,1,3
 182 Holpie manuscript SI format,47,MG 18:1 | MG 18:1_0:0_0:0,MG,main,C21H40O4,,4.78,[M+Na]+ 379.2819; [M+H-H2O]+ 339.2894,0,1,0,1,1,1,4,0;1;0;1;1;1,0,1,0,1,1,1,4
 182 Holpie manuscript SI format,48,MG 18:2 | MG 18:2_0:0_0:0,MG,main,C21H38O4,,3.6,[M+Na]+ 377.2662; [M+H-H2O]+ 337.2737,0,0,0,0,1,1,2,0;0;0;0;1;1,0,0,0,0,1,1,2
-182 Holpie manuscript SI format,55,"DG 32:0 | 1,2-DG 16:0/16:0",DG,main,C35H68O5,,16.08,[M+Na]+ 591.4959,1,1,1,1,1,1,6,1;2;1;1;1;2,1,0,1,1,1,1,5
+182 Holpie manuscript SI format,55,"DG 32:0 | 1,2-DG 16:0/16:0",DG,main,C35H68O5,,16.08,[M+Na]+ 591.4959,1,1,1,1,1,1,6,1;2;1;1;1;2,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,56,"DG 32:0 | 1,3-DG 16:0/16:0",DG,main,C35H68O5,,16.16,[M+Na]+ 591.4959,1,1,1,1,1,1,6,1;2;1;1;1;2,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,57,"DG 32:1 | 1,2-DG 16:0_16:1",DG,main,C35H66O5,,15.12,[M+Na]+ 589.4802,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,58,"DG 32:1 | 1,3-DG 16:0_16:1",DG,main,C35H66O5,,15.19,[M+Na]+ 589.4802,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,1,1,6
@@ -537,8 +537,8 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 182 Holpie manuscript SI format,70,"DG 36:2 | 1,3-DG 18:1/18:1",DG,main,C39H72O5,,16.16,[M+Na]+ 643.5272,1,1,1,1,1,1,6,1;3;1;3;2;3,1,0,1,1,1,1,5
 182 Holpie manuscript SI format,71,"DG 36:3 | 1,2-DG 18:1_18:2",DG,main,C39H70O5,,15.29,[M+Na]+ 641.5115,1,1,1,1,1,1,6,1;1;1;1;1;3,1,0,1,1,1,1,5
 182 Holpie manuscript SI format,72,"DG 36:3 | 1,3-DG 18:1_18:2",DG,main,C39H70O5,,15.35,[M+Na]+ 641.5115,1,1,1,1,1,1,6,1;1;1;1;1;3,1,0,1,1,1,1,5
-182 Holpie manuscript SI format,73,"DG 36:4 | 1,3-DG 18:1_18:3",DG,main,C39H68O5,,14.53,[M+Na]+ 639.4959,1,1,1,1,1,1,6,2;2;2;2;5;4,1,0,1,1,1,1,5
-182 Holpie manuscript SI format,74,"DG 36:4 | 1,3-DG 18:2_18:2",DG,main,C39H68O5,,14.53,[M+Na]+ 639.4959,1,1,1,1,1,1,6,2;2;2;2;5;4,1,0,1,1,1,1,5
+182 Holpie manuscript SI format,73,"DG 36:4 | 1,3-DG 18:1_18:3",DG,main,C39H68O5,,14.53,[M+Na]+ 639.4959,1,1,1,1,1,1,6,2;2;2;2;5;4,1,1,1,1,1,1,6
+182 Holpie manuscript SI format,74,"DG 36:4 | 1,3-DG 18:2_18:2",DG,main,C39H68O5,,14.53,[M+Na]+ 639.4959,1,1,1,1,1,1,6,2;2;2;2;5;4,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,80,PE P-34:1 | PE P-16:0/18:1,PE P-,main,C39H76NO7P,,15.27,[M+H]+ 702.5432,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,81,PE P-34:2 | PE P-16:0/18:2,PE P-,main,C39H74NO7P,,14.34,[M+H]+ 700.5276,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,82,PE P-36:1 | PE P-18:0/18:1,PE P-,main,C41H80NO7P,,16.25,[M+H]+ 730.5745,1,1,1,1,1,1,6,1;2;2;2;2;2,1,1,1,1,1,1,6
@@ -550,7 +550,7 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 182 Holpie manuscript SI format,88,PE P-36:4 | PE P-16:0/20:4,PE P-,main,C41H74NO7P,,14.05,[M+H]+ 724.5276,1,1,1,1,1,1,6,1;2;1;2;1;1,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,89,PE P-36:5 | PE P-16:0/20:5,PE P-,main,C41H72NO7P,,13.16,[M+H]+ 722.5119,1,1,1,1,1,1,6,7;2;4;4;5;2,1,1,1,1,1,0,5
 182 Holpie manuscript SI format,90,PE P-38:1 | PE P-20:0/18:1,PE P-,main,C43H84NO7P,,17.05,[M+H]+ 758.6058,1,1,1,1,0,1,5,2;2;3;3;0;3,0,0,0,0,0,0,0
-182 Holpie manuscript SI format,91,PE P-38:2 | PE P-20:0/18:2,PE P-,main,C43H82NO7P,,16.32,[M+H]+ 756.5902,1,1,1,1,1,1,6,1;3;3;3;2;2,1,0,1,1,0,1,4
+182 Holpie manuscript SI format,91,PE P-38:2 | PE P-20:0/18:2,PE P-,main,C43H82NO7P,,16.32,[M+H]+ 756.5902,1,1,1,1,1,1,6,1;3;3;3;2;2,1,0,1,1,0,0,3
 182 Holpie manuscript SI format,92,PE P-38:3 | PE P-18:0/20:3,PE P-,main,C43H80NO7P,,15.67,[M+H]+ 754.5745,1,1,1,1,1,1,6,1;3;3;3;2;2,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,93,PE P-38:4 | PE P-18:0/20:4,PE P-,main,C43H78NO7P,,15.18,[M+H]+ 752.5589,1,1,1,1,1,1,6,3;4;3;4;4;4,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,94,PE P-38:4 | PE P-16:0/22:4,PE P-,main,C43H78NO7P,,14.86,[M+H]+ 752.5589,1,1,1,1,1,1,6,3;4;3;4;4;4,1,1,1,1,1,1,6
@@ -562,10 +562,10 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 182 Holpie manuscript SI format,100,PE P-40:4 | PE P-18:0/22:4,PE P-,main,C45H82NO7P,,15.91,[M+H]+ 780.5902,1,1,1,1,1,1,6,2;4;5;5;3;3,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,101,PE P-40:4 | PE P-20:0/20:4,PE P-,main,C45H82NO7P,,16.14,[M+H]+ 780.5902,1,1,1,1,1,1,6,2;4;5;5;3;3,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,102,PE P-40:5 | PE P-18:0/22:5,PE P-,main,C45H80NO7P,,15.17,[M+H]+ 778.5745,1,1,1,1,1,1,6,1;4;3;3;2;3,1,1,1,1,1,1,6
-182 Holpie manuscript SI format,103,PE P-40:5 | PE P-18:1/22:4,PE P-,main,C45H80NO7P,,15.0,[M+H]+ 778.5745,1,1,1,1,1,1,6,1;4;3;3;2;3,1,0,1,1,1,1,5
+182 Holpie manuscript SI format,103,PE P-40:5 | PE P-18:1/22:4,PE P-,main,C45H80NO7P,,15.0,[M+H]+ 778.5745,1,1,1,1,1,1,6,1;4;3;3;2;3,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,104,PE P-40:5 | PE P-20:1/20:4,PE P-,main,C45H80NO7P,,15.17,[M+H]+ 778.5745,1,1,1,1,1,1,6,1;4;3;3;2;3,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,105,PE P-40:6 | PE P-18:1/22:5,PE P-,main,C45H78NO7P,,14.11,[M+H]+ 776.5589,1,1,1,1,1,1,6,1;3;1;1;1;1,1,1,0,0,1,1,4
-182 Holpie manuscript SI format,106,PE P-40:6 | PE P-18:0/22:6,PE P-,main,C45H78NO7P,,13.71,[M+H]+ 776.5589,1,1,1,1,1,1,6,1;3;1;1;1;1,0,0,0,0,0,0,0
+182 Holpie manuscript SI format,106,PE P-40:6 | PE P-18:0/22:6,PE P-,main,C45H78NO7P,,13.71,[M+H]+ 776.5589,1,1,1,1,1,1,6,1;3;1;1;1;1,0,1,0,0,0,0,1
 182 Holpie manuscript SI format,114,CE 16:0 | CE 16:0,CE,main,C43H76O2,,20.62,[M+NH4]+ 642.6184,1,1,1,1,1,1,6,1;1;1;1;1;2,1,1,1,1,1,0,5
 182 Holpie manuscript SI format,115,CE 16:1 | CE 16:1,CE,main,C43H74O2,,20.07,[M+NH4]+ 640.6027,1,1,1,1,1,1,6,1;1;1;1;1;1,1,1,1,1,1,0,5
 182 Holpie manuscript SI format,116,CE 18:0 | CE 18:0,CE,main,C45H80O2,,21.06,[M+NH4]+ 670.6497,1,1,1,1,1,1,6,1;1;1;1;3;2,1,1,1,1,1,1,6
@@ -581,7 +581,7 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 182 Holpie manuscript SI format,126,CE 22:6 | CE 22:6,CE,main,C49H76O2,,19.46,[M+NH4]+ 714.6184,1,1,1,1,1,1,6,1;1;1;1;2;1,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,132,TG 42:0 | TG 16:0_14:0_12:0,TG,main,C45H86O6,,19.01,[M+NH4]+ 740.6763; [M+Na]+ 745.6317,1,1,1,1,1,1,6,5;6;7;7;6;7,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,133,TG 42:1 | TG 12:0_12:0_18:1,TG,main,C45H84O6,,18.45,[M+NH4]+ 738.6606; [M+Na]+ 743.6160,1,1,1,1,1,1,6,2;2;3;3;3;3,1,1,1,1,1,1,6
-182 Holpie manuscript SI format,134,TG 42:2 | n.a.,TG,main,C45H82O6,,17.88,[M+NH4]+ 736.6450; [M+Na]+ 741.6004,1,1,1,1,1,1,6,1;2;2;2;2;1,1,1,1,1,1,1,6
+182 Holpie manuscript SI format,134,TG 42:2 | n.a.,TG,main,C45H82O6,,17.88,[M+NH4]+ 736.6450; [M+Na]+ 741.6004,1,1,1,1,1,1,6,1;2;2;2;2;1,1,1,1,1,1,0,5
 182 Holpie manuscript SI format,135,TG 44:0 | TG 16:0_14:0_14:0,TG,main,C47H90O6,,19.58,[M+NH4]+ 768.7076; [M+Na]+ 773.6630,1,1,1,1,1,1,6,3;5;4;4;3;2,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,136,TG 44:1 | TG 14:0_18:1_12:0,TG,main,C47H88O6,,19.01,[M+NH4]+ 766.6919; [M+Na]+ 771.6473,1,1,1,1,1,1,6,3;5;4;5;3;2,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,137,TG 44:1 | TG 16:1_14:0_14:0,TG,main,C47H88O6,,19.01,[M+NH4]+ 766.6919; [M+Na]+ 771.6473,1,1,1,1,1,1,6,3;5;4;5;3;2,1,1,1,1,1,1,6
@@ -617,7 +617,7 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 182 Holpie manuscript SI format,167,TG 50:3 | TG 16:1_16:1_18:1,TG,main,C53H96O6,,19.49,[M+NH4]+ 846.7545; [M+Na]+ 851.7099,1,1,1,1,1,1,6,3;3;4;2;5;8,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,168,TG 50:4 | TG 18:2_18:2_14:0,TG,main,C53H94O6,,19.09,[M+NH4]+ 844.7389; [M+Na]+ 849.6943,1,1,1,1,1,1,6,3;3;3;4;6;11,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,169,TG 50:4 | TG 18:3_16:1_16:0,TG,main,C53H94O6,,19.09,[M+NH4]+ 844.7389; [M+Na]+ 849.6943,1,1,1,1,1,1,6,3;3;3;4;6;11,1,1,1,1,1,1,6
-182 Holpie manuscript SI format,170,TG 50:4 | TG 18:2_16:1_16:1,TG,main,C53H94O6,,18.99,[M+NH4]+ 844.7389; [M+Na]+ 849.6943,1,1,1,1,1,1,6,3;3;3;4;6;11,1,1,1,1,1,1,6
+182 Holpie manuscript SI format,170,TG 50:4 | TG 18:2_16:1_16:1,TG,main,C53H94O6,,18.99,[M+NH4]+ 844.7389; [M+Na]+ 849.6943,1,1,1,1,1,1,6,3;3;3;4;6;11,1,1,1,1,1,0,5
 182 Holpie manuscript SI format,171,TG 51:0 | TG 18:0_17:0_16:0,TG,main,C54H104O6,,20.99,[M+NH4]+ 866.8171; [M+Na]+ 871.7725,1,1,1,1,1,1,6,2;1;3;2;3;5,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,172,TG 51:1 | TG 17:0_18:1_16:0,TG,main,C54H102O6,,20.61,[M+NH4]+ 864.8015; [M+Na]+ 869.7569,1,1,1,1,1,1,6,2;2;2;2;5;5,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,173,TG 51:2 | TG 17:1_18:1_16:0,TG,main,C54H100O6,,20.21,[M+NH4]+ 862.7858; [M+Na]+ 867.7412,1,1,1,1,1,1,6,3;2;4;4;4;9,1,1,1,1,1,1,6
@@ -633,7 +633,7 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 182 Holpie manuscript SI format,183,TG 52:4 | TG 18:1_18:2_16:1,TG,main,C55H98O6,,19.47,[M+NH4]+ 872.7702; [M+Na]+ 877.7256,1,1,1,1,1,1,6,7;4;5;5;8;7,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,184,TG 52:4 | TG 18:1_18:3_16:0,TG,main,C55H98O6,,19.55,[M+NH4]+ 872.7702; [M+Na]+ 877.7256,1,1,1,1,1,1,6,7;4;5;5;8;7,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,185,TG 52:4 | TG 18:2_18:2_16:0,TG,main,C55H98O6,,19.55,[M+NH4]+ 872.7702; [M+Na]+ 877.7256,1,1,1,1,1,1,6,7;4;5;5;8;7,1,1,1,1,1,1,6
-182 Holpie manuscript SI format,186,TG 52:5 | TG 18:2_18:2_16:1,TG,main,C55H96O6,,19.05,[M+NH4]+ 870.7545; [M+Na]+ 875.7099,1,1,1,1,1,1,6,2;2;3;2;2;10,1,1,1,1,1,1,6
+182 Holpie manuscript SI format,186,TG 52:5 | TG 18:2_18:2_16:1,TG,main,C55H96O6,,19.05,[M+NH4]+ 870.7545; [M+Na]+ 875.7099,1,1,1,1,1,1,6,2;2;3;2;2;10,1,1,0,1,1,0,4
 182 Holpie manuscript SI format,187,TG 52:5 | TG 18:3_18:2_16:0,TG,main,C55H96O6,,19.18,[M+NH4]+ 870.7545; [M+Na]+ 875.7099,1,1,1,1,1,1,6,2;2;3;2;2;10,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,188,TG 53:1 | TG 18:0_18:1_17:0,TG,main,C56H106O6,,20.97,[M+NH4]+ 892.8328; [M+Na]+ 897.7882,1,1,1,1,1,1,6,2;1;4;2;3;5,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,189,TG 53:2 | TG 18:1_18:1_17:0,TG,main,C56H104O6,,20.53,[M+NH4]+ 890.8171; [M+Na]+ 895.7725,1,1,1,1,1,1,6,2;1;4;2;3;6,1,1,1,1,1,1,6
@@ -645,7 +645,7 @@ sheet,xlsx_row,name,class,group,formula,vetted_neg_adduct,vetted_RT_min,positive
 182 Holpie manuscript SI format,195,TG 54:1 | TG 18:0_20:1_16:0,TG,main,C57H108O6,,21.09,[M+NH4]+ 906.8484; [M+Na]+ 911.8038,1,1,1,1,1,1,6,2;3;3;2;2;2,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,196,TG 54:2 | TG 20:1_18:1_16:0,TG,main,C57H106O6,,20.74,[M+NH4]+ 904.8328; [M+Na]+ 909.7882,1,1,1,1,1,1,6,3;3;2;2;2;2,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,197,TG 54:2 | TG 18:0_18:1_18:1,TG,main,C57H106O6,,20.74,[M+NH4]+ 904.8328; [M+Na]+ 909.7882,1,1,1,1,1,1,6,3;3;2;2;2;2,1,1,1,1,1,1,6
-182 Holpie manuscript SI format,198,TG 54:3 | TG 18:1_18:1_18:1,TG,main,C57H104O6,,20.3,[M+NH4]+ 902.8171; [M+Na]+ 907.7725,1,1,1,1,1,1,6,4;3;2;2;3;4,1,1,1,1,1,1,6
+182 Holpie manuscript SI format,198,TG 54:3 | TG 18:1_18:1_18:1,TG,main,C57H104O6,,20.3,[M+NH4]+ 902.8171; [M+Na]+ 907.7725,1,1,1,1,1,1,6,4;3;2;2;3;4,1,1,1,1,1,0,5
 182 Holpie manuscript SI format,199,TG 54:3 | TG 18:0_18:2_18:1,TG,main,C57H104O6,,20.39,[M+NH4]+ 902.8171; [M+Na]+ 907.7725,1,1,1,1,1,1,6,4;3;2;2;3;4,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,200,TG 54:4 | TG 18:1_18:2_18:1,TG,main,C57H102O6,,19.95,[M+NH4]+ 900.8015; [M+Na]+ 905.7569,1,1,1,1,1,1,6,3;2;5;4;5;9,1,1,1,1,1,1,6
 182 Holpie manuscript SI format,201,TG 54:4 | TG 18:0_18:2_18:2,TG,main,C57H102O6,,20.02,[M+NH4]+ 900.8015; [M+Na]+ 905.7569,1,1,1,1,1,1,6,3;2;5;4;5;9,1,1,1,1,1,1,6
