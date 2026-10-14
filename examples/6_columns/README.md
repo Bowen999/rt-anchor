@@ -18,3 +18,5 @@ column.
 | `column_85` | 3741 | 291 |
 
 Lipid names in the tables are m/z-only MS-DIAL guesses; none is MS/MS-confirmed.
+[`compare/`](compare/) matches the manually vetted lipid list against the serum
+tables.

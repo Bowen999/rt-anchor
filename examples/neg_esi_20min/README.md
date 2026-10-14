@@ -12,4 +12,4 @@ from MS-DIAL (area tables). Use `polarity="negative"`.
 
 Lipid names in the tables are m/z-only MS-DIAL guesses; none is MS/MS-confirmed.
 The manually vetted lipid list for these data is
-[`../lipid_vetted_list.xlsx`](../lipid_vetted_list.xlsx).
+[`../6_columns/compare/lipid_vetted_list.xlsx`](../6_columns/compare/lipid_vetted_list.xlsx).

@@ -13,9 +13,11 @@ standards mixture from the same column — named after the panel to pass as
 | [`neg_esi_20min/`](neg_esi_20min/) | QTOF, **negative** mode: serum + standards runs of the 20-min method, incl. a lower-threshold standards re-export | `mix21` |
 | [`output/`](output/) | what `write_results` writes for the Mix 15 run | |
 
-[`lipid_vetted_list.xlsx`](lipid_vetted_list.xlsx) is the manually vetted lipid
-list (from MS-DIAL) for the `6_columns/` and `neg_esi_20min/` serum data; the
-m/z-only names inside those tables themselves are unconfirmed guesses.
+[`6_columns/compare/lipid_vetted_list.xlsx`](6_columns/compare/lipid_vetted_list.xlsx)
+is the manually vetted lipid list (from MS-DIAL) for the `6_columns/` and
+`neg_esi_20min/` serum data; the m/z-only names inside those tables themselves
+are unconfirmed guesses. [`6_columns/compare/`](6_columns/compare/) matches the
+list against the six positive-mode serum tables.
 
 Under 1.2.3 the Mix 15 example shows **both gates declining**. Stage 1 matches
 595 pairs (173 standards + 422 sample) and keeps 433 after trimming. The series
