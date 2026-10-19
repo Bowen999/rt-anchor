@@ -23,7 +23,8 @@ cd "$ROOT"
 codesign --force --deep --sign - "$DIST/RT Anchor.app"
 
 # 3. Stage + compressed dmg
-mkdir -p "$STAGE/Applications" "$ROOT/dist/macos"   # dist/ is gitignored, so absent on a fresh checkout
+mkdir -p "$ROOT/dist/macos"   # dist/ is gitignored, so absent on a fresh checkout
+ln -s /Applications "$STAGE/Applications"   # drag target; a plain folder here cannot receive the drop
 cp -R "$DIST/RT Anchor.app" "$STAGE/"
 cp "$ROOT/example/samples.txt" "$ROOT/example/standards.txt" "$STAGE/" 2>/dev/null || true
 hdiutil create -volname "RT Anchor" -srcfolder "$STAGE" -format UDZO \
