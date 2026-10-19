@@ -1,0 +1,4 @@
+== vetted RT -> column_20 RT check, 222 rows of vetted_panel_table.csv ==
+  sheet 492: 130 points, max |column_20 RT - mapped vetted RT| = 0.291 min (window 0.30), curve from 60 knots
+  sheet 182: 92 points, max |column_20 RT - mapped vetted RT| = 0.262 min (window 0.30), curve from 32 knots
+  wrote figures/vetted_rt_check_column_20.png

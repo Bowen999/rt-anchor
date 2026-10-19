@@ -1,0 +1,15 @@
+222 ion targets, 1003 used non-reference cells, 994 pooled points (a peak shared by two rows counted once)
+wrote vetted_panel_metrics.csv:
+      Scope              Stage   n  Median Absolute Deviation (min)  90th Percentile Absolute Error (min)  Deviation Range Min (min)  Deviation Range Max (min)  Within ±0.2 min (%)  Within ±0.5 min (%)
+All columns Before calibration 994                            6.412                                34.885                     -10.08                      65.13                  4.4                  7.3
+All columns  After calibration 994                            0.047                                 0.246                      -9.48                      16.26                 85.4                 96.9
+  Column 12 Before calibration 198                            8.419                                 9.732                     -10.08                       6.37                  0.0                  0.0
+  Column 12  After calibration 198                            0.048                                 0.184                      -0.45                      16.26                 90.4                 99.5
+  Column 16 Before calibration 209                            3.456                                 5.914                      -6.14                      -0.15                  0.5                  0.5
+  Column 16  After calibration 209                            0.018                                 0.170                      -0.27                       0.24                 92.8                100.0
+  Column 20 Before calibration 219                            1.547                                 2.078                      -4.22                       0.33                 19.6                 32.9
+  Column 20  After calibration 219                            0.052                                 0.195                      -4.11                       1.82                 90.4                 97.3
+  Column 41 Before calibration 193                           15.623                                18.538                       2.48                      24.65                  0.0                  0.0
+  Column 41  After calibration 193                            0.065                                 0.412                      -3.37                       9.44                 79.8                 92.7
+  Column 85 Before calibration 175                           36.083                                60.359                       1.67                      65.13                  0.0                  0.0
+  Column 85  After calibration 175                            0.092                                 0.417                      -9.48                      10.37                 70.9                 94.3

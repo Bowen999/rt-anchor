@@ -1,0 +1,26 @@
+== figures for the vetted-lipid table (vetted_panel_table.csv) ==
+font used: Arial.ttf
+
+222 ion targets (219 high, 3 low), 1003 used non-reference cells, 994 pooled cells (a peak shared by two rows counted once)
+pooled: n cells 994; median |dRT_after| 0.04705 min; 85.4 % within 0.2 min (849 of 994); median |dRT_before| 6.4115 min; 4.4 % within 0.2 min (44 of 994)
+pooled cells per column: column_12 198, column_16 209, column_20 219, column_41 193, column_85 175; |dRT_after| > 0.5 / 1 / 2 min: 31 / 17 / 8
+overview heatmap table (median dRT per group and column, minutes; before | after):
+  group                   Column 12  Column 16  Column 20  Column 41  Column 85   |  Column 12  Column 16  Column 20  Column 41  Column 85
+  LPC (n=17)                  −2.77      −1.11      −2.10       3.38       9.63   |     −0.009      0.005     −0.052      0.014      0.009
+  PC (n=24)                   −7.07      −3.43      −0.17      15.11      33.94   |     −0.020     −0.013     −0.014      0.101     −0.079
+  EtherPC (n=21)              −7.39      −3.43      −0.26      15.22      33.87   |     −0.007     −0.006     −0.019      0.165      0.084
+  PE (n=5)                    −6.23      −3.40       0.03      14.24      31.02   |      0.033     −0.013      0.035     −0.165     −0.540
+  EtherPE (n=9)               −7.22      −3.44      −0.20      14.80      33.37   |      0.060     −0.005      0.065     −0.169     −0.144
+  PI (n=8)                    −6.62      −3.46      −0.05      12.99      30.31   |     −0.039     −0.123     −0.071     −0.460     −0.066
+  SM (n=21)                   −6.77      −3.31      −0.24      13.56      31.85   |      0.010     −0.003      0.011      0.022      0.012
+  Cer_NS (n=5)                −9.01      −4.01      −1.12      15.81      39.84   |      0.077      0.001     −0.029     −0.037     −0.407
+  DG (n=7)                    −8.25      −3.41      −0.69      15.20      36.09   |     −0.005      0.011      0.003     −0.075      0.098
+  TG (n=71)                   −9.68      −5.78      −1.68      18.26      56.96   |      0.016     −0.021      0.008     −0.007     −0.014
+  CE (n=11)                  −10.00      −5.73      −2.06      17.84      50.52   |      0.025      0.016      0.036      0.004      0.007
+  Other (n=23)                −3.11      −1.24      −2.05       4.76      14.00   |     −0.011      0.023     −0.008     −0.023      0.010
+
+wrote 4 figures in 1 s:
+  figures/overview_heatmap.png
+  figures/rt_error_ecdf.png
+  figures/rt_error_violin_linear.png
+  figures/rt_error_violin_symlog.png

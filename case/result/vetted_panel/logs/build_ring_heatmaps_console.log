@@ -1,0 +1,10 @@
+== circular heatmaps, one per lipid category (plotted dRT vs column_22, minutes) ==
+222 rows of vetted_panel_table.csv in 3 categories
+  figure                          rows  used  not used  median |dRT|      min      max  label pt / ring-name pt / canvas in
+  Glycerophospholipids, before      96   428        52        3.4795   -9.124   41.212  18.0 / 23.4 / 14.6
+  Glycerophospholipids, after       96   428        52        0.0593   -9.482   16.256  18.0 / 23.4 / 14.6
+  Glycerolipids, before             78   356        34        9.6530   -9.909   65.131  19.0 / 21.1 / 13.2
+  Glycerolipids, after              78   356        34        0.0358   -3.368    0.555  19.0 / 21.1 / 13.2
+  Others, before                    48   219        21        6.7700  -10.076   62.852  19.0 / 13.5 / 10.3
+  Others, after                     48   219        21        0.0522   -0.442   10.371  19.0 / 13.5 / 10.3
+  rows drawn: 222 of 222; used cells drawn: before 1003, after 1003 (the table has 1003 non-reference cells)

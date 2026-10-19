@@ -1,0 +1,2 @@
+self-check: the 219 high-confidence rows reproduce per_ion_panel.py (ions, picks, RT before / after); reference column unchanged (max |d| 4.9e-12 min)
+wrote vetted_panel_table.csv: 222 ion targets = 219 high + 3 low  (expected 219 + 3: summary_funnel_per_ion.csv, 'panel' row)
