@@ -1,0 +1,218 @@
+confidence,lipid,class,vetted_names,positive_target_ions,reason,n_columns_with_candidates,n_columns_usable,column_12_n_candidates,column_12_dominance,column_12_RT_min,column_16_n_candidates,column_16_dominance,column_16_RT_min,column_20_n_candidates,column_20_dominance,column_20_RT_min,column_22_n_candidates,column_22_dominance,column_22_RT_min,column_41_n_candidates,column_41_dominance,column_41_RT_min,column_85_n_candidates,column_85_dominance,column_85_RT_min
+high,LPA 16:0,LPA,LPA 16:0,[M+NH4]+ 428.2772,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,LPA 18:0,LPA,LPA 18:0,[M+NH4]+ 456.3085,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,LPE O-16:0,EtherLPE,LPE O-16:0,[M+H]+ 440.3136,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,LPE O-18:2,EtherLPE,LPE O-18:2,[M+H]+ 464.3136,column_22 pick less than 2x the next candidate,3,1,0,,,2,1.30,3.8330,1,inf,2.8860,2,1.06,5.1110,0,,,0,,
+high,BA 24:1;O4;G,BileAcid,BA 24:1;O4;G,[M+H]+ 466.3163,usable on fewer than 3 columns,1,1,0,,,0,,,0,,,1,inf,1.2510,0,,,0,,
+high,ST 27:1;O;S,SSulfate,ST 27:1;O;S; ST 27:1;O;S,[M+NH4]+ 484.3455,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,LPE 18:3,LPE,LPE 18:3,[M+H]+ 476.2772,usable on fewer than 3 columns,2,2,0,,,1,inf,3.4310,0,,,1,inf,4.5560,0,,,0,,
+high,LPE 18:1,LPE,LPE 18:1; LPE 18:1,[M+H]+ 480.3085,no candidate within 15 ppm on column_22,1,1,0,,,0,,,0,,,0,,,0,,,1,inf,14.5470
+high,ST 28:1;O;S,SSulfate,ST 28:1;O;S,[M+NH4]+ 498.3612,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,LPE O-20:1,EtherLPE,LPE O-20:1,[M+H]+ 494.3605,column_20 pick more than 0.30 min from the vetted RT,5,3,0,,,1,inf,3.8510,1,inf,2.9230,1,inf,5.1370,2,1.78,8.7810,2,1.57,15.7810
+high,ST 29:1;O;S,SSulfate,ST 29:1;O;S,[M+NH4]+ 512.3768,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,LPE 20:5,LPE,LPE 20:5,[M+H]+ 500.2772,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,LPE 20:4,LPE,LPE 20:4; LPE 20:4,[M+H]+ 502.2928,no candidate within 15 ppm on column_22,1,1,0,,,0,,,0,,,0,,,0,,,1,inf,12.7650
+high,LPE 20:3,LPE,LPE 20:3,[M+H]+ 504.3085,column_22 pick less than 2x the next candidate,5,2,0,,,2,1.25,2.9740,2,1.46,1.9660,2,1.22,3.9610,2,6.04,6.5690,1,inf,11.9050
+high,LPG 18:1,LPG,LPG 18:1,[M+NH4]+ 528.3296,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,LPE 22:6,LPE,LPE 22:6,[M+H]+ 526.2928,no candidate within 15 ppm on column_20,4,4,0,,,2,3.37,2.8820,0,,,2,2.81,3.9040,1,inf,24.3560,1,inf,40.0570
+high,LPE 22:4,LPE,LPE 22:4,[M+H]+ 530.3241,no candidate within 15 ppm on column_22,2,2,0,,,0,,,0,,,0,,,1,inf,7.0010,1,inf,12.8830
+high,Cer 34:1;O2,Cer_NS,Cer 34:1;O2|Cer 18:1;O2/16:0; Cer 34:1;O2|Cer 18:1;O2/16:0,[M+H]+ 538.5194,usable on fewer than 3 columns,3,2,0,,,2,1.09,9.3330,0,,,1,inf,12.7110,1,inf,25.1920,0,,
+high,LPC O-18:2,EtherLPC,LPC O-18:2,[M+H]+ 506.3605,column_20 pick more than 0.30 min from the vetted RT,6,5,5,1.84,2.4360,4,4.73,4.0200,4,4.04,3.2920,4,4.60,5.3970,4,4.76,9.3090,4,4.73,16.5400
+high,LPC 17:0,LPC,LPC 17:0; LPC 17:0,[M+H]+ 510.3554,column_22 pick less than 2x the next candidate,6,5,2,2.06,1.9720,1,inf,3.6940,2,2.01,2.7620,3,1.94,4.9290,4,2.04,8.2400,4,2.02,15.0570
+high,LPC 18:3,LPC,LPC 18:3,[M+H]+ 518.3241,column_20 pick more than 0.30 min from the vetted RT,6,6,3,3.47,1.5780,4,6.63,3.3510,4,10.96,2.3230,3,6.60,4.4600,5,4.05,7.3320,6,6.09,13.5530
+high,Cer 34:0;O2,Cer_NDS,Cer 34:0;O2|Cer 18:0;O2/16:0,[M+H]+ 540.5350,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,LPC 20:5,LPC,LPC 20:5,[M+H]+ 542.3241,column_20 pick less than 2x the next candidate,6,5,1,inf,1.3000,3,2.59,2.9740,2,1.77,1.9270,4,2.64,3.9870,4,5.29,6.8310,5,7.88,12.5410
+high,LPC 20:3,LPC,LPC 20:3,[M+H]+ 546.3554,column_20 pick less than 2x the next candidate,6,4,5,1.61,2.4360,4,2.79,4.0200,3,1.13,3.2920,5,2.01,5.4060,4,5.88,9.3140,5,5.88,16.5400
+high,LPI 18:2,LPI,LPI 18:2,[M+NH4]+ 614.3300,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,LPI 18:1,LPI,LPI 18:1,[M+NH4]+ 616.3456,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,LPI 18:0,LPI,LPI 18:0,[M+NH4]+ 618.3613,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,Cer 36:1;O2,Cer_NS,Cer 36:1;O2|Cer 18:1;O2/18:0,[M+H]+ 566.5507,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,LPI 20:4,LPI,LPI 20:4,[M+NH4]+ 638.3300,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,LPI 20:3,LPI,LPI 20:3,[M+NH4]+ 640.3456,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,LPC 22:0,LPC,LPC 22:0,[M+H]+ 580.4337,column_20 pick more than 0.30 min from the vetted RT,6,6,2,2.14,3.9490,1,inf,5.5300,1,inf,6.3910,1,inf,7.7750,1,inf,15.2710,1,inf,25.0490
+high,Cer 41:0;O2,Cer_NDS,Cer 41:0;O2|Cer 18:0;O2/23:0,[M+H]+ 638.6446,column_20 pick more than 0.30 min from the vetted RT,4,4,0,,,1,inf,13.8320,1,inf,13.1440,1,inf,18.0320,1,inf,34.4550,0,,
+high,Cer 42:2;O2,Cer_NS,Cer 42:2;O2|Cer 18:1;O2/24:1; Cer 42:2;O2|Cer 18:1;O2/24:1,[M+H]+ 648.6289,column_22 pick less than 2x the next candidate,6,1,2,1.56,8.2460,1,inf,13.5290,2,1.41,16.1330,2,1.37,17.2010,2,1.38,33.0770,2,1.45,55.4090
+high,LPC 24:0,LPC,LPC 24:0,[M+H]+ 608.4650,column_20 pick more than 0.30 min from the vetted RT,6,6,2,2.51,4.5400,1,inf,6.5400,1,inf,8.4000,1,inf,9.2600,1,inf,18.8000,1,inf,30.5190
+high,PE O-32:2,EtherPE,PE O-32:2|PE O-16:1_16:1,[M+H]+ 674.5119,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,PE O-32:1,EtherPE,PE O-32:1|PE O-16:1_16:0,[M+H]+ 676.5276,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,PE 32:1,PE,PE 32:1|PE 16:0_16:1,[M+H]+ 690.5068,no candidate within 15 ppm on column_22,1,1,0,,,1,inf,15.2550,0,,,0,,,0,,,0,,
+high,PE O-34:1,EtherPE,PE O-34:1|PE O-18:1_16:0; PE O-34:1|PE O-18:1_16:0; PE O-34:1|PE O-18:1_16:0,[M+H]+ 704.5589,column_20 pick more than 0.30 min from the vetted RT,3,3,0,,,0,,,1,inf,12.8020,1,inf,12.7100,0,,,1,inf,43.9780
+high,PE O-34:0,EtherPE,PE O-34:0|PE O-18:0_16:0,[M+H]+ 706.5745,column_20 pick more than 0.30 min from the vetted RT,6,6,1,inf,6.0280,1,inf,9.4630,1,inf,13.0100,1,inf,12.8840,1,inf,27.1370,1,inf,44.6520
+high,SM 31:1;O2,SM,SM 31:1;O2|SM 18:1;O2/13:0,[M+H]+ 661.5279,column_22 pick less than 2x the next candidate,6,2,4,2.24,5.3500,2,1.60,6.1120,2,1.44,8.0430,4,1.32,8.7190,2,1.87,18.5170,3,11.86,70.6240
+high,Cer 43:2;O2,Cer_NS,Cer 43:2;O2|Cer 19:1;O2/24:1,[M+H]+ 662.6446,no candidate within 15 ppm on column_22,1,1,0,,,1,inf,13.6500,0,,,0,,,0,,,0,,
+high,Cer 42:1;O3,Cer_NP,Cer 42:1;O3|Cer 18:0;O3/24:1,[M+H]+ 666.6395,no candidate within 15 ppm on column_22,2,2,0,,,1,inf,13.5240,0,,,0,,,0,,,1,inf,54.8430
+high,PE O-35:3,EtherPE,PE O-35:3|PE O-17:1_18:2,[M+H]+ 714.5432,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,Cer 42:0;O3,Cer_NP,Cer 42:0;O3|Cer 18:0;O3/24:0,[M+H]+ 668.6551,usable on fewer than 3 columns,2,2,0,,,1,inf,13.6800,0,,,1,inf,17.6450,0,,,0,,
+high,PE 34:0,PE,PE 34:0|PE 16:0_18:0,[M+H]+ 720.5538,column_20 pick more than 0.30 min from the vetted RT,6,6,1,inf,5.6370,2,2.42,8.5370,2,2.51,12.1600,3,2.41,11.8800,3,2.26,25.4400,2,2.20,41.8060
+high,SM 32:1;O2,SM,SM 32:1;O2|SM 16:1;O2/16:0,[M+H]+ 675.5436,column_20 pick more than 0.30 min from the vetted RT,6,6,2,3.03,4.6270,1,inf,6.6490,2,79.30,9.1200,1,inf,9.4730,1,inf,20.1790,2,13.89,33.0770
+high,PE O-36:6,EtherPE,PE O-36:6|PE O-16:1_20:5; PE P-36:5 | PE P-16:0/20:5,[M+H]+ 722.5119,column_20 pick less than 2x the next candidate,6,5,7,2.67,12.4980,2,8.14,10.7520,4,1.01,1.9490,4,2.71,16.9010,5,4.63,7.2320,2,7.34,13.6360
+high,SM 32:0;O2,SM,SM 32:0;O2,[M+H]+ 677.5592,column_20 pick more than 0.30 min from the vetted RT,6,5,1,inf,4.8200,2,4.32,7.0690,2,2.18,9.8750,2,2.93,10.0480,1,inf,21.4020,3,1.37,35.1140
+high,PE O-36:4,EtherPE,PE O-36:4|PE O-16:0_20:4; PE P-36:3 | PE P-16:0/20:3; PE P-36:3 | PE P-18:0/18:3; PE P-36:3 | PE P-18:1/18:2,[M+H]+ 726.5432,column_22 pick less than 2x the next candidate,6,1,1,inf,6.0720,3,1.46,9.6360,2,1.88,12.9410,3,1.50,13.0920,2,1.18,27.8070,3,1.16,46.0360
+high,PE O-36:2,EtherPE,PE O-36:2|PE O-18:0_18:2; PE O-36:2|PE O-18:0_18:2; PE O-36:2|PE O-18:1_18:1; PE O-36:2|PE O-18:1_18:1; PE P-36:1 | PE P-18:0/18:1,[M+H]+ 730.5745,usable on fewer than 3 columns,6,2,1,inf,7.2520,2,1.93,12.3550,2,1.88,14.9750,2,2.05,15.6550,2,1.07,31.2140,2,1.05,42.9070
+high,SM 33:2;O2,SM,SM 33:2;O2,[M+H]+ 687.5436,column_22 pick less than 2x the next candidate,6,3,3,4.10,11.1470,2,1.40,15.5370,2,3.21,19.1010,4,1.38,9.0400,1,inf,19.6180,4,1.29,72.3780
+high,PE 36:5,PE,PE 36:5|PE 16:0_20:5,[M+H]+ 738.5068,column_20 pick more than 0.30 min from the vetted RT,4,4,0,,,1,inf,8.6880,1,inf,12.1950,1,inf,12.0530,1,inf,25.8920,0,,
+high,PE O-37:5,EtherPE,PE O-37:5|PE O-17:1_20:4,[M+H]+ 738.5432,column_22 pick less than 2x the next candidate,5,0,2,1.48,5.3500,2,1.15,10.0260,0,,,2,1.09,13.4900,2,1.63,22.3770,2,1.52,47.0890
+high,PE 36:4,PE,PE 36:4|PE 18:2_18:2; PE 36:4|PE 16:0_20:4,[M+H]+ 740.5225,column_22 pick less than 2x the next candidate,6,5,2,2.87,5.6070,2,5.47,8.5190,2,5.71,11.9170,2,1.92,11.8750,1,inf,25.8580,1,inf,42.7760
+high,PG 34:2,PG,PG 34:2|PG 16:0_18:2,[M+NH4]+ 764.5436,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,PC O-35:4,EtherPC,PE O-38:4|PE O-18:0_20:4; PE O-38:4|PE O-18:0_20:4; PE O-38:4|PE O-18:0_20:4; PE O-38:4|PE O-18:0_20:4; PE O-38:4|PE O-18:0_20:4; PC O-35:4|PC O-15:0_20:4; PE P-38:3 | PE P-18:0/20:3,[M+H]+ 754.5745,column_22 pick less than 2x the next candidate,6,1,1,inf,6.8720,3,1.40,11.0950,3,1.00,11.6620,3,1.45,14.5380,2,1.61,30.0570,2,1.41,42.9110
+high,PC O-35:3,EtherPC,PE O-38:3|PE O-20:1_18:2; PE O-38:3|PE O-20:1_18:2; PE O-38:3|PE O-20:1_18:2; PC O-35:3|PC O-17:1_18:2; PC O-35:3|PC O-17:1_18:2; PC O-35:3|PC O-17:1_18:2; PE P-38:2 | PE P-20:0/18:2,[M+H]+ 756.5902,column_22 pick less than 2x the next candidate,6,1,1,inf,7.3950,3,1.65,9.5800,3,1.47,12.9250,3,1.60,13.0310,2,1.49,27.9510,2,1.58,46.1360
+high,PE O-38:2,EtherPE,PE O-38:2|PE O-20:1_18:1; PE O-38:2|PE O-20:0_18:2; PE O-38:2|PE O-20:1_18:1; PC O-35:2|PC O-17:1_18:1; PE P-38:1 | PE P-20:0/18:1,[M+H]+ 758.6058,column_22 pick less than 2x the next candidate,5,0,2,1.94,6.2580,2,1.94,10.0780,3,1.97,13.3660,3,1.83,13.5460,0,,,3,1.95,47.5330
+high,PC O-32:2,EtherPC,PC O-32:2|PC O-16:1_16:1,[M+H]+ 716.5589,column_20 pick more than 0.30 min from the vetted RT,4,4,1,inf,5.3500,1,inf,7.8650,1,inf,11.1130,1,inf,11.0960,0,,,0,,
+high,SM 34:1;O3,SM,SM 34:1;O3,[M+H]+ 719.5698,column_20 pick more than 0.30 min from the vetted RT,6,6,2,9.75,10.6220,5,2.18,7.3890,2,6.06,18.5450,6,3.49,20.6940,2,3.06,38.5430,2,36.75,70.2450
+high,SM 35:0;O2,SM,SM 35:0;O2,[M+H]+ 719.6062,no candidate within 15 ppm on column_22,3,3,0,,,1,inf,13.8530,0,,,0,,,1,inf,25.9100,1,inf,42.8200
+high,PE 38:5,PE,PE 38:5|PE 18:1_20:4,[M+H]+ 766.5381,column_22 pick less than 2x the next candidate,6,0,3,1.19,6.3840,5,1.75,8.6660,3,1.27,12.0030,6,1.08,4.1830,4,1.28,24.3610,4,1.47,13.7400
+high,PE 38:4,PE,PE 38:4|PE 18:0_20:4; PE 38:4|PE 18:0_20:4; PC 35:4|PC 15:0_20:4,[M+H]+ 768.5538,usable on fewer than 3 columns,6,2,2,1.42,6.2670,2,2.00,10.0090,3,2.07,13.3140,2,2.18,13.4900,3,1.23,28.5030,3,1.09,40.0520
+high,PC 35:3,PC,PE 38:3|PE 18:0_20:3; PE 38:3|PE 18:0_20:3; PC 35:3|PC 17:1_18:2,[M+H]+ 770.5694,column_22 pick less than 2x the next candidate,6,2,3,3.11,5.3940,2,2.52,8.1210,4,1.40,11.4270,2,1.18,11.1390,3,1.47,25.4440,3,1.24,41.9150
+high,PE O-40:9,EtherPE,PE O-40:9|PE O-18:3_22:6,[M+H]+ 772.5276,no candidate within 15 ppm on column_22,1,1,0,,,0,,,0,,,0,,,0,,,1,inf,45.9670
+high,SM 36:3;O2,SM,SM 36:3;O2,[M+H]+ 727.5749,column_22 pick less than 2x the next candidate,6,3,2,3.04,4.8550,3,1.01,7.8520,4,1.96,9.9010,4,1.84,10.1870,8,4.14,24.4830,4,2.18,40.3300
+high,PE O-40:8,EtherPE,PE O-40:8|PE O-18:2_22:6,[M+H]+ 774.5432,column_20 pick less than 2x the next candidate,6,3,1,inf,6.5840,1,inf,10.8400,2,1.93,12.2120,1,inf,14.3040,2,1.16,29.6300,2,1.30,45.7310
+high,HexCer 36:1;O2,HexCer_NS,HexCer 36:1;O2|HexCer 18:1;O2/18:0,[M+H]+ 728.6035,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,PE O-40:6,EtherPE,PE O-40:6|PE O-20:2_20:4; PE O-40:6|PE O-20:2_20:4; PE O-40:6|PE O-18:1_22:5; PE O-40:6|PE O-18:1_22:5; PE P-40:5 | PE P-18:0/22:5; PE P-40:5 | PE P-18:1/22:4; PE P-40:5 | PE P-20:1/20:4,[M+H]+ 778.5745,column_20 pick less than 2x the next candidate,6,3,1,inf,6.5920,4,2.49,10.9700,3,1.84,13.8560,3,2.51,14.4250,2,1.42,30.1440,3,1.05,50.1830
+high,SM 36:0;O2,SM,SM 36:0;O2|SM 18:0;O2/18:0,[M+H]+ 733.6218,column_20 pick less than 2x the next candidate,6,5,2,14.07,8.8360,2,3.49,13.9050,3,1.13,13.3230,2,2.38,18.2220,5,3.04,36.0190,6,3.30,60.3490
+high,PC O-37:5,EtherPC,PE O-40:5|PE O-18:0_22:5; PE O-40:5|PE O-20:1_20:4; PE O-40:5|PE O-20:1_20:4; PE O-40:5|PE O-20:1_20:4; PC O-37:5|PC O-17:1_20:4; PE P-40:4 | PE P-18:0/22:4; PE P-40:4 | PE P-20:0/20:4,[M+H]+ 780.5902,column_22 pick less than 2x the next candidate,6,1,2,6.77,5.9240,4,1.80,9.3680,5,1.95,12.6510,5,1.81,12.8150,3,1.62,27.8680,3,1.80,46.0880
+high,PC O-33:0,EtherPC,PC O-33:0|PC O-17:0_16:0,[M+H]+ 734.6058,column_22 pick less than 2x the next candidate,4,0,0,,,2,1.06,10.7690,2,1.07,14.2580,2,1.06,14.2180,0,,,2,1.00,48.5210
+high,PE O-40:3,EtherPE,PE O-40:3|PE O-22:1_18:2,[M+H]+ 784.6215,usable on fewer than 3 columns,3,2,0,,,2,1.07,10.5460,1,inf,13.6700,1,inf,14.0100,0,,,0,,
+high,PE O-40:2,EtherPE,PE O-40:2|PE O-22:1_18:1,[M+H]+ 786.6371,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,PE 40:7,PE,PE 40:7|PE 18:1_22:6,[M+H]+ 790.5381,column_20 pick more than 0.30 min from the vetted RT,6,4,1,inf,6.2670,2,3.18,10.0090,1,inf,13.3100,2,3.88,13.4900,3,1.55,24.3300,3,1.74,40.0560
+high,SM 37:1;O2,SM,SM 37:1;O2; SM 37:1;O2|SM 17:1;O2/20:0,[M+H]+ 745.6218,column_22 pick less than 2x the next candidate,6,3,4,4.05,6.2750,5,1.24,10.0780,5,3.38,13.4790,6,1.03,13.5250,6,2.56,27.6330,6,1.54,45.7700
+high,PE 40:6,PE,PE 40:6|PE 18:0_22:6; PE 40:6|PE 18:0_22:6; PC 37:6|PC 15:0_22:6,[M+H]+ 792.5538,column_22 pick less than 2x the next candidate,6,2,2,1.22,6.0890,2,1.55,9.6800,2,1.17,12.9190,3,1.77,13.1610,5,3.56,25.7010,5,2.22,42.5070
+high,PC 33:0,PC,PC 33:0|PC 16:0_17:0,[M+H]+ 748.5851,column_22 pick less than 2x the next candidate,6,0,2,1.91,6.1930,2,1.69,9.7450,2,1.89,13.3100,2,1.79,13.1960,2,1.49,27.7550,2,1.78,45.8010
+high,PC 37:3,PC,PE 40:3|PE 18:0_22:3; PC 37:3|PC 19:1_18:2; PC 37:3|PC 17:0_20:3; PC 37:3|PC 17:0_20:3,[M+H]+ 798.6007,column_22 pick less than 2x the next candidate,6,0,2,1.33,6.0370,3,1.32,9.5500,2,1.36,12.9150,2,1.37,13.0050,2,1.69,28.1250,2,1.32,46.5620
+high,PE O-42:9,EtherPE,PE O-42:9|PE O-20:3_22:6,[M+H]+ 800.5589,no candidate within 15 ppm on column_22,2,2,0,,,0,,,0,,,0,,,1,inf,26.7670,1,inf,48.6790
+high,PC 34:3,PC,PC 34:3|PC 14:0_20:3; PC 34:3|PC 16:1_18:2,[M+H]+ 756.5538,column_22 pick less than 2x the next candidate,6,1,6,17.10,5.1070,5,1.61,7.5490,7,1.52,10.2480,7,1.45,10.7190,5,1.96,24.1870,7,1.04,39.7650
+high,PE O-42:8,EtherPE,PE O-42:8|PE O-20:2_22:6,[M+H]+ 802.5745,no candidate within 15 ppm on column_22,2,1,0,,,0,,,0,,,0,,,2,2.14,27.8640,2,1.99,46.0790
+high,PE O-42:7,EtherPE,PE O-42:7|PE O-20:1_22:6,[M+H]+ 804.5902,column_22 pick less than 2x the next candidate,6,2,1,inf,5.7370,3,1.64,9.0390,2,1.61,12.2080,3,1.55,12.4680,1,inf,28.7080,2,1.29,47.5240
+high,PE O-42:6,EtherPE,PE O-42:6|PE O-22:2_20:4,[M+H]+ 806.6058,no candidate within 15 ppm on column_22,3,3,0,,,0,,,1,inf,12.6940,0,,,1,inf,28.5180,1,inf,47.2630
+high,PE O-42:5,EtherPE,PE O-42:5|PE O-22:1_20:4; PE O-42:5|PE O-22:1_20:4,[M+H]+ 808.6215,no candidate within 15 ppm on column_22,2,2,0,,,1,inf,13.4250,1,inf,13.1320,0,,,0,,,0,,
+high,PI 32:1,PI,PI 32:1|PI 16:0_16:1,[M+NH4]+ 826.5440,no candidate within 15 ppm on column_22,2,1,0,,,0,,,0,,,0,,,3,1.50,23.5040,1,inf,37.9460
+high,PC O-36:6,EtherPC,PC O-36:6|PC O-16:1_20:5,[M+H]+ 764.5589,column_22 pick less than 2x the next candidate,6,2,2,1.61,5.2760,2,1.01,9.1080,2,1.70,11.0500,2,1.11,12.5160,2,5.61,27.0020,2,5.16,44.5340
+high,PE O-42:4,EtherPE,PE O-42:4|PE O-24:2_18:2,[M+H]+ 810.6371,usable on fewer than 3 columns,2,2,0,,,1,inf,11.5310,0,,,1,inf,14.9540,0,,,0,,
+high,PS 38:4,PS,PS 38:4|PS 18:0_20:4,[M+H]+ 812.5436,no candidate within 15 ppm on column_22,3,2,0,,,2,1.08,4.5060,0,,,0,,,1,inf,18.1470,1,inf,30.0300
+high,HexCer 41:1;O3,HexCer_HS,HexCer 41:1;O3|HexCer 18:1;O2/23:0;O; HexCer 41:1;O3|HexCer 18:1;O2/23:0;O,[M+H]+ 814.6767,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,PC O-36:3,EtherPC,PC O-36:3|PC O-16:0_20:3; PC O-36:3|PC O-16:0_20:3; PC O-36:3|PC O-18:1_18:2,[M+H]+ 770.6058,column_22 pick less than 2x the next candidate,6,0,3,1.19,5.9670,5,1.21,9.4370,4,1.28,12.7500,4,1.21,12.8840,4,1.01,28.0420,6,1.28,46.3310
+high,PC 35:2,PC,PC 35:2|PC 17:0_18:2; PC 35:2|PC 17:0_18:2; PC 35:2|PC 17:0_18:2,[M+H]+ 772.5851,column_22 pick less than 2x the next candidate,6,4,1,inf,5.8670,2,2.04,9.1170,3,1.95,12.5770,2,1.97,12.5380,2,2.51,27.1460,2,2.02,44.8430
+high,PC 36:6,PC,PC 36:6|PC 14:0_22:6,[M+H]+ 778.5381,column_22 pick less than 2x the next candidate,6,1,2,2.57,4.6930,4,1.54,6.7530,4,1.07,10.2300,4,1.75,9.6980,3,1.72,24.1780,6,1.02,39.7600
+high,PC 36:5,PC,PC 36:5|PC 18:2_18:3; PC 36:5|PC 16:1_20:4; PC 36:5|PC 16:0_20:5,[M+H]+ 780.5538,column_22 pick less than 2x the next candidate,6,2,5,1.30,5.5460,8,1.16,8.4020,10,1.18,10.3340,10,1.47,11.7410,10,3.69,25.7530,12,3.50,42.4590
+high,HexCer 42:2;O3,HexCer_HS,HexCer 42:2;O3|HexCer 18:1;O2/24:1;O; HexCer 42:2;O3|HexCer 18:1;O2/24:1;O,[M+H]+ 826.6767,column_20 pick less than 2x the next candidate,6,5,2,3.07,7.2570,2,3.10,12.6190,2,1.85,14.9410,2,3.43,15.8630,1,inf,32.7070,2,3.28,54.2820
+high,PC 36:3,PC,PC 36:3|PC 18:1_18:2; PC 36:3|PC 18:1_18:2; PC 36:3|PC 16:0_20:3; PC 36:3|PC 16:0_20:3,[M+H]+ 784.5851,column_22 pick less than 2x the next candidate,6,2,7,109.03,5.7110,10,1.82,8.8050,7,1.83,12.2120,10,1.80,12.2000,9,2.19,26.7980,10,1.79,44.2860
+high,PE O-44:8,EtherPE,PE O-44:8|PE O-22:2_22:6,[M+H]+ 830.6058,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,PE O-44:6,EtherPE,PE O-44:6|PE O-24:2_20:4,[M+H]+ 834.6371,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,PC 36:0,PC,PC 36:0|PC 18:0_18:0,[M+H]+ 790.6320,no candidate within 15 ppm on column_22,3,3,1,inf,7.3220,0,,,0,,,0,,,1,inf,31.7890,1,inf,52.7330
+high,PE O-44:5,EtherPE,PE O-44:5|PE O-24:1_20:4,[M+H]+ 836.6528,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,PI 34:1,PI,PI 34:1|PI 16:0_18:1,[M+NH4]+ 854.5753,column_22 pick less than 2x the next candidate,6,2,2,8.88,5.3590,2,1.04,7.8960,3,1.94,11.5140,3,1.89,11.2040,5,2.50,26.2580,5,1.61,43.4600
+high,PC O-38:6,EtherPC,PC O-38:6|PC O-16:0_22:6; PC O-38:6|PC O-18:2_20:4; PC O-38:6|PC O-18:2_20:4; PC O-38:6|PC O-16:1_22:5,[M+H]+ 792.5902,column_22 pick less than 2x the next candidate,6,0,4,1.72,5.7550,6,1.93,9.0520,5,1.77,12.2560,6,1.70,12.4730,5,1.95,27.5500,8,1.53,45.6000
+high,PC 37:5,PC,PC 37:5|PC 17:1_20:4,[M+H]+ 794.5694,column_22 pick less than 2x the next candidate,6,3,1,inf,5.3500,4,1.96,8.1040,6,1.16,10.8160,7,1.45,11.1050,4,2.57,27.1590,5,2.24,44.8430
+high,PC 37:4,PC,PC 37:4|PC 17:0_20:4; PC 37:4|PC 17:0_20:4; PC 37:4|PC 17:0_20:4,[M+H]+ 796.5851,column_22 pick less than 2x the next candidate,6,2,2,25.98,5.7630,3,1.92,8.9350,5,1.88,12.3250,3,1.91,12.3560,3,2.20,27.1110,4,1.91,44.8610
+high,PC 37:1,PC,PC 37:1|PC 19:0_18:1,[M+H]+ 802.6320,no candidate within 15 ppm on column_22,5,4,1,inf,7.0310,2,1.36,9.2990,1,inf,14.7110,0,,,1,inf,31.1880,2,5.33,51.7890
+high,PI 35:2,PI,PI 35:2|PI 17:0_18:2,[M+NH4]+ 866.5753,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,PC 38:7,PC,PC 38:7|PC 16:1_22:6; PC 38:7|PC 16:1_22:6; PC 38:7|PC 18:2_20:5,[M+H]+ 804.5538,column_20 pick more than 0.30 min from the vetted RT,6,6,6,5.46,5.4420,8,11.11,8.2250,8,12.14,11.5530,8,11.94,11.5510,6,3.17,25.6790,5,3.79,42.5330
+high,PI 35:1,PI,PI 35:1|PI 17:0_18:1,[M+NH4]+ 868.5910,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,PC 38:5,PC,PC 38:5|PC 16:0_22:5; PC 38:5|PC 16:0_22:5,[M+H]+ 808.5851,column_22 pick less than 2x the next candidate,6,2,4,2.05,5.4850,8,1.92,8.3630,10,3.81,11.6050,6,1.85,11.7240,7,1.01,26.4100,10,1.06,43.6680
+high,SM 42:4;O2,SM,SM 42:4;O2|SM 18:2;O2/24:2,[M+H]+ 809.6531,column_22 pick less than 2x the next candidate,6,4,2,2.57,6.1240,2,1.06,9.8870,2,3.17,13.0450,3,1.01,15.8630,6,8.47,31.2880,6,8.37,52.1190
+high,PE O-46:6,EtherPE,PE O-46:6|PE O-26:2_20:4,[M+H]+ 862.6684,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,PE O-46:5,EtherPE,PE O-46:5|PE O-26:1_20:4,[M+H]+ 864.6841,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,PC 39:6,PC,PC 39:6|PC 17:0_22:6; PC 39:6|PC 17:0_22:6,[M+H]+ 820.5851,column_22 pick less than 2x the next candidate,6,2,2,7.37,5.5890,3,1.98,8.6400,2,13.58,11.8830,3,1.63,12.0360,4,1.77,28.3950,5,1.04,44.6470
+high,PC O-40:6,EtherPC,PC O-40:6|PC O-18:0_22:6; PC O-40:6|PC O-18:1_22:5,[M+H]+ 820.6215,usable on fewer than 3 columns,6,2,3,1.00,6.2800,4,2.87,10.3290,5,1.31,13.3450,4,2.82,13.8060,4,1.32,29.7780,5,1.34,49.4080
+high,PC 39:5,PC,PC 39:5|PC 17:0_22:5,[M+H]+ 822.6007,column_20 pick more than 0.30 min from the vetted RT,6,5,1,inf,5.7940,2,2.37,9.0650,2,2.14,12.3470,4,2.33,12.5030,1,inf,27.3370,3,1.56,49.2560
+high,PC 39:4,PC,PC 39:4|PC 19:0_20:4,[M+H]+ 824.6164,column_22 pick less than 2x the next candidate,6,3,1,inf,6.4190,4,1.76,8.8830,1,inf,13.6260,5,1.59,12.2870,3,2.39,29.2910,3,1.70,48.6390
+high,PC O-40:3,EtherPC,PC O-40:3|PC O-22:1_18:2,[M+H]+ 826.6684,column_20 pick less than 2x the next candidate,6,5,2,3.07,7.2570,2,3.10,12.6190,2,1.85,14.9410,2,3.43,15.8630,1,inf,32.7070,2,3.28,54.2820
+high,SM 43:2;O2,SM,SM 43:2;O2|SM 19:1;O2/24:1,[M+H]+ 827.7001,column_22 pick less than 2x the next candidate,6,3,3,4.01,7.5000,4,1.34,12.9740,4,2.05,15.3870,4,1.57,20.8160,5,1.79,32.3330,4,9.52,75.0100
+high,HexCer 42:1;O3,HexCer_HS,HexCer 42:1;O3|HexCer 18:1;O2/24:0;O,[M+H]+ 828.6923,column_20 pick less than 2x the next candidate,6,4,1,inf,7.9510,1,inf,13.4380,3,1.96,15.9030,2,2.75,17.0530,1,inf,34.4540,2,1.66,57.2930
+high,PC 40:8,PC,PC 40:8|PC 18:2_22:6,[M+H]+ 830.5694,column_22 pick less than 2x the next candidate,6,1,3,1.52,5.4850,3,1.01,7.2030,4,1.89,11.6010,3,1.09,11.7060,4,2.13,26.3970,4,1.97,43.6730
+high,HexCer 42:0;O3,HexCer_HDS,HexCer 42:0;O3|HexCer 17:0;O2/25:0;O,[M+H]+ 830.7080,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,PC 40:7,PC,PC 40:7|PC 18:1_22:6; PC 40:7|PC 18:2_22:5,[M+H]+ 832.5851,column_22 pick less than 2x the next candidate,6,2,5,1.17,5.3420,6,1.32,8.1170,7,1.24,13.0100,8,1.85,13.1610,6,3.62,28.3550,8,4.17,47.1060
+high,Hex2Cer 32:1;O2,Hex2Cer,Hex2Cer 32:1;O2,[M+H]+ 834.5937,column_20 pick more than 0.30 min from the vetted RT,6,6,3,10.98,5.9110,9,12.11,9.3680,6,18.42,12.6030,7,12.56,12.8320,6,2.06,28.2290,8,2.56,46.8750
+high,PC 40:5,PC,PC 40:5|PC 18:0_22:5,[M+H]+ 836.6164,column_20 pick more than 0.30 min from the vetted RT,6,5,2,55.88,6.1110,2,42.15,9.8180,2,51.86,13.0190,2,44.82,13.3000,5,1.99,29.0080,7,2.42,48.1240
+high,PI 38:6,PI,PI 38:6|PI 16:0_22:6,[M+NH4]+ 900.5597,column_20 pick more than 0.30 min from the vetted RT,6,6,1,inf,6.0890,2,13.79,9.6930,1,inf,13.0100,1,inf,13.1610,3,4.40,28.3470,2,4.80,47.1150
+high,PI 38:5,PI,PI 38:5|PI 18:1_20:4; PI 38:5|PI 18:0_20:5,[M+NH4]+ 902.5753,column_20 pick less than 2x the next candidate,6,5,1,inf,6.3670,2,3.06,10.3380,2,1.06,13.5480,2,3.59,13.8060,2,13.72,29.3910,2,11.77,48.7330
+high,PI 38:2,PI,PI 38:2|PI 18:0_20:2,[M+NH4]+ 908.6223,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,PC O-42:6,EtherPC,PC O-42:6|PC O-22:2_20:4; PC O-42:6|PC O-20:0_22:6,[M+H]+ 848.6528,column_20 pick less than 2x the next candidate,6,4,2,2.21,6.5750,2,15.57,12.1560,2,1.81,13.8220,1,inf,15.4900,4,3.39,32.1800,3,1.92,51.6710
+high,PC O-42:4,EtherPC,PC O-42:4|PC O-24:2_18:2; PC O-42:4|PC O-22:0_20:4,[M+H]+ 852.6841,column_22 pick less than 2x the next candidate,6,2,2,1.38,7.8290,2,1.87,13.3860,4,2.33,15.7210,3,1.66,16.9230,2,5.43,33.3950,4,1.52,57.2150
+high,PC 42:10,PC,PC 42:10|PC 20:4_22:6,[M+H]+ 854.5694,column_22 pick less than 2x the next candidate,6,3,2,8.88,5.3590,2,1.04,7.8960,3,1.94,11.5140,2,1.89,11.2040,4,3.05,26.2580,5,3.34,43.4600
+high,PC O-42:2,EtherPC,PC O-42:2|PC O-24:1_18:1,[M+H]+ 856.7154,column_22 pick less than 2x the next candidate,6,2,2,1.09,8.4110,1,inf,13.7710,2,1.05,16.4800,2,1.08,17.7370,1,inf,36.3540,2,1.18,59.7910
+high,PC 42:8,PC,PC 42:8|PC 20:4_22:4,[M+H]+ 858.6007,column_20 pick more than 0.30 min from the vetted RT,6,4,3,1.02,6.1110,5,1.54,9.8180,4,2.12,13.0190,4,2.64,13.3000,4,2.28,29.0120,4,2.38,48.1290
+high,PC 42:7,PC,PC 42:7|PC 20:1_22:6,[M+H]+ 860.6164,column_22 pick less than 2x the next candidate,6,2,2,1.79,5.9330,3,1.09,9.4540,2,1.67,12.6110,4,1.05,12.9360,3,7.41,30.3490,3,6.11,50.4090
+high,PI 40:6,PI,PI 40:6|PI 18:0_22:6,[M+NH4]+ 928.5910,no candidate within 15 ppm on column_22,5,5,1,inf,5.2810,1,inf,7.8610,1,inf,11.1500,0,,,2,7.99,30.3400,1,inf,50.4050
+high,PI 40:4,PI,PI 40:4|PI 18:0_22:4,[M+NH4]+ 932.6223,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,CAR 12:0,CAR,CAR 12:0 | CAR 12:0,[M+H]+ 344.2795,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,CAR 13:0,CAR,CAR 13:0 | CAR 13:0,[M+H]+ 358.2952,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,CAR 14:0,CAR,CAR 14:0 | CAR 14:0,[M+H]+ 372.3108,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,CAR 14:1,CAR,CAR 14:1 | CAR 14:1,[M+H]+ 370.2952,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,CAR 14:2,CAR,CAR 14:2 | CAR 14:2,[M+H]+ 368.2795,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,CAR 16:1,CAR,CAR 16:1 | CAR 16:1,[M+H]+ 398.3265,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+high,CAR 18:0,CAR,CAR 18:0 | CAR 18:0,[M+H]+ 428.3734,usable on fewer than 3 columns,2,2,0,,,1,inf,3.9080,0,,,1,inf,5.2230,0,,,0,,
+high,MG 16:0,MG,MG 16:0 | MG 16:0_0:0_0:0,[M+Na]+ 353.2662; [M+H-H2O]+ 313.2737,no candidate within 15 ppm on column_20,4,4,0,,,1,inf,4.1040,0,,,1,inf,5.4830,1,inf,8.8510,1,inf,15.8550
+high,MG 18:0,MG,MG 18:0 | MG 18:0_0:0_0:0,[M+Na]+ 381.2975; [M+H-H2O]+ 341.3050,no candidate within 15 ppm on column_22,3,3,1,inf,3.6880,0,,,0,,,0,,,1,inf,11.4740,1,inf,19.5020
+high,MG 18:1,MG,MG 18:1 | MG 18:1_0:0_0:0,[M+Na]+ 379.2819; [M+H-H2O]+ 339.2894,no candidate within 15 ppm on column_20,4,4,0,,,1,inf,4.2110,0,,,1,inf,5.6620,1,inf,9.4840,1,inf,16.7320
+high,MG 18:2,MG,MG 18:2 | MG 18:2_0:0_0:0,[M+Na]+ 377.2662; [M+H-H2O]+ 337.2737,no candidate within 15 ppm on column_22,2,2,0,,,0,,,0,,,0,,,1,inf,8.1400,1,inf,14.8610
+high,DG 34:0,DG,"DG 34:0 | 1,2-DG 16:0_18:0; DG 34:0 | 1,3-DG 16:0_18:0",[M+Na]+ 619.5272,column_22 pick less than 2x the next candidate,6,3,2,3.17,8.1240,2,1.07,13.4200,2,1.05,14.2250,2,1.28,16.9750,2,4.81,32.7510,2,9.48,54.8000
+high,DG 36:0,DG,"DG 36:0 | 1,3-DG 18:0/18:0",[M+Na]+ 647.5585,no candidate within 15 ppm on column_22,2,2,0,,,0,,,0,,,0,,,1,inf,34.8050,1,inf,58.4420
+high,DG 36:4,DG,"DG 36:4 | 1,3-DG 18:1_18:3; DG 36:4 | 1,3-DG 18:2_18:2",[M+Na]+ 639.4959,column_20 pick more than 0.30 min from the vetted RT,6,5,2,5.10,6.4540,2,7.32,10.1820,2,3.12,13.2840,2,7.03,13.6290,5,1.11,28.6900,4,2.95,47.3850
+high,CE 18:1,CE,CE 18:1 | CE 18:1,[M+NH4]+ 668.6340,column_20 pick less than 2x the next candidate,6,4,3,1.80,11.6850,1,inf,15.7450,4,1.71,19.6390,2,77.57,21.6250,3,39.17,39.6960,3,183.34,75.8590
+high,CE 22:5,CE,CE 22:5 | CE 22:5,[M+NH4]+ 716.6340,column_22 pick less than 2x the next candidate,6,1,2,1.33,10.9040,2,16.61,15.2820,2,1.09,18.8270,3,1.17,20.9760,3,1.52,39.0910,3,1.30,72.2560
+high,TG 42:0,TG,TG 42:0 | TG 16:0_14:0_12:0,[M+NH4]+ 740.6763; [M+Na]+ 745.6317,column_22 pick less than 2x the next candidate,6,1,5,1.40,6.2750,6,1.09,14.5030,7,1.21,13.4790,7,1.03,13.5250,6,5.44,37.5070,7,1.54,45.7700
+high,TG 42:1,TG,TG 42:1 | TG 12:0_12:0_18:1,[M+NH4]+ 738.6606; [M+Na]+ 743.6160,column_20 pick less than 2x the next candidate,6,5,2,inf,9.6080,2,inf,14.2520,3,1.89,17.5910,3,5.11,19.1060,3,8.00,37.0540,3,3.13,64.2390
+high,TG 44:0,TG,TG 44:0 | TG 16:0_14:0_14:0,[M+NH4]+ 768.7076; [M+Na]+ 773.6630,column_20 pick more than 0.30 min from the vetted RT,6,4,3,2.30,6.9790,5,1.83,11.7750,4,2.33,14.6500,4,2.06,15.1530,3,1.03,30.1700,2,inf,69.6140
+high,TG 46:0,TG,TG 46:0 | TG 16:0_16:0_14:0,[M+NH4]+ 796.7389; [M+Na]+ 801.6943,column_20 pick more than 0.30 min from the vetted RT,6,5,2,2.10,7.6600,3,2.89,13.1610,6,2.79,15.6300,4,2.08,16.5030,4,1.84,32.3890,5,3.60,54.0430
+high,TG 46:1,TG,TG 46:1 | TG 16:0_18:1_12:0; TG 46:1 | TG 16:0_16:1_14:0,[M+NH4]+ 794.7232; [M+Na]+ 799.6786,column_22 pick less than 2x the next candidate,6,1,5,1.23,10.6960,4,1.35,14.7970,5,1.05,18.7190,4,1.23,20.3220,5,2.45,38.2470,4,1.23,51.3620
+high,TG 49:0,TG,TG 49:0 | TG 17:0_16:0_16:0,[M+NH4]+ 838.7858; [M+Na]+ 843.7412,column_20 pick less than 2x the next candidate,6,4,3,8.46,11.8410,3,5.38,15.5030,4,1.32,19.8640,3,13.69,21.4690,4,2.31,39.9790,6,1.63,82.1780
+high,TG 49:3,TG,TG 49:3 | TG 18:2_16:1_15:0,[M+NH4]+ 832.7389; [M+Na]+ 837.6943,column_22 pick less than 2x the next candidate,6,1,4,1.67,10.5230,4,1.05,14.7280,4,1.28,18.5060,3,1.08,20.1970,4,3.75,33.4250,5,1.39,70.6540
+high,TG 51:0,TG,TG 51:0 | TG 18:0_17:0_16:0,[M+NH4]+ 866.8171; [M+Na]+ 871.7725,column_20 pick more than 0.30 min from the vetted RT,6,3,2,1.28,12.2140,1,inf,15.8060,3,3.90,19.6990,2,inf,21.8630,3,1.02,40.9710,5,1.56,84.8850
+high,TG 53:1,TG,TG 53:1 | TG 18:0_18:1_17:0,[M+NH4]+ 892.8328; [M+Na]+ 897.7882,column_20 pick less than 2x the next candidate,6,3,2,inf,12.2230,1,inf,15.8190,4,1.36,19.4300,2,inf,21.8850,3,1.53,41.1620,5,1.76,85.2860
+high,TG 54:1,TG,TG 54:1 | TG 20:0_18:1_16:0; TG 54:1 | TG 18:1_18:0_18:0; TG 54:1 | TG 18:0_20:1_16:0,[M+NH4]+ 906.8484; [M+Na]+ 911.8038,column_20 pick less than 2x the next candidate,6,5,2,inf,12.3790,3,41.26,15.9830,3,1.23,20.4190,2,inf,22.0930,2,inf,41.7410,2,inf,86.1650
+high,TG 54:6,TG,TG 54:6 | TG 18:1_18:2_18:3; TG 54:6 | TG 20:4_18:1_16:1; TG 54:6 | TG 20:4_18:2_16:0,[M+NH4]+ 896.7702; [M+Na]+ 901.7256,column_22 pick less than 2x the next candidate,6,1,7,1.71,10.4490,5,154.55,14.7240,6,1.92,18.3630,10,1.68,20.2100,7,1.83,38.4380,11,1.18,72.3250
+high,TG 56:1,TG,TG 56:1 | TG 24:1_16:0_16:0,[M+NH4]+ 934.8797; [M+Na]+ 939.8351,column_20 pick more than 0.30 min from the vetted RT,6,6,2,inf,12.5570,2,inf,16.3300,2,21.70,20.0550,2,6.47,22.4440,3,4.69,43.0990,1,inf,87.9410
+high,TG 56:2,TG,TG 56:2 | TG 20:1_18:1_18:0; TG 56:2 | TG 22:0_18:2_16:0; TG 56:2 | TG 22:1_18:1_16:0,[M+NH4]+ 932.8641; [M+Na]+ 937.8195,column_20 pick less than 2x the next candidate,6,5,3,32.40,11.6160,4,5.68,15.9960,4,1.89,19.6130,3,4.96,22.1060,2,inf,41.9460,2,inf,86.4910
+high,TG 56:3,TG,TG 56:3 | TG 20:1_18:1_18:1,[M+NH4]+ 930.8484; [M+Na]+ 935.8038,column_20 pick more than 0.30 min from the vetted RT,6,6,2,3.77,12.0670,3,18.10,15.6850,3,8.19,19.2400,3,12.60,21.7510,3,25.61,41.0010,2,inf,85.0980
+high,TG 56:5,TG,TG 56:5 | TG 22:4_16:0_18:1; TG 56:5 | TG 20:4_18:1_18:0; TG 56:5 | TG 20:1_18:2_18:2,[M+NH4]+ 926.8171; [M+Na]+ 931.7725,column_22 pick less than 2x the next candidate,6,1,3,1.06,11.5630,2,143.41,15.2730,3,1.45,19.3780,2,1.88,21.3010,5,1.48,39.9790,9,1.21,82.7870
+high,TG 56:7,TG,TG 56:7 | TG 22:5_18:2_16:0,[M+NH4]+ 922.7858; [M+Na]+ 927.7412,column_22 pick less than 2x the next candidate,6,3,4,1.23,10.6960,3,43.18,14.8580,5,1.33,18.6320,4,1.61,20.4780,6,4.90,38.7990,9,3.37,74.7970
+high,TG 56:8,TG,TG 56:8 | TG 22:6_18:2_16:0,[M+NH4]+ 920.7702; [M+Na]+ 925.7256,column_22 pick less than 2x the next candidate,6,1,4,1.26,10.4880,2,inf,14.7360,4,1.33,18.4020,4,1.19,20.2790,4,1.03,38.3420,7,1.12,73.0560
+high,TG 58:2,TG,TG 58:2 | TG 22:0_18:1_18:1; TG 58:2 | TG 24:0_16:0_18:2; TG 58:2 | TG 24:1_18:1_16:0,[M+NH4]+ 960.8954; [M+Na]+ 965.8508,column_20 pick more than 0.30 min from the vetted RT,6,6,3,3.85,12.0580,3,2.46,16.3470,3,16.04,20.0330,3,4.09,22.4700,1,inf,43.3600,1,inf,88.3190
+high,TG 58:3,TG,TG 58:3 | TG 22:0_18:2_18:1,[M+NH4]+ 958.8797; [M+Na]+ 963.8351,column_20 pick more than 0.30 min from the vetted RT,6,6,2,9.37,11.6330,2,inf,16.0310,3,11.97,19.5950,3,2.73,22.1400,1,inf,42.3200,2,3.34,87.0440
+low,LPA 16:1,LPA,LPA 16:1,[M+NH4]+ 426.2615,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+low,LPA 18:3,LPA,LPA 18:3,[M+NH4]+ 450.2615,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+low,LPA 18:2,LPA,LPA 18:2,[M+NH4]+ 452.2772,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+low,LPA 20:5,LPA,LPA 20:5,[M+NH4]+ 474.2615,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+low,LPA 20:4,LPA,LPA 20:4,[M+NH4]+ 476.2772,usable on fewer than 3 columns,2,2,0,,,1,inf,3.4310,0,,,1,inf,4.5560,0,,,0,,
+low,LPA 22:6,LPA,LPA 22:6,[M+NH4]+ 500.2772,no candidate within 15 ppm on column_22,0,0,0,,,0,,,0,,,0,,,0,,,0,,
+low,PA 34:2,PA,PA 34:2|PA 16:0_18:2; PA 34:2|PA 16:0_18:2,[M+NH4]+ 690.5068,no candidate within 15 ppm on column_22,1,1,0,,,1,inf,15.2550,0,,,0,,,0,,,0,,
+low,DMPE 32:2,DMPE,DMPE 32:2|DMPE 14:0_18:2,[M+H]+ 716.5225,column_20 pick more than 0.30 min from the vetted RT,6,6,1,inf,5.7110,1,inf,8.6840,1,inf,12.1910,1,inf,12.0570,1,inf,25.8920,1,inf,42.7550
+low,DMPE 32:1,DMPE,DMPE 32:1|DMPE 16:0_16:1,[M+H]+ 718.5381,column_20 pick more than 0.30 min from the vetted RT,5,5,0,,,2,4.48,9.7830,1,inf,13.3050,2,5.12,13.2390,1,inf,27.5980,1,inf,45.6830
+low,DMPE 32:0,DMPE,DMPE 32:0|DMPE 16:0_16:0,[M+H]+ 720.5538,column_20 pick more than 0.30 min from the vetted RT,6,6,1,inf,5.6370,2,2.42,8.5370,2,2.51,12.1600,3,2.41,11.8800,3,2.26,25.4400,2,2.20,41.8060
+low,DMPE 33:2,DMPE,DMPE 33:2|DMPE 15:0_18:2,[M+H]+ 730.5381,column_20 pick more than 0.30 min from the vetted RT,6,6,1,inf,4.9200,1,inf,7.1250,1,inf,10.0260,1,inf,10.1610,1,inf,22.8470,1,inf,37.4720
+low,DMPE 34:4,DMPE,DMPE 34:4|DMPE 14:0_20:4,[M+H]+ 740.5225,column_22 pick less than 2x the next candidate,6,5,2,2.87,5.6070,2,5.47,8.5190,2,5.71,11.9170,2,1.92,11.8750,1,inf,25.8580,1,inf,42.7760
+low,DMPE 34:2,DMPE,DMPE 34:2|DMPE 16:0_18:2; DMPE 34:2|DMPE 16:1_18:1,[M+H]+ 744.5538,column_20 pick more than 0.30 min from the vetted RT,6,6,1,inf,5.2290,2,11.78,7.7360,1,inf,10.9940,2,11.54,10.9450,2,23.40,24.3610,3,22.05,40.0170
+low,DMPE 34:1,DMPE,DMPE 34:1|DMPE 16:0_18:1,[M+H]+ 746.5694,column_20 pick more than 0.30 min from the vetted RT,6,6,3,10.05,5.7200,3,7.24,8.7270,3,8.40,12.2820,3,6.96,12.1050,2,12.22,26.1410,2,14.08,43.0980
+low,DMPE 34:0,DMPE,DMPE 34:0|DMPE 16:0_18:0,[M+H]+ 748.5851,column_22 pick less than 2x the next candidate,6,0,2,1.91,6.1930,2,1.69,9.7450,2,1.89,13.3100,2,1.79,13.1960,2,1.49,27.7550,2,1.78,45.8010
+low,DMPE 35:2,DMPE,DMPE 35:2|DMPE 17:0_18:2; DMPE 35:2|DMPE 17:0_18:2,[M+H]+ 758.5694,column_20 pick more than 0.30 min from the vetted RT,6,6,1,inf,5.5460,1,inf,8.3980,4,94.98,11.8310,3,5245.35,11.7320,5,160.11,25.7360,4,35.50,42.4630
+low,DMPE 35:1,DMPE,DMPE 35:1|DMPE 17:0_18:1,[M+H]+ 760.5851,column_20 pick more than 0.30 min from the vetted RT,6,6,2,4.15,6.0410,2,4.20,9.4540,1,inf,12.9840,1,inf,12.9010,1,inf,27.4760,3,4.48,45.4130
+low,DMPE 36:5,DMPE,DMPE 36:5|DMPE 16:0_20:5; DMPE 36:5|DMPE 16:1_20:4; DMPE 36:5|DMPE 18:2_18:3; DMPE 36:5|DMPE 16:0_20:5,[M+H]+ 766.5381,column_22 pick less than 2x the next candidate,6,0,3,1.19,6.3840,5,1.75,8.6660,3,1.27,12.0030,6,1.08,4.1830,4,1.28,24.3610,4,1.47,13.7400
+low,DMPE 36:4,DMPE,DMPE 36:4|DMPE 18:2_18:2; DMPE 36:4|DMPE 18:2_18:2; DMPE 36:4|DMPE 18:2_18:2; DMPE 36:4|DMPE 16:0_20:4,[M+H]+ 768.5538,usable on fewer than 3 columns,6,2,2,1.42,6.2670,2,2.00,10.0090,3,2.07,13.3140,2,2.18,13.4900,3,1.23,28.5030,3,1.09,40.0520
+low,DMPE 36:3,DMPE,DMPE 36:3|DMPE 18:1_18:2; DMPE 36:3|DMPE 18:1_18:2; DMPE 36:3|DMPE 16:0_20:3,[M+H]+ 770.5694,column_22 pick less than 2x the next candidate,6,2,3,3.11,5.3940,2,2.52,8.1210,4,1.40,11.4270,2,1.18,11.1390,3,1.47,25.4440,3,1.24,41.9150
+low,DMPE 36:2,DMPE,DMPE 36:2|DMPE 18:1_18:1; DMPE 36:2|DMPE 18:1_18:1,[M+H]+ 772.5851,column_22 pick less than 2x the next candidate,6,4,1,inf,5.8670,2,2.04,9.1170,3,1.95,12.5770,2,1.97,12.5380,2,2.51,27.1460,2,2.02,44.8430
+low,DMPE 36:1,DMPE,DMPE 36:1|DMPE 18:0_18:1,[M+H]+ 774.6007,column_20 pick more than 0.30 min from the vetted RT,6,6,1,inf,6.3750,2,3.02,10.2380,2,2.97,13.6180,2,2.90,13.7070,2,4.64,28.7860,2,3.21,47.6460
+low,DMPE 37:4,DMPE,DMPE 37:4|DMPE 17:0_20:4; DMPE 37:4|DMPE 17:0_20:4,[M+H]+ 782.5694,column_20 pick more than 0.30 min from the vetted RT,6,6,5,7.34,5.4420,9,7.58,8.2250,9,8.04,11.5530,8,7.60,11.5510,10,4.95,25.7010,9,5.42,42.4980
+low,DMPE 37:3,DMPE,DMPE 37:3|DMPE 17:0_20:3,[M+H]+ 784.5851,column_22 pick less than 2x the next candidate,6,2,7,109.03,5.7110,10,1.82,8.8050,7,1.83,12.2120,10,1.80,12.2000,9,2.19,26.7980,10,1.79,44.2860
+low,DMPE 37:2,DMPE,DMPE 37:2|DMPE 19:0_18:2,[M+H]+ 786.6007,column_20 pick more than 0.30 min from the vetted RT,6,6,1,inf,6.1930,2,13.05,9.8700,1,inf,13.2360,2,11.67,13.3430,2,1488.27,28.4210,3,13.30,47.0930
+low,DMPE 38:6,DMPE,DMPE 38:6|DMPE 18:2_20:4; DMPE 38:6|DMPE 16:0_22:6; DMPE 38:6|DMPE 18:2_20:4,[M+H]+ 792.5538,column_22 pick less than 2x the next candidate,6,2,2,1.22,6.0890,2,1.55,9.6800,2,1.17,12.9190,3,1.77,13.1610,5,3.56,25.7010,5,2.22,42.5070
+low,DMPE 38:5,DMPE,MMPE 39:5|MMPE 17:0_22:5; DMPE 38:5|DMPE 16:0_22:5,[M+H]+ 794.5694,column_22 pick less than 2x the next candidate,6,3,1,inf,5.3500,4,1.96,8.1040,6,1.16,10.8160,7,1.45,11.1050,4,2.57,27.1590,5,2.24,44.8430
+low,DMPE 38:4,DMPE,DMPE 38:4|DMPE 18:0_20:4; DMPE 38:4|DMPE 18:1_20:3; DMPE 38:4|DMPE 18:0_20:4; DMPE 38:4|DMPE 18:2_20:2,[M+H]+ 796.5851,column_22 pick less than 2x the next candidate,6,2,2,25.98,5.7630,3,1.92,8.9350,5,1.88,12.3250,3,1.91,12.3560,3,2.20,27.1110,4,1.91,44.8610
+low,DMPE 38:3,DMPE,DMPE 38:3|DMPE 20:1_18:2; DMPE 38:3|DMPE 18:0_20:3; DMPE 38:3|DMPE 18:0_20:3,[M+H]+ 798.6007,column_22 pick less than 2x the next candidate,6,0,2,1.33,6.0370,3,1.32,9.5500,2,1.36,12.9150,2,1.37,13.0050,2,1.69,28.1250,2,1.32,46.5620
+low,DMPE 38:2,DMPE,DMPE 38:2|DMPE 18:0_20:2,[M+H]+ 800.6164,column_20 pick more than 0.30 min from the vetted RT,6,6,1,inf,6.5320,2,2.65,10.6840,2,2.41,13.8430,2,2.66,14.1480,2,4.23,29.7130,3,3.74,49.2600
+low,DMPE 40:10,DMPE,DMPE 40:10|DMPE 20:5_20:5,[M+H]+ 812.5225,no candidate within 15 ppm on column_20,3,3,0,,,1,inf,10.0220,0,,,1,inf,13.4950,1,inf,28.5160,0,,
+low,DMPE 40:5,DMPE,DMPE 40:5|DMPE 18:0_22:5; DMPE 40:5|DMPE 18:0_22:5,[M+H]+ 822.6007,column_20 pick more than 0.30 min from the vetted RT,6,5,1,inf,5.7940,2,2.37,9.0650,2,2.14,12.3470,4,2.33,12.5030,1,inf,27.3370,3,1.56,49.2560
+low,DMPE 40:4,DMPE,DMPE 40:4|DMPE 18:0_22:4,[M+H]+ 824.6164,column_22 pick less than 2x the next candidate,6,3,1,inf,6.4190,4,1.76,8.8830,1,inf,13.6260,5,1.59,12.2870,3,2.39,29.2910,3,1.70,48.6390
+low,FA 16:0,FA,FA 16:0 | FA 16:0,,no positive-mode target ion (not searched),,,,,,,,,,,,,,,,,,,,
+low,FA 16:1,FA,FA 16:1 | FA 16:1,,no positive-mode target ion (not searched),,,,,,,,,,,,,,,,,,,,
+low,FA 18:0,FA,FA 18:0 | FA 18:0,,no positive-mode target ion (not searched),,,,,,,,,,,,,,,,,,,,
+low,FA 18:1,FA,FA 18:1 | FA 18:1,,no positive-mode target ion (not searched),,,,,,,,,,,,,,,,,,,,
+low,FA 18:2,FA,FA 18:2 | FA 18:2,,no positive-mode target ion (not searched),,,,,,,,,,,,,,,,,,,,
+low,FA 18:3,FA,FA 18:3 | FA 18:3,,no positive-mode target ion (not searched),,,,,,,,,,,,,,,,,,,,
+low,FA 20:3,FA,FA 20:3 | FA 20:3,,no positive-mode target ion (not searched),,,,,,,,,,,,,,,,,,,,
+low,FA 20:4,FA,FA 20:4 | FA 20:4,,no positive-mode target ion (not searched),,,,,,,,,,,,,,,,,,,,
+low,FA 20:4,FA,FA 20:4 | FA 20:4,,no positive-mode target ion (not searched),,,,,,,,,,,,,,,,,,,,
+low,FA 20:5,FA,FA 20:5 | FA 20:5,,no positive-mode target ion (not searched),,,,,,,,,,,,,,,,,,,,
+low,FA 22:4,FA,FA 22:4 | FA 22:4,,no positive-mode target ion (not searched),,,,,,,,,,,,,,,,,,,,
+low,FA 22:5,FA,FA 22:5 | FA 22:5,,no positive-mode target ion (not searched),,,,,,,,,,,,,,,,,,,,
+low,FA 22:5,FA,FA 22:5 | FA 22:5,,no positive-mode target ion (not searched),,,,,,,,,,,,,,,,,,,,
+low,FA 22:6,FA,FA 22:6 | FA 22:6,,no positive-mode target ion (not searched),,,,,,,,,,,,,,,,,,,,

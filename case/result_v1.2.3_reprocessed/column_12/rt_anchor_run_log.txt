@@ -1,0 +1,11 @@
+loaded sample table: {'source_format': 'msdial', 'polarity': 'positive', 'n_features': 2477, 'mz_col': 'Average Mz', 'rt_col': 'Average Rt(min)', 'rt_unit': 'min', 'rt_min_minutes': 1.126, 'rt_max_minutes': 12.862, 'n_sample_columns': 4, 'sample_columns': ['P Finnie Serum clmn TEST 1_GD1_01_66704', 'P Finnie Serum clmn TEST 2_GD1_01_66705', 'P Finnie Serum clmn TEST 3_GD1_01_66706', 'P Finnie Serum clmn TEST 4_GD1_01_66707'], 'n_total_columns': 41}
+loaded standards run: 480 features, RT 1.20-12.86 min
+reference: user-supplied reference pair [custom] — sample 3229 features, standards 383 features
+panel: mix21 — 21 standards ionisable in positive mode
+sample-run pairs: 1288 matched, 1271 kept after masking the stage-2 anchor m/z
+stage 1: 1498 pairs (227 standards + 1271 sample), 1314 kept after MAD trimming; source RT span 1.13-12.82 -> reference 3.68-23.09 min
+series term: series term engaged: leave-own-out MSE 38% below curve-only (threshold 20%); 83 homologous series (581 pairs, 507 with a leave-own-out prediction); 699/2477 features corrected
+lattice term: lattice term engaged: leave-own-out MSE 24% below curve-only (threshold 20%); 21 lattice families (705 pairs, 434 judged by the gate); 878/2477 features corrected
+stage 2: disabled (use_sample_anchors=False) — stage-1 curve only
+iRT (mix21): 21 landmarks, RT 1.46-21.78 min on the reference standards run
+detection QC on the user's standards run: 18/21 panel standards located (reporting only — it does not drive the calibration)

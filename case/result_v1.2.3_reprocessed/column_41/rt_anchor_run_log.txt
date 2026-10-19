@@ -1,0 +1,11 @@
+loaded sample table: {'source_format': 'msdial', 'polarity': 'positive', 'n_features': 4128, 'mz_col': 'Average Mz', 'rt_col': 'Average Rt(min)', 'rt_unit': 'min', 'rt_min_minutes': 2.667, 'rt_max_minutes': 44.753, 'n_sample_columns': 4, 'sample_columns': ['P Sandie 50 Serum 1_GD1_01_66550', 'P Sandie 50 Serum 2_GD1_01_66551', 'P Sandie 50 Serum 3_GD1_01_66552', 'P Sandie 50 Serum 4_GD1_01_66553'], 'n_total_columns': 41}
+loaded standards run: 405 features, RT 3.06-41.85 min
+reference: user-supplied reference pair [custom] — sample 3229 features, standards 383 features
+panel: mix21 — 21 standards ionisable in positive mode
+sample-run pairs: 1532 matched, 1515 kept after masking the stage-2 anchor m/z
+stage 1: 1737 pairs (222 standards + 1515 sample), 1513 kept after MAD trimming; source RT span 2.67-44.75 -> reference 1.27-22.92 min
+series term: series term engaged: leave-own-out MSE 45% below curve-only (threshold 20%); 94 homologous series (704 pairs, 644 with a leave-own-out prediction); 1190/4128 features corrected
+lattice term: lattice term engaged: leave-own-out MSE 43% below curve-only (threshold 20%); 18 lattice families (833 pairs, 467 judged by the gate); 1507/4128 features corrected
+stage 2: disabled (use_sample_anchors=False) — stage-1 curve only
+iRT (mix21): 21 landmarks, RT 1.46-21.78 min on the reference standards run
+detection QC on the user's standards run: 20/21 panel standards located (reporting only — it does not drive the calibration)

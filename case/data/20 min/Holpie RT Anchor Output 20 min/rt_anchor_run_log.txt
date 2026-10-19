@@ -1,0 +1,10 @@
+loaded sample table: {'source_format': 'msdial', 'polarity': 'positive', 'n_features': 2964, 'mz_col': 'Average Mz', 'rt_col': 'Average Rt(min)', 'rt_unit': 'min', 'rt_min_minutes': 1.149, 'rt_max_minutes': 21.549, 'n_sample_columns': 4, 'sample_columns': ['P Holpie Serum 2_GD1_01_66386', 'P Holpie Serum 3_GD1_01_66387', 'P Holpie Serum 4_GD1_01_66388', 'P Holpie Serum 5_GD1_01_66389'], 'n_total_columns': 41}
+loaded standards run: 316 features, RT 1.17-21.39 min
+reference: Column 25 [col35] — sample 610 features, standards 383 features
+panel: mix21 — 21 standards ionisable in positive mode
+sample-run pairs: 483 matched, 466 kept after masking the stage-2 anchor m/z
+stage 1: 661 pairs (195 standards + 466 sample), 629 kept after MAD trimming; source RT span 1.71-21.39 -> reference 4.03-23.30 min
+stage 2: 17/17 plasma lipids validated in both sample runs, 17 usable as anchors; 1 pick(s) moved by curve-assisted isomer refinement
+stage 2 gate: gated off: LOO MSE only 14% below no-correction (threshold 20%) — the anchor residuals do not generalise
+iRT (mix21): 21 landmarks, RT 1.46-21.78 min on the reference standards run
+detection QC on the user's standards run: 20/21 panel standards located (reporting only — it does not drive the calibration)

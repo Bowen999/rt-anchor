@@ -1,0 +1,134 @@
+{
+  "app": "RT Anchor",
+  "method": "cross-column-v2",
+  "rt_anchor_version": "1.2.0",
+  "timestamp": "2026-10-12T13:45:59",
+  "duration_seconds": 0.323,
+  "inputs": {
+    "samples": "C:\\Users\\suppo\\Desktop\\Rt trials TRES\\Carly 35\\Serum\\Carly 35 Area_2_2026_10_12_13_24_24.csv",
+    "standards": "C:\\Users\\suppo\\Desktop\\Rt trials TRES\\Carly 35\\STDs\\Res\\Carly stds Area_1_2026_08_16_23_14_28.csv",
+    "mixture": {
+      "key": "mix21",
+      "label": "21",
+      "n_standards": 21
+    },
+    "reference": {
+      "key": "col35",
+      "label": "Column 25",
+      "sample": "C:\\Users\\suppo\\Documents\\programs\\RT\\RT.Anchor-win64\\RT Anchor\\_internal\\rt_anchor\\reference_data\\col35\\reference_sample.csv",
+      "standards": "C:\\Users\\suppo\\Documents\\programs\\RT\\RT.Anchor-win64\\RT Anchor\\_internal\\rt_anchor\\reference_data\\col35\\reference_standards.csv",
+      "is_default": true,
+      "provenance": {
+        "key": "col35",
+        "label": "Column 25",
+        "column_id": "25",
+        "gradient_minutes": 35,
+        "matrix": "human serum",
+        "instrument": "QTOF (MS-DIAL alignment export)",
+        "polarity": "positive",
+        "mixture_run": "P Carly RT Mix 4p4 2Xdil (Mix 4.4 = the 21-standard panel)",
+        "note": "Reference dataset defining the Cal_RT time axis and the iRT ruler. Only the two bulky spectrum columns were removed; every row and every other column is byte-identical to the source MS-DIAL export.",
+        "files": {
+          "sample": {
+            "bundled_file": "reference_sample.csv",
+            "source_path": "v2/5 chroms/data/25/25_serum.csv",
+            "source_sha256_16": "710554140bb9e9c5",
+            "source_bytes": 304293,
+            "bundled_bytes": 270931,
+            "dropped_columns": [
+              "MS1 isotopic spectrum",
+              "MS/MS spectrum"
+            ],
+            "n_features": 610
+          },
+          "standards": {
+            "bundled_file": "reference_standards.csv",
+            "source_path": "v2/5 chroms/data/25/25_standards.csv",
+            "source_sha256_16": "f0b613524d75b8c2",
+            "source_bytes": 186242,
+            "bundled_bytes": 165216,
+            "dropped_columns": [
+              "MS1 isotopic spectrum",
+              "MS/MS spectrum"
+            ],
+            "n_features": 383
+          }
+        }
+      }
+    },
+    "single_files": [],
+    "n_single_files": 0
+  },
+  "polarity": "positive",
+  "parameters": {
+    "match_mz_tol_ppm": 10.0,
+    "match_mz_tol_da": 0.008,
+    "mz_tol_ppm": 10.0,
+    "mz_tol_min_da": 0.0,
+    "rt_window_min": 0.5,
+    "rt_window_seed_min": 2.0,
+    "curve_frac": 0.1,
+    "curve_iter": 3,
+    "curve_mad_k": 3.0,
+    "curve_min_points": 20,
+    "use_sample_pairs": true,
+    "use_sample_anchors": true,
+    "class_aware": true,
+    "min_anchors": 3,
+    "anchor_gate_min_mse_reduction": 0.2,
+    "anchor_tie_tol_min": 0.15,
+    "isomer_sn_frac": 0.1,
+    "sigma_window_pairs": 50,
+    "conf_high_irt": 1.0,
+    "conf_low_irt": 2.0,
+    "irt_landmark_panel": "mix21",
+    "extrapolate": true,
+    "extrapolate_mode": "linear",
+    "tie_epsilon_min": 0.005,
+    "max_drop_anchors": 3,
+    "min_gaussian_similarity": 0.0,
+    "asymmetry_range": [
+      0.0,
+      1000000000.0
+    ],
+    "rt_unit": null,
+    "verbose": true
+  },
+  "results": {
+    "calibration_scope": "project",
+    "n_features": 3229,
+    "n_features_extrapolated": 9,
+    "confidence_counts": {
+      "high": 3220,
+      "low": 9
+    },
+    "curve": {
+      "n_pairs": 819,
+      "n_pairs_kept": 806,
+      "n_pairs_standards": 335,
+      "n_pairs_sample": 484,
+      "residual_min": {
+        "median_abs": 6.750155989720952e-14,
+        "p90_abs": 1.0906830993917538e-12
+      }
+    },
+    "anchors": {
+      "engaged": false,
+      "n_validated": 17,
+      "n_used": 17,
+      "lam_g": 1.0,
+      "lam_c": 0.0,
+      "gate_mse_reduction": 0.0,
+      "gate_threshold": 0.2,
+      "gate_reason": "no correction needed: the stage-1 curve already reproduces all 17 anchors to within 5.65e-13 min RMS"
+    },
+    "irt": {
+      "n_landmarks": 21,
+      "landmark_rt_span_min": [
+        1.455,
+        21.779
+      ],
+      "panel_used": "mix21"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+loaded sample table: {'source_format': 'msdial', 'polarity': 'positive', 'n_features': 3229, 'mz_col': 'Average Mz', 'rt_col': 'Average Rt(min)', 'rt_unit': 'min', 'rt_min_minutes': 1.251, 'rt_max_minutes': 27.83, 'n_sample_columns': 4, 'sample_columns': ['P Carly Serum 1_GD1_01_66465', 'P Carly Serum 2_GD1_01_66466', 'P Carly Serum 3_GD1_01_66467', 'P Carly Serum 4_GD1_01_66468'], 'n_total_columns': 41}
+loaded standards run: 383 features, RT 1.44-24.23 min
+reference: Column 25 [col35] — sample 610 features, standards 383 features
+panel: mix21 — 21 standards ionisable in positive mode
+sample-run pairs: 501 matched, 484 kept after masking the stage-2 anchor m/z
+stage 1: 819 pairs (335 standards + 484 sample), 806 kept after MAD trimming; source RT span 1.44-24.23 -> reference 1.44-24.23 min
+stage 2: 17/17 plasma lipids validated in both sample runs, 17 usable as anchors; no pick moved by isomer refinement
+stage 2 gate: no correction needed: the stage-1 curve already reproduces all 17 anchors to within 5.65e-13 min RMS
+iRT (mix21): 21 landmarks, RT 1.46-21.78 min on the reference standards run
+detection QC on the user's standards run: 21/21 panel standards located (reporting only — it does not drive the calibration)

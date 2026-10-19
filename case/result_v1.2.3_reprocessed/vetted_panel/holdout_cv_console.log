@@ -1,0 +1,58 @@
+fold 0 column_12: 19 lipids held out, 414 reference features removed, 1391 pairs, series off, lattice engaged
+fold 0 column_16: 19 lipids held out, 414 reference features removed, 1904 pairs, series off, lattice off
+fold 0 column_20: 19 lipids held out, 414 reference features removed, 1456 pairs, series engaged, lattice engaged
+fold 0 column_41: 19 lipids held out, 414 reference features removed, 1592 pairs, series engaged, lattice engaged
+fold 0 column_85: 19 lipids held out, 414 reference features removed, 1425 pairs, series engaged, lattice engaged
+fold 1 column_12: 19 lipids held out, 424 reference features removed, 1387 pairs, series off, lattice engaged
+fold 1 column_16: 19 lipids held out, 424 reference features removed, 1907 pairs, series off, lattice off
+fold 1 column_20: 19 lipids held out, 424 reference features removed, 1446 pairs, series engaged, lattice engaged
+fold 1 column_41: 19 lipids held out, 424 reference features removed, 1571 pairs, series engaged, lattice engaged
+fold 1 column_85: 19 lipids held out, 424 reference features removed, 1412 pairs, series engaged, lattice engaged
+fold 2 column_12: 18 lipids held out, 374 reference features removed, 1398 pairs, series off, lattice off
+fold 2 column_16: 18 lipids held out, 374 reference features removed, 1944 pairs, series off, lattice off
+fold 2 column_20: 18 lipids held out, 374 reference features removed, 1466 pairs, series engaged, lattice engaged
+fold 2 column_41: 18 lipids held out, 374 reference features removed, 1595 pairs, series engaged, lattice engaged
+fold 2 column_85: 18 lipids held out, 374 reference features removed, 1430 pairs, series engaged, lattice engaged
+fold 3 column_12: 18 lipids held out, 398 reference features removed, 1377 pairs, series engaged, lattice engaged
+fold 3 column_16: 18 lipids held out, 398 reference features removed, 1920 pairs, series off, lattice off
+fold 3 column_20: 18 lipids held out, 398 reference features removed, 1457 pairs, series engaged, lattice engaged
+fold 3 column_41: 18 lipids held out, 398 reference features removed, 1589 pairs, series engaged, lattice engaged
+fold 3 column_85: 18 lipids held out, 398 reference features removed, 1423 pairs, series engaged, lattice engaged
+fold 4 column_12: 18 lipids held out, 447 reference features removed, 1375 pairs, series off, lattice engaged
+fold 4 column_16: 18 lipids held out, 447 reference features removed, 1907 pairs, series off, lattice off
+fold 4 column_20: 18 lipids held out, 447 reference features removed, 1456 pairs, series engaged, lattice engaged
+fold 4 column_41: 18 lipids held out, 447 reference features removed, 1573 pairs, series engaged, lattice engaged
+fold 4 column_85: 18 lipids held out, 447 reference features removed, 1415 pairs, series engaged, lattice engaged
+fold 5 column_12: 18 lipids held out, 448 reference features removed, 1370 pairs, series engaged, lattice off
+fold 5 column_16: 18 lipids held out, 448 reference features removed, 1890 pairs, series off, lattice off
+fold 5 column_20: 18 lipids held out, 448 reference features removed, 1442 pairs, series engaged, lattice engaged
+fold 5 column_41: 18 lipids held out, 448 reference features removed, 1578 pairs, series engaged, lattice engaged
+fold 5 column_85: 18 lipids held out, 448 reference features removed, 1405 pairs, series engaged, lattice engaged
+fold 6 column_12: 18 lipids held out, 458 reference features removed, 1363 pairs, series engaged, lattice off
+fold 6 column_16: 18 lipids held out, 458 reference features removed, 1896 pairs, series off, lattice off
+fold 6 column_20: 18 lipids held out, 458 reference features removed, 1431 pairs, series engaged, lattice engaged
+fold 6 column_41: 18 lipids held out, 458 reference features removed, 1556 pairs, series engaged, lattice engaged
+fold 6 column_85: 18 lipids held out, 458 reference features removed, 1391 pairs, series engaged, lattice engaged
+fold 7 column_12: 18 lipids held out, 349 reference features removed, 1402 pairs, series engaged, lattice off
+fold 7 column_16: 18 lipids held out, 349 reference features removed, 1955 pairs, series off, lattice off
+fold 7 column_20: 18 lipids held out, 349 reference features removed, 1488 pairs, series engaged, lattice engaged
+fold 7 column_41: 18 lipids held out, 349 reference features removed, 1621 pairs, series engaged, lattice engaged
+fold 7 column_85: 18 lipids held out, 349 reference features removed, 1442 pairs, series engaged, lattice engaged
+fold 8 column_12: 18 lipids held out, 390 reference features removed, 1392 pairs, series engaged, lattice off
+fold 8 column_16: 18 lipids held out, 390 reference features removed, 1926 pairs, series off, lattice off
+fold 8 column_20: 18 lipids held out, 390 reference features removed, 1465 pairs, series engaged, lattice engaged
+fold 8 column_41: 18 lipids held out, 390 reference features removed, 1603 pairs, series engaged, lattice engaged
+fold 8 column_85: 18 lipids held out, 390 reference features removed, 1421 pairs, series engaged, lattice engaged
+fold 9 column_12: 18 lipids held out, 380 reference features removed, 1378 pairs, series engaged, lattice off
+fold 9 column_16: 18 lipids held out, 380 reference features removed, 1898 pairs, series off, lattice off
+fold 9 column_20: 18 lipids held out, 380 reference features removed, 1450 pairs, series engaged, lattice engaged
+fold 9 column_41: 18 lipids held out, 380 reference features removed, 1596 pairs, series engaged, lattice engaged
+fold 9 column_85: 18 lipids held out, 380 reference features removed, 1414 pairs, series engaged, lattice engaged
+
+830 held-out points (expected 830); median |dRT_after| in-sample 0.0486 -> held-out 0.0653 min; within 0.2 min 84.6% -> 80.6%
+gate outcomes per column (folds engaged / 10):
+  column_12: series 6, lattice 4
+  column_16: series 0, lattice 0
+  column_20: series 10, lattice 10
+  column_41: series 10, lattice 10
+  column_85: series 10, lattice 10

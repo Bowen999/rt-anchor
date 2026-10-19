@@ -1,0 +1,74 @@
+== figures for the vetted-lipid validation panel (read from the CSVs of build_vetted_panel.py) ==
+font used: arial.ttf
+
+-- set high_confidence: 182 lipids, 830 used non-reference cells, 830 pooled cells (expected 830) --
+   pooled: n cells 830; median |dRT_after| 0.04865 min; 84.6 % within 0.2 min (702 of 830); median |dRT_before| 6.0530 min; 5.3 % within 0.2 min (44 of 830)
+   pooled cells per column: column_12 163, column_16 178, column_20 182, column_41 160, column_85 147; |dRT_after| > 0.5 / 1 / 2 min: 28 / 15 / 7
+   ok         pooled cells                                         expected          830   obtained          830
+   ok         cells within 0.2 min after calibration               expected          702   obtained          702
+   ok         cells within 0.2 min before calibration              expected           44   obtained           44
+   ok         cells with |dRT_after| > 0.5 / 1 / 2 min             expected  (28, 15, 7)   obtained  (28, 15, 7)
+   ok         % within 0.2 min after calibration                   expected         84.6   obtained       84.578   (tolerance 0.05)
+   ok         % within 0.2 min before calibration                  expected          5.3   obtained       5.3012   (tolerance 0.05)
+   ok         median |dRT_after| (brief: from unrounded values)    expected       0.0486   obtained      0.04865   (tolerance 0.0001)
+   ok         median |dRT_before| (brief: from unrounded values)   expected        6.053   obtained        6.053   (tolerance 0.001)
+   note: computed from the 4-decimal values in the CSVs; with an even number of cells the median is the mean of two of them and can end in a 5 (a rounding tie); build_vetted_panel_console.log has the medians from unrounded values
+   overview heatmap table (median dRT per group and column, minutes; before | after):
+     group                   Column 12  Column 16  Column 20  Column 41  Column 85   |  Column 12  Column 16  Column 20  Column 41  Column 85
+     LPC (n=17)                  −2.77      −1.11      −2.10       3.38       9.63   |     −0.009      0.005     −0.052      0.014      0.009
+     PC (n=24)                   −7.07      −3.43      −0.18      15.11      33.94   |     −0.020     −0.013     −0.014      0.101     −0.079
+     EtherPC (n=21)              −7.39      −3.43      −0.26      15.22      33.87   |     −0.007     −0.006     −0.019      0.165      0.084
+     PE (n=5)                    −6.23      −3.40       0.03      14.24      31.02   |      0.033     −0.014      0.035     −0.165     −0.540
+     EtherPE (n=9)               −7.22      −3.44      −0.20      14.80      33.37   |      0.060     −0.005      0.065     −0.169     −0.144
+     PI (n=8)                    −6.62      −3.46      −0.05      12.99      30.31   |     −0.039     −0.123     −0.071     −0.460     −0.066
+     SM (n=21)                   −6.77      −3.31      −0.24      13.56      31.85   |      0.010     −0.003      0.011      0.022      0.012
+     Cer_NS (n=5)                −9.01      −4.01      −1.12      15.81      39.84   |      0.077      0.001     −0.029     −0.037     −0.408
+     DG (n=7)                    −8.25      −3.41      −0.69      15.20      36.09   |     −0.005      0.011      0.003     −0.075      0.098
+     TG (n=34)                   −9.68      −5.79      −1.67      18.25      57.35   |      0.014     −0.018      0.007     −0.005     −0.018
+     CE (n=11)                  −10.00      −5.73      −2.06      17.84      50.52   |      0.025      0.016      0.036      0.004      0.007
+     Other (n=20)                −3.31      −1.27      −2.01       4.64      12.43   |     −0.009      0.023      0.009     −0.022      0.011
+
+-- set high_and_low_confidence: 185 lipids, 839 used non-reference cells, 830 pooled cells (expected 830) --
+   pooled: n cells 830; median |dRT_after| 0.04865 min; 84.6 % within 0.2 min (702 of 830); median |dRT_before| 6.0530 min; 5.3 % within 0.2 min (44 of 830)
+   pooled cells per column: column_12 163, column_16 178, column_20 182, column_41 160, column_85 147; |dRT_after| > 0.5 / 1 / 2 min: 28 / 15 / 7
+   ok         pooled cells                                         expected          830   obtained          830
+   ok         cells within 0.2 min after calibration               expected          702   obtained          702
+   ok         cells within 0.2 min before calibration              expected           44   obtained           44
+   ok         cells with |dRT_after| > 0.5 / 1 / 2 min             expected  (28, 15, 7)   obtained  (28, 15, 7)
+   ok         % within 0.2 min after calibration                   expected         84.6   obtained       84.578   (tolerance 0.05)
+   ok         % within 0.2 min before calibration                  expected          5.3   obtained       5.3012   (tolerance 0.05)
+   ok         median |dRT_after| (brief: from unrounded values)    expected       0.0486   obtained      0.04865   (tolerance 0.0001)
+   ok         median |dRT_before| (brief: from unrounded values)   expected        6.053   obtained        6.053   (tolerance 0.001)
+   note: computed from the 4-decimal values in the CSVs; with an even number of cells the median is the mean of two of them and can end in a 5 (a rounding tie); build_vetted_panel_console.log has the medians from unrounded values
+   overview heatmap table (median dRT per group and column, minutes; before | after):
+     group                   Column 12  Column 16  Column 20  Column 41  Column 85   |  Column 12  Column 16  Column 20  Column 41  Column 85
+     LPC (n=17)                  −2.77      −1.11      −2.10       3.38       9.63   |     −0.009      0.005     −0.052      0.014      0.009
+     PC (n=24)                   −7.07      −3.43      −0.18      15.11      33.94   |     −0.020     −0.013     −0.014      0.101     −0.079
+     EtherPC (n=21)              −7.39      −3.43      −0.26      15.22      33.87   |     −0.007     −0.006     −0.019      0.165      0.084
+     PE (n=5)                    −6.23      −3.40       0.03      14.24      31.02   |      0.033     −0.014      0.035     −0.165     −0.540
+     EtherPE (n=9)               −7.22      −3.44      −0.20      14.80      33.37   |      0.060     −0.005      0.065     −0.169     −0.144
+     PI (n=8)                    −6.62      −3.46      −0.05      12.99      30.31   |     −0.039     −0.123     −0.071     −0.460     −0.066
+     SM (n=21)                   −6.77      −3.31      −0.24      13.56      31.85   |      0.010     −0.003      0.011      0.022      0.012
+     Cer_NS (n=5)                −9.01      −4.01      −1.12      15.81      39.84   |      0.077      0.001     −0.029     −0.037     −0.408
+     DG (n=7)                    −8.25      −3.41      −0.69      15.20      36.09   |     −0.005      0.011      0.003     −0.075      0.098
+     TG (n=34)                   −9.68      −5.79      −1.67      18.25      57.35   |      0.014     −0.018      0.007     −0.005     −0.018
+     CE (n=11)                  −10.00      −5.73      −2.06      17.84      50.52   |      0.025      0.016      0.036      0.004      0.007
+     Other (n=20)                −3.31      −1.27      −2.01       4.64      12.43   |     −0.009      0.023      0.009     −0.022      0.011
+     Low confidence (n=3)        −2.94      −1.13      −2.08      14.31      31.70   |     −0.111      0.022     −0.229     −0.125     −0.540
+
+-- QC figure: groups with a column_20 pick per sheet and status --
+   sheet 492: in_panel 130, excluded_rule_h 34, excluded_other 74
+   sheet 182: in_panel 55, excluded_rule_h 8, excluded_other 15
+   consistency: in-panel points with |delta| <= 0.30 min: 185 of 185; rule-h points with |delta| > 0.30 min: 42 of 42
+
+expected-number check: 0 expected number(s) differ
+wrote 9 figures in 3 s:
+  figures/high_confidence/overview_heatmap.png
+  figures/high_confidence/rt_error_ecdf.png
+  figures/high_confidence/rt_error_violin_linear.png
+  figures/high_confidence/rt_error_violin_symlog.png
+  figures/high_and_low_confidence/overview_heatmap.png
+  figures/high_and_low_confidence/rt_error_ecdf.png
+  figures/high_and_low_confidence/rt_error_violin_linear.png
+  figures/high_and_low_confidence/rt_error_violin_symlog.png
+  figures/vetted_rt_check_column_20.png

@@ -1,0 +1,109 @@
+== 1. from the vetted list to the panel ==
+  list entries                                               high                    601   all                    674   492-row MS-DIAL sheet + 182-row manuscript sheet
+  distinct species names                                     high                    384   all                    433   sum composition as written
+  entries with a positive-mode target (searchable)           high                    601   all                    660   the 14 FA have no positive ion
+  target m/z values (TG / MG list two ions)                  high                    699   all                    758   
+  distinct target m/z values                                 high                    409   all                    414   
+  distinct targets (one per lipid ion set)                   high                    352   all                    357   
+  effective targets (m/z within 10 ppm merged)               high                    350   all                    355   
+  effective targets with a feature within 10 ppm on >= 3/4/5/6 columns high        292/274/266/249   all        293/274/266/249   any feature at the m/z; not an identification
+  effective targets with a feature within 15 ppm on >= 3/4/5/6 columns high        294/281/271/254   all        295/281/271/254   any feature at the m/z; not an identification
+  panel: identity-checked usable peak on >= 3/4/5/6 columns  high        182/177/162/127   all        185/179/163/127   reference column included; 15 ppm candidates, rules of build_vetted_panel.py
+
+== 2. error vs the reference RT (min), high-confidence panel ==
+
+  all columns
+                                  n  median|d|   p90|d|               range         central 95%  <=0.2 min  <=0.5 min
+  before calibration            830      6.053   33.633    -10.08 .. +65.13     -9.70 .. +53.25       5.3%       8.8%
+  after, in-sample              830      0.049    0.264     -9.48 .. +16.26      -0.42 .. +0.39      84.6%      96.6%
+                              95% CI: median 0.042-0.054, p90 0.229-0.305, <=0.2 82.1-87.2 %, <=0.5 95.2-97.9 %
+  after, held out (10-fold)     830      0.065    0.303     -9.49 .. +16.23      -0.43 .. +0.45      80.6%      96.4%
+                              95% CI: median 0.057-0.072, p90 0.273-0.360, <=0.2 77.7-83.5 %, <=0.5 94.9-97.7 %
+
+  column_12
+                                  n  median|d|   p90|d|               range         central 95%  <=0.2 min  <=0.5 min
+  before calibration            163      7.747    9.705     -10.08 .. +6.37     -10.00 .. -2.57       0.0%       0.0%
+  after, in-sample              163      0.050    0.218     -0.45 .. +16.26      -0.29 .. +0.31      88.3%      99.4%
+  after, held out (10-fold)     163      0.079    0.308     -0.51 .. +16.23      -0.43 .. +0.32      76.7%      98.2%
+
+  column_16
+                                  n  median|d|   p90|d|               range         central 95%  <=0.2 min  <=0.5 min
+  before calibration            178      3.434    5.823      -6.11 .. -0.15      -6.03 .. -1.00       0.6%       0.6%
+  after, in-sample              178      0.018    0.126      -0.23 .. +0.24      -0.21 .. +0.07      94.4%     100.0%
+  after, held out (10-fold)     178      0.022    0.132      -0.22 .. +0.29      -0.21 .. +0.11      92.7%     100.0%
+
+  column_20
+                                  n  median|d|   p90|d|               range         central 95%  <=0.2 min  <=0.5 min
+  before calibration            182      0.970    2.102      -4.22 .. +0.33      -2.25 .. +0.18      23.6%      39.6%
+  after, in-sample              182      0.052    0.220      -4.11 .. +1.82      -0.26 .. +0.30      89.0%      96.7%
+  after, held out (10-fold)     182      0.061    0.223      -4.19 .. +1.83      -0.31 .. +0.36      89.0%      96.7%
+
+  column_41
+                                  n  median|d|   p90|d|               range         central 95%  <=0.2 min  <=0.5 min
+  before calibration            160     15.232   18.301     +2.48 .. +24.65     +2.76 .. +18.93       0.0%       0.0%
+  after, in-sample              160      0.088    0.416      -1.95 .. +9.44      -0.52 .. +0.97      76.9%      92.5%
+  after, held out (10-fold)     160      0.094    0.430      -2.02 .. +9.59      -0.76 .. +0.95      70.6%      92.5%
+
+  column_85
+                                  n  median|d|   p90|d|               range         central 95%  <=0.2 min  <=0.5 min
+  before calibration            147     34.689   57.275     +1.67 .. +65.13     +7.96 .. +62.67       0.0%       0.0%
+  after, in-sample              147      0.092    0.414     -9.48 .. +10.37      -0.51 .. +0.56      71.4%      93.9%
+  after, held out (10-fold)     147      0.107    0.422     -9.49 .. +10.37      -0.48 .. +0.90      70.7%      93.9%
+
+== 3. sufficiency checks ==
+  points per column: column_12 163, column_16 178, column_20 182, column_41 160, column_85 147
+  lipids per display group: TG 34, PC 24, EtherPC 21, SM 21, Other 20, LPC 17, CE 11, EtherPE 9, PI 8, DG 7, PE 5, Cer_NS 5
+  reference RT of the panel lipids 1.42-22.43 min (reference run features 1.25-27.83); largest gap between neighbouring panel lipids 2.00 min (between 1.42 and 3.42); lipids per 2-min bin: 0-2: 1, 2-4: 8, 4-6: 19, 6-8: 2, 8-10: 4, 10-12: 21, 12-14: 33, 14-16: 32, 16-18: 14, 18-20: 9, 20-22: 36, 22-24: 3
+  identity-robust subset (single candidate on the column and on the reference), after, in-sample: n 239, median |d| 0.058, p90 0.328, <=0.2 83.3 %, <=0.5 96.2 %
+  identity-robust subset (single candidate on the column and on the reference), after, held out (10-fold): n 239, median |d| 0.071, p90 0.337, <=0.2 79.5 %, <=0.5 95.4 %
+  points beyond 0.5 / 1 / 2 min, after, in-sample: 28 / 15 / 7
+  points beyond 0.5 / 1 / 2 min, after, held out (10-fold): 30 / 17 / 8
+
+
+######## per ion: each ion of a lipid is its own target (TG, MG list two) ########
+  ion targets (one per distinct ion m/z)                     high                    409   all                    414   
+  effective ion targets (m/z within 10 ppm merged)           high                    407   all                    412   
+  effective ion targets with a feature within 10 ppm on >= 3/4/5/6 columns high        345/325/309/287   all        346/325/309/287   any feature at the m/z; not an identification
+  effective ion targets with a feature within 15 ppm on >= 3/4/5/6 columns high        347/333/317/295   all        348/333/317/295   any feature at the m/z; not an identification
+  panel: identity-checked usable ion target on >= 3/4/5/6 columns high        219/213/194/149   all        222/215/195/149   195 lipids (high); per_ion_panel.py
+  TG / MG ion targets in the panel: [M+NH4]+ 40, [M+Na]+ 31; TG lipids with both ions 24, one ion only 23
+
+  error vs the reference RT (min), per-ion high-confidence panel
+
+  all columns
+                                  n  median|d|   p90|d|               range         central 95%  <=0.2 min  <=0.5 min
+  before calibration            994      6.412   34.885    -10.08 .. +65.13     -9.71 .. +58.05       4.4%       7.3%
+  after, in-sample              994      0.047    0.246     -9.48 .. +16.26      -0.42 .. +0.37      85.4%      96.9%
+                              95% CI: median 0.042-0.053, p90 0.224-0.279, <=0.2 83.1-87.6 %, <=0.5 95.6-98.0 %
+  after, held out (10-fold)     994      0.064    0.282     -9.53 .. +16.27      -0.46 .. +0.40      82.3%      96.8%
+                              95% CI: median 0.055-0.075, p90 0.247-0.326, <=0.2 79.7-84.8 %, <=0.5 95.5-98.0 %
+
+  column_12
+                                  n  median|d|   p90|d|               range         central 95%  <=0.2 min  <=0.5 min
+  before calibration            198      8.419    9.732     -10.08 .. +6.37      -9.98 .. -2.60       0.0%       0.0%
+  after, in-sample              198      0.048    0.184     -0.45 .. +16.26      -0.22 .. +0.31      90.4%      99.5%
+  after, held out (10-fold)     198      0.077    0.242     -0.50 .. +16.27      -0.35 .. +0.29      84.8%      99.0%
+
+  column_16
+                                  n  median|d|   p90|d|               range         central 95%  <=0.2 min  <=0.5 min
+  before calibration            209      3.456    5.914      -6.13 .. -0.15      -6.10 .. -1.00       0.5%       0.5%
+  after, in-sample              209      0.018    0.170      -0.27 .. +0.24      -0.22 .. +0.07      92.8%     100.0%
+  after, held out (10-fold)     209      0.021    0.172      -0.27 .. +0.28      -0.23 .. +0.12      91.9%     100.0%
+
+  column_20
+                                  n  median|d|   p90|d|               range         central 95%  <=0.2 min  <=0.5 min
+  before calibration            219      1.547    2.078      -4.22 .. +0.33      -2.22 .. +0.17      19.6%      32.9%
+  after, in-sample              219      0.052    0.195      -4.11 .. +1.82      -0.26 .. +0.27      90.4%      97.3%
+  after, held out (10-fold)     219      0.075    0.237      -4.21 .. +1.86      -0.29 .. +0.34      86.3%      97.7%
+
+  column_41
+                                  n  median|d|   p90|d|               range         central 95%  <=0.2 min  <=0.5 min
+  before calibration            193     15.623   18.538     +2.48 .. +24.65     +2.81 .. +19.27       0.0%       0.0%
+  after, in-sample              193      0.065    0.412      -3.37 .. +9.44      -0.75 .. +0.95      79.8%      92.7%
+  after, held out (10-fold)     193      0.076    0.434      -3.35 .. +9.31      -0.76 .. +0.60      76.7%      93.8%
+
+  column_85
+                                  n  median|d|   p90|d|               range         central 95%  <=0.2 min  <=0.5 min
+  before calibration            175     36.083   60.359     +1.67 .. +65.13     +8.07 .. +63.21       0.0%       0.0%
+  after, in-sample              175      0.092    0.417     -9.48 .. +10.37      -0.52 .. +0.52      70.9%      94.3%
+  after, held out (10-fold)     175      0.105    0.443     -9.53 .. +10.34      -0.60 .. +0.50      69.1%      92.6%

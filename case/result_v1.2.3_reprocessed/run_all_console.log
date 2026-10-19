@@ -1,0 +1,85 @@
+rt_anchor version: 1.2.3 C:\Users\li_la\OneDrive\Desktop\RT_Calibration\software\rt-anchor\rt_anchor\src\rt_anchor\__init__.py
+================ column_12 ================
+2026-10-14 01:45:29 [INFO] loaded sample table: {'source_format': 'msdial', 'polarity': 'positive', 'n_features': 2477, 'mz_col': 'Average Mz', 'rt_col': 'Average Rt(min)', 'rt_unit': 'min', 'rt_min_minutes': 1.126, 'rt_max_minutes': 12.862, 'n_sample_columns': 4, 'sample_columns': ['P Finnie Serum clmn TEST 1_GD1_01_66704', 'P Finnie Serum clmn TEST 2_GD1_01_66705', 'P Finnie Serum clmn TEST 3_GD1_01_66706', 'P Finnie Serum clmn TEST 4_GD1_01_66707'], 'n_total_columns': 41}
+2026-10-14 01:45:29 [INFO] loaded standards run: 480 features, RT 1.20-12.86 min
+2026-10-14 01:45:29 [INFO] reference: user-supplied reference pair [custom] — sample 3229 features, standards 383 features
+2026-10-14 01:45:29 [INFO] panel: mix21 — 21 standards ionisable in positive mode
+2026-10-14 01:45:29 [INFO] sample-run pairs: 1288 matched, 1271 kept after masking the stage-2 anchor m/z
+2026-10-14 01:45:29 [INFO] stage 1: 1498 pairs (227 standards + 1271 sample), 1314 kept after MAD trimming; source RT span 1.13-12.82 -> reference 3.68-23.09 min
+2026-10-14 01:45:29 [INFO] series term: series term engaged: leave-own-out MSE 38% below curve-only (threshold 20%); 83 homologous series (581 pairs, 507 with a leave-own-out prediction); 699/2477 features corrected
+2026-10-14 01:45:29 [INFO] lattice term: lattice term engaged: leave-own-out MSE 24% below curve-only (threshold 20%); 21 lattice families (705 pairs, 434 judged by the gate); 878/2477 features corrected
+2026-10-14 01:45:29 [INFO] stage 2: disabled (use_sample_anchors=False) — stage-1 curve only
+2026-10-14 01:45:29 [INFO] iRT (mix21): 21 landmarks, RT 1.46-21.78 min on the reference standards run
+2026-10-14 01:45:29 [INFO] detection QC on the user's standards run: 18/21 panel standards located (reporting only — it does not drive the calibration)
+2026-10-14 01:45:31 [INFO] wrote: {"calibrated_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_12/rt_anchor_run_calibrated.csv", "model_json": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_12/rt_anchor_run_model.json", "anchors_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_12/rt_anchor_run_anchors.csv", "pairs_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_12/rt_anchor_run_pairs.csv", "landmarks_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_12/rt_anchor_run_landmarks.csv", "log_txt": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_12/rt_anchor_run_log.txt", "report_html": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_12/rt_anchor_run_report.html"}
+---- column_12 exit code: 0 ----
+================ column_16 ================
+2026-10-14 01:45:32 [INFO] loaded sample table: {'source_format': 'msdial', 'polarity': 'positive', 'n_features': 3223, 'mz_col': 'Average Mz', 'rt_col': 'Average Rt(min)', 'rt_unit': 'min', 'rt_min_minutes': 1.268, 'rt_max_minutes': 17.35, 'n_sample_columns': 4, 'sample_columns': ['P Carly 25 Serum I_GD1_01_66508', 'P Carly 25 Serum II_GD1_01_66509', 'P Carly 25 Serum III_GD1_01_66510', 'P Carly 25 Serum IV_GD1_01_66511'], 'n_total_columns': 41}
+2026-10-14 01:45:32 [INFO] loaded standards run: 405 features, RT 1.28-17.53 min
+2026-10-14 01:45:32 [INFO] reference: user-supplied reference pair [custom] — sample 3229 features, standards 383 features
+2026-10-14 01:45:32 [INFO] panel: mix21 — 21 standards ionisable in positive mode
+2026-10-14 01:45:32 [INFO] sample-run pairs: 1812 matched, 1794 kept after masking the stage-2 anchor m/z
+2026-10-14 01:45:32 [INFO] stage 1: 2093 pairs (299 standards + 1794 sample), 1547 kept after MAD trimming; source RT span 1.27-17.47 -> reference 1.44-23.57 min
+2026-10-14 01:45:32 [INFO] series term: series term gated off: leave-own-out MSE 27% above curve-only (threshold: 20% below); 94 homologous series (671 pairs, 584 with a leave-own-out prediction); 0/3223 features corrected
+2026-10-14 01:45:32 [INFO] lattice term: lattice term gated off: leave-own-out MSE only 4% below curve-only (threshold 20%); 15 lattice families (683 pairs, 786 judged by the gate); 0/3223 features corrected
+2026-10-14 01:45:32 [INFO] stage 2: disabled (use_sample_anchors=False) — stage-1 curve only
+2026-10-14 01:45:32 [INFO] iRT (mix21): 21 landmarks, RT 1.46-21.78 min on the reference standards run
+2026-10-14 01:45:32 [INFO] detection QC on the user's standards run: 19/21 panel standards located (reporting only — it does not drive the calibration)
+2026-10-14 01:45:33 [INFO] wrote: {"calibrated_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_16/rt_anchor_run_calibrated.csv", "model_json": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_16/rt_anchor_run_model.json", "anchors_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_16/rt_anchor_run_anchors.csv", "pairs_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_16/rt_anchor_run_pairs.csv", "landmarks_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_16/rt_anchor_run_landmarks.csv", "log_txt": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_16/rt_anchor_run_log.txt", "report_html": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_16/rt_anchor_run_report.html"}
+---- column_16 exit code: 0 ----
+================ column_20 ================
+2026-10-14 01:45:35 [INFO] loaded sample table: {'source_format': 'msdial', 'polarity': 'positive', 'n_features': 2964, 'mz_col': 'Average Mz', 'rt_col': 'Average Rt(min)', 'rt_unit': 'min', 'rt_min_minutes': 1.149, 'rt_max_minutes': 21.549, 'n_sample_columns': 4, 'sample_columns': ['P Holpie Serum 2_GD1_01_66386', 'P Holpie Serum 3_GD1_01_66387', 'P Holpie Serum 4_GD1_01_66388', 'P Holpie Serum 5_GD1_01_66389'], 'n_total_columns': 41}
+2026-10-14 01:45:35 [INFO] loaded standards run: 316 features, RT 1.17-21.39 min
+2026-10-14 01:45:35 [INFO] reference: user-supplied reference pair [custom] — sample 3229 features, standards 383 features
+2026-10-14 01:45:35 [INFO] panel: mix21 — 21 standards ionisable in positive mode
+2026-10-14 01:45:35 [INFO] sample-run pairs: 1411 matched, 1394 kept after masking the stage-2 anchor m/z
+2026-10-14 01:45:35 [INFO] stage 1: 1589 pairs (195 standards + 1394 sample), 1409 kept after MAD trimming; source RT span 1.17-21.39 -> reference 3.26-23.16 min
+2026-10-14 01:45:35 [INFO] series term: series term engaged: leave-own-out MSE 50% below curve-only (threshold 20%); 92 homologous series (649 pairs, 561 with a leave-own-out prediction); 798/2964 features corrected
+2026-10-14 01:45:35 [INFO] lattice term: lattice term engaged: leave-own-out MSE 39% below curve-only (threshold 20%); 18 lattice families (738 pairs, 456 judged by the gate); 1072/2964 features corrected
+2026-10-14 01:45:35 [INFO] stage 2: disabled (use_sample_anchors=False) — stage-1 curve only
+2026-10-14 01:45:35 [INFO] iRT (mix21): 21 landmarks, RT 1.46-21.78 min on the reference standards run
+2026-10-14 01:45:35 [INFO] detection QC on the user's standards run: 20/21 panel standards located (reporting only — it does not drive the calibration)
+2026-10-14 01:45:35 [INFO] wrote: {"calibrated_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_20/rt_anchor_run_calibrated.csv", "model_json": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_20/rt_anchor_run_model.json", "anchors_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_20/rt_anchor_run_anchors.csv", "pairs_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_20/rt_anchor_run_pairs.csv", "landmarks_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_20/rt_anchor_run_landmarks.csv", "log_txt": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_20/rt_anchor_run_log.txt", "report_html": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_20/rt_anchor_run_report.html"}
+---- column_20 exit code: 0 ----
+================ column_22 ================
+2026-10-14 01:45:37 [INFO] loaded sample table: {'source_format': 'msdial', 'polarity': 'positive', 'n_features': 3229, 'mz_col': 'Average Mz', 'rt_col': 'Average Rt(min)', 'rt_unit': 'min', 'rt_min_minutes': 1.251, 'rt_max_minutes': 27.83, 'n_sample_columns': 4, 'sample_columns': ['P Carly Serum 1_GD1_01_66465', 'P Carly Serum 2_GD1_01_66466', 'P Carly Serum 3_GD1_01_66467', 'P Carly Serum 4_GD1_01_66468'], 'n_total_columns': 41}
+2026-10-14 01:45:37 [INFO] loaded standards run: 383 features, RT 1.44-24.23 min
+2026-10-14 01:45:37 [INFO] reference: user-supplied reference pair [custom] — sample 3229 features, standards 383 features
+2026-10-14 01:45:37 [INFO] panel: mix21 — 21 standards ionisable in positive mode
+2026-10-14 01:45:37 [INFO] sample-run pairs: 2185 matched, 2168 kept after masking the stage-2 anchor m/z
+2026-10-14 01:45:37 [INFO] stage 1: 2503 pairs (335 standards + 2168 sample), 2503 kept after MAD trimming; source RT span 1.25-24.23 -> reference 1.25-24.23 min
+2026-10-14 01:45:37 [INFO] series term: no correction needed: the stage-1 curve already reproduces the series pairs; 131 homologous series (1107 pairs, 898 with a leave-own-out prediction); 0/3229 features corrected
+2026-10-14 01:45:37 [INFO] lattice term: no correction needed: the stage-1 curve already reproduces the lattice pairs; 32 lattice families (1127 pairs, 1571 judged by the gate); 0/3229 features corrected
+2026-10-14 01:45:37 [INFO] stage 2: disabled (use_sample_anchors=False) — stage-1 curve only
+2026-10-14 01:45:37 [INFO] iRT (mix21): 21 landmarks, RT 1.46-21.78 min on the reference standards run
+2026-10-14 01:45:37 [INFO] detection QC on the user's standards run: 21/21 panel standards located (reporting only — it does not drive the calibration)
+2026-10-14 01:45:38 [INFO] wrote: {"calibrated_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_22/rt_anchor_run_calibrated.csv", "model_json": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_22/rt_anchor_run_model.json", "anchors_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_22/rt_anchor_run_anchors.csv", "pairs_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_22/rt_anchor_run_pairs.csv", "landmarks_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_22/rt_anchor_run_landmarks.csv", "log_txt": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_22/rt_anchor_run_log.txt", "report_html": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_22/rt_anchor_run_report.html"}
+---- column_22 exit code: 0 ----
+================ column_41 ================
+2026-10-14 01:45:39 [INFO] loaded sample table: {'source_format': 'msdial', 'polarity': 'positive', 'n_features': 4128, 'mz_col': 'Average Mz', 'rt_col': 'Average Rt(min)', 'rt_unit': 'min', 'rt_min_minutes': 2.667, 'rt_max_minutes': 44.753, 'n_sample_columns': 4, 'sample_columns': ['P Sandie 50 Serum 1_GD1_01_66550', 'P Sandie 50 Serum 2_GD1_01_66551', 'P Sandie 50 Serum 3_GD1_01_66552', 'P Sandie 50 Serum 4_GD1_01_66553'], 'n_total_columns': 41}
+2026-10-14 01:45:39 [INFO] loaded standards run: 405 features, RT 3.06-41.85 min
+2026-10-14 01:45:39 [INFO] reference: user-supplied reference pair [custom] — sample 3229 features, standards 383 features
+2026-10-14 01:45:39 [INFO] panel: mix21 — 21 standards ionisable in positive mode
+2026-10-14 01:45:39 [INFO] sample-run pairs: 1532 matched, 1515 kept after masking the stage-2 anchor m/z
+2026-10-14 01:45:39 [INFO] stage 1: 1737 pairs (222 standards + 1515 sample), 1513 kept after MAD trimming; source RT span 2.67-44.75 -> reference 1.27-22.92 min
+2026-10-14 01:45:39 [INFO] series term: series term engaged: leave-own-out MSE 45% below curve-only (threshold 20%); 94 homologous series (704 pairs, 644 with a leave-own-out prediction); 1190/4128 features corrected
+2026-10-14 01:45:39 [INFO] lattice term: lattice term engaged: leave-own-out MSE 43% below curve-only (threshold 20%); 18 lattice families (833 pairs, 467 judged by the gate); 1507/4128 features corrected
+2026-10-14 01:45:39 [INFO] stage 2: disabled (use_sample_anchors=False) — stage-1 curve only
+2026-10-14 01:45:39 [INFO] iRT (mix21): 21 landmarks, RT 1.46-21.78 min on the reference standards run
+2026-10-14 01:45:39 [INFO] detection QC on the user's standards run: 20/21 panel standards located (reporting only — it does not drive the calibration)
+2026-10-14 01:45:40 [INFO] wrote: {"calibrated_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_41/rt_anchor_run_calibrated.csv", "model_json": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_41/rt_anchor_run_model.json", "anchors_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_41/rt_anchor_run_anchors.csv", "pairs_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_41/rt_anchor_run_pairs.csv", "landmarks_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_41/rt_anchor_run_landmarks.csv", "log_txt": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_41/rt_anchor_run_log.txt", "report_html": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_41/rt_anchor_run_report.html"}
+---- column_41 exit code: 0 ----
+================ column_85 ================
+2026-10-14 01:45:42 [INFO] loaded sample table: {'source_format': 'msdial', 'polarity': 'positive', 'n_features': 3741, 'mz_col': 'Average Mz', 'rt_col': 'Average Rt(min)', 'rt_unit': 'min', 'rt_min_minutes': 3.667, 'rt_max_minutes': 89.925, 'n_sample_columns': 4, 'sample_columns': ['P Sandie 100 Serum I_GD1_01_66531', 'P Sandie 100 Serum II_GD1_01_66532', 'P Sandie 100 Serum III_GD1_01_66533', 'P Sandie 100 Serum IV_GD1_01_66534'], 'n_total_columns': 41}
+2026-10-14 01:45:42 [INFO] loaded standards run: 291 features, RT 3.58-84.92 min
+2026-10-14 01:45:42 [INFO] reference: user-supplied reference pair [custom] — sample 3229 features, standards 383 features
+2026-10-14 01:45:42 [INFO] panel: mix21 — 21 standards ionisable in positive mode
+2026-10-14 01:45:42 [INFO] sample-run pairs: 1381 matched, 1364 kept after masking the stage-2 anchor m/z
+2026-10-14 01:45:42 [INFO] stage 1: 1547 pairs (183 standards + 1364 sample), 1422 kept after MAD trimming; source RT span 3.58-89.92 -> reference 1.30-22.91 min
+2026-10-14 01:45:42 [INFO] series term: series term engaged: leave-own-out MSE 57% below curve-only (threshold 20%); 90 homologous series (667 pairs, 612 with a leave-own-out prediction); 1352/3741 features corrected
+2026-10-14 01:45:42 [INFO] lattice term: lattice term engaged: leave-own-out MSE 45% below curve-only (threshold 20%); 17 lattice families (746 pairs, 399 judged by the gate); 1268/3741 features corrected
+2026-10-14 01:45:42 [INFO] stage 2: disabled (use_sample_anchors=False) — stage-1 curve only
+2026-10-14 01:45:42 [INFO] iRT (mix21): 21 landmarks, RT 1.46-21.78 min on the reference standards run
+2026-10-14 01:45:42 [INFO] detection QC on the user's standards run: 20/21 panel standards located (reporting only — it does not drive the calibration)
+2026-10-14 01:45:42 [INFO] wrote: {"calibrated_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_85/rt_anchor_run_calibrated.csv", "model_json": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_85/rt_anchor_run_model.json", "anchors_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_85/rt_anchor_run_anchors.csv", "pairs_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_85/rt_anchor_run_pairs.csv", "landmarks_csv": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_85/rt_anchor_run_landmarks.csv", "log_txt": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_85/rt_anchor_run_log.txt", "report_html": "C:/Users/li_la/OneDrive/Desktop/RT_Calibration/result_v1.2.3_reprocessed/column_85/rt_anchor_run_report.html"}
+---- column_85 exit code: 0 ----

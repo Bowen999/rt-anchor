@@ -1,0 +1,191 @@
+{
+  "method": "cross-column-v2",
+  "calibration_scope": "project",
+  "reference": {
+    "key": "custom",
+    "label": "user-supplied reference pair",
+    "sample": "C:\\Users\\li_la\\OneDrive\\Desktop\\RT_Calibration\\data\\22 min\\Serum\\22 min Serum Area_2_2026_10_12_13_24_24.csv",
+    "standards": "C:\\Users\\li_la\\OneDrive\\Desktop\\RT_Calibration\\data\\22 min\\STDs\\Res\\22 min stds Area_1_2026_08_16_23_14_28.csv",
+    "is_default": false,
+    "provenance": {
+      "note": "user-supplied; results are on this column's time axis and are not comparable with default-reference runs."
+    }
+  },
+  "panel": {
+    "key": "mix21",
+    "label": "21",
+    "n_standards": 21
+  },
+  "curve": {
+    "n_pairs": 2503,
+    "n_pairs_kept": 2503,
+    "n_pairs_standards": 335,
+    "n_pairs_sample": 2168,
+    "rt_span_src_min": [
+      1.251,
+      24.229
+    ],
+    "rt_span_ref_min": [
+      1.251,
+      24.229
+    ],
+    "residual_min": {
+      "median_abs": 7.283063041541027e-14,
+      "p90_abs": 6.693312570860147e-13
+    }
+  },
+  "series": {
+    "enabled": true,
+    "engaged": false,
+    "gate_mse_reduction": 0.0,
+    "gate_threshold": 0.2,
+    "gate_reason": "no correction needed: the stage-1 curve already reproduces the series pairs",
+    "n_series": 131,
+    "n_pairs_covered": 898,
+    "kmd_tol": 0.008,
+    "min_members": 4,
+    "end_reach_ch2": 2,
+    "exclude_rt_min": 0.034467,
+    "n_features_corrected": 0
+  },
+  "lattice": {
+    "enabled": true,
+    "engaged": false,
+    "gate_mse_reduction": 0.0,
+    "gate_threshold": 0.2,
+    "gate_reason": "no correction needed: the stage-1 curve already reproduces the lattice pairs",
+    "n_families": 32,
+    "n_pairs_in_families": 1127,
+    "n_pairs_covered": 1571,
+    "n_features_corrected": 0,
+    "kmd_tol": 0.008,
+    "min_members": 6,
+    "max_distance": 3.0,
+    "min_neighbours": 2,
+    "max_neighbours": 4,
+    "exclude_rt_min": 0.034467
+  },
+  "anchors": {
+    "engaged": false,
+    "class_aware": false,
+    "n_validated": 0,
+    "n_used": 0,
+    "lam_g": 1.0,
+    "lam_c": 0.0,
+    "gate_mse_reduction": null,
+    "gate_threshold": 0.2,
+    "gate_reason": "anchors disabled",
+    "sigma_anchor_min": 0.0,
+    "loo_residual_min": {
+      "median": 0.0,
+      "p90": 0.0,
+      "max": 0.0
+    },
+    "table": []
+  },
+  "irt": {
+    "n_landmarks": 21,
+    "landmark_rt_span_min": [
+      1.455,
+      21.779
+    ],
+    "irt_range": [
+      1.0,
+      100.0
+    ],
+    "definition": "affine on the reference-column RT axis",
+    "panel_used": "mix21",
+    "reason": "21 landmarks, RT 1.46-21.78 min on the reference standards run"
+  },
+  "detection_qc": {
+    "user_standards_run": {
+      "n_panel": 21,
+      "n_detected": 21,
+      "native_rt": {
+        "PC 6:0_6:0": 1.455,
+        "PC 7:0_7:0": 2.149,
+        "PC 8:0_8:0": 3.186,
+        "PC 9:0_9:0": 4.118,
+        "PC 10:0_10:0": 4.938,
+        "PC 11:0_11:0": 5.806,
+        "PC 12:0_12:0": 6.847,
+        "PC 13:0_13:0": 8.093,
+        "PC 14:0_14:0": 9.513,
+        "PC 14:0_16:0": 11.076,
+        "PC 16:0_18:2": 11.726,
+        "PC 16:0_18:1": 12.903,
+        "PC 18:0_18:1": 14.51,
+        "PC 18:0_18:0": 15.813,
+        "DG 16:0_18:0": 16.99,
+        "DG 18:0_18:0": 17.995,
+        "CE 20:5": 20.476,
+        "CE 18:2": 21.16,
+        "TG 16:0_18:1_16:0": 21.285,
+        "CE 18:1": 21.614,
+        "TG 18:0_18:2_18:0": 21.779
+      },
+      "rt_range_min": [
+        1.436,
+        24.229
+      ],
+      "n_features": 383,
+      "note": "QC only \u2014 does not drive the calibration"
+    }
+  },
+  "n_features": 3229,
+  "n_features_extrapolated": 1,
+  "confidence_counts": {
+    "high": 3228,
+    "low": 1
+  },
+  "config": {
+    "match_mz_tol_ppm": 15.0,
+    "match_mz_tol_da": 0.0,
+    "mz_tol_ppm": 15.0,
+    "mz_tol_min_da": 0.0,
+    "rt_window_min": 0.5,
+    "rt_window_seed_min": 2.0,
+    "curve_frac": 0.1,
+    "curve_iter": 3,
+    "curve_mad_k": 3.0,
+    "curve_min_points": 20,
+    "use_sample_pairs": true,
+    "use_series_term": true,
+    "series_kmd_tol": 0.008,
+    "series_min_members": 4,
+    "series_end_reach_ch2": 2,
+    "series_exclude_rt_frac": 0.0015,
+    "series_exclude_rt_floor_min": 0.03,
+    "series_gate_min_mse_reduction": 0.2,
+    "series_min_covered_pairs": 20,
+    "use_lattice_term": true,
+    "lattice_kmd_tol": 0.008,
+    "lattice_min_members": 6,
+    "lattice_max_distance": 3.0,
+    "lattice_min_neighbours": 2,
+    "lattice_max_neighbours": 4,
+    "lattice_gate_min_mse_reduction": 0.2,
+    "lattice_min_covered_pairs": 20,
+    "use_sample_anchors": false,
+    "class_aware": true,
+    "min_anchors": 3,
+    "anchor_gate_min_mse_reduction": 0.2,
+    "anchor_tie_tol_min": 0.15,
+    "isomer_sn_frac": 0.1,
+    "sigma_window_pairs": 50,
+    "conf_high_irt": 1.0,
+    "conf_low_irt": 2.0,
+    "irt_landmark_panel": "mix21",
+    "extrapolate": true,
+    "extrapolate_mode": "linear",
+    "tie_epsilon_min": 0.005,
+    "max_drop_anchors": 3,
+    "min_gaussian_similarity": 0.0,
+    "asymmetry_range": [
+      0.0,
+      1000000000.0
+    ],
+    "rt_unit": null,
+    "verbose": true
+  }
+}

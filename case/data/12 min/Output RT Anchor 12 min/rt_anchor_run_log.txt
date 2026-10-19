@@ -1,0 +1,11 @@
+loaded sample table: {'source_format': 'msdial', 'polarity': 'positive', 'n_features': 2477, 'mz_col': 'Average Mz', 'rt_col': 'Average Rt(min)', 'rt_unit': 'min', 'rt_min_minutes': 1.126, 'rt_max_minutes': 12.862, 'n_sample_columns': 4, 'sample_columns': ['P Finnie Serum clmn TEST 1_GD1_01_66704', 'P Finnie Serum clmn TEST 2_GD1_01_66705', 'P Finnie Serum clmn TEST 3_GD1_01_66706', 'P Finnie Serum clmn TEST 4_GD1_01_66707'], 'n_total_columns': 41}
+loaded standards run: 480 features, RT 1.20-12.86 min
+reference: Column 25 [col35] — sample 610 features, standards 383 features
+panel: mix21 — 21 standards ionisable in positive mode
+sample-run pairs: 471 matched, 454 kept after masking the stage-2 anchor m/z
+stage 1: 680 pairs (226 standards + 454 sample), 609 kept after MAD trimming; source RT span 1.14-12.82 -> reference 3.73-23.27 min
+stage 2: 17/17 plasma lipids validated in both sample runs, 17 usable as anchors; 1 pick(s) moved by curve-assisted isomer refinement
+stage 2 gate: class-aware correction engaged: LOO MSE 51% below no-correction (threshold 20%)
+stage 2 engaged: lam_g=0.0, lam_c=0.8, 15 anchors, sigma_anchor=0.052 min
+iRT (mix21): 21 landmarks, RT 1.46-21.78 min on the reference standards run
+detection QC on the user's standards run: 18/21 panel standards located (reporting only — it does not drive the calibration)

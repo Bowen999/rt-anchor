@@ -1,0 +1,317 @@
+confidence,sheet,lipid,status,reason,vetted_RT_min,vetted_RT_mapped_to_column_20_min,column_20_RT_min,column_20_identity_delta_min
+high,492,LPE O-16:1,in_panel,,3.5210,2.7604,2.7440,-0.0164
+high,492,BA 24:1;O3;G,in_panel,,1.3310,1.0821,1.1530,0.0709
+high,492,LPE 16:0,in_panel,,3.0580,2.4026,2.4230,0.0204
+high,492,LPE O-18:2,excluded_other,column_22 pick less than 2x the next candidate,3.6810,2.8844,2.8860,0.0016
+high,492,LPE O-18:1,in_panel,,5.1830,4.0601,3.9140,-0.1461
+high,492,LPC 14:0,in_panel,,1.9770,1.5736,1.7140,0.1404
+high,492,LPE 18:2,in_panel,,2.5350,2.0010,2.0010,0.0000
+high,492,LPC 15:0,in_panel,,2.5100,1.9819,1.9790,-0.0029
+high,492,LPE O-20:1,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,7.2850,5.7380,2.9230,-2.8150
+high,492,LPE 20:3,excluded_other,column_22 pick less than 2x the next candidate,2.7000,2.1277,1.9660,-0.1617
+high,492,LPC O-16:0,in_panel,,3.4670,2.7186,2.7310,0.0124
+high,492,LPC 16:1,in_panel,,2.2020,1.7455,1.8100,0.0645
+high,492,LPC 16:0,in_panel,,2.8740,2.2612,2.3230,0.0618
+high,492,LPC O-18:2,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,2.6950,2.1238,3.2920,1.1682
+high,492,LPC 17:1,in_panel,,2.5260,1.9941,2.0750,0.0809
+high,492,LPC O-18:1,in_panel,,3.6080,2.8278,2.8490,0.0212
+high,492,LPC 17:0,excluded_other,column_22 pick less than 2x the next candidate,3.5310,2.7681,2.7620,-0.0061
+high,492,LPC O-18:0,in_panel,,5.0880,3.9851,3.8880,-0.0971
+high,492,LPC 18:3,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,1.8440,1.4724,2.3230,0.8506
+high,492,LPC 18:2,in_panel,,2.4060,1.9020,1.9310,0.0290
+high,492,LPC 18:1,in_panel,,3.1640,2.4844,2.4400,-0.0444
+high,492,LPC 18:0,in_panel,,4.2620,3.3370,3.2920,-0.0450
+high,492,LPI 16:0,in_panel,,2.1760,1.7255,1.7440,0.0185
+high,492,LPC 19:1,in_panel,,3.7970,2.9745,2.8700,-0.1045
+high,492,LPC 19:0,in_panel,,5.1780,4.0561,3.9270,-0.1291
+high,492,LPC O-20:0,in_panel,,7.2810,5.7347,5.4480,-0.2867
+high,492,LPC 20:5,excluded_other,column_20 pick less than 2x the next candidate,1.7520,1.4024,1.9270,0.5246
+high,492,LPC 20:4,in_panel,,2.1670,1.7187,1.8440,0.1253
+high,492,LPC 20:3,excluded_other,column_20 pick less than 2x the next candidate,2.5730,2.0302,3.2920,1.2618
+high,492,LPC 20:2,in_panel,,3.2410,2.5438,2.6010,0.0572
+high,492,LPC 20:1,in_panel,,4.3650,3.4173,3.3920,-0.0253
+high,492,LPC 20:0,in_panel,,6.2140,4.8794,4.6610,-0.2184
+high,492,LPC 22:6,in_panel,,1.9830,1.5781,1.7440,0.1659
+high,492,LPC 22:5,in_panel,,2.6580,2.0954,1.9140,-0.1814
+high,492,LPC 22:4,in_panel,,3.0120,2.3671,2.3490,-0.0181
+high,492,Cer 40:1;O2,in_panel,,17.5360,16.2092,16.2070,-0.0022
+high,492,LPC 22:0,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,8.4620,6.7063,6.3910,-0.3153
+high,492,Cer 41:1;O2,in_panel,,17.9040,16.6265,16.6060,-0.0205
+high,492,Cer 41:0;O2,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,18.1310,16.8839,13.1440,-3.7399
+high,492,Cer 42:3;O2,in_panel,,16.6650,15.2235,15.3180,0.0945
+high,492,Cer 42:2;O2,excluded_other,column_22 pick less than 2x the next candidate,17.4490,16.1105,16.1330,0.0225
+high,492,Cer 42:1;O2,in_panel,,18.2480,17.0165,16.9830,-0.0335
+high,492,Cer 42:0;O2,in_panel,,18.4720,17.2705,17.2260,-0.0445
+high,492,LPC 24:0,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,10.8250,8.7024,8.4000,-0.3024
+high,492,Cer 43:1;O2,in_panel,,18.4350,17.2286,17.1920,-0.0366
+high,492,PE O-34:3,in_panel,,14.5500,12.8108,12.8540,0.0432
+high,492,PE O-34:2,in_panel,,15.4940,13.8849,13.8950,0.0101
+high,492,PE O-34:1,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,15.1490,13.4949,12.8020,-0.6929
+high,492,PE O-34:0,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,15.3150,13.6821,13.0100,-0.6721
+high,492,SM 31:1;O2,excluded_other,column_22 pick less than 2x the next candidate,10.4540,8.3791,8.0430,-0.3361
+high,492,PE 34:2,in_panel,,13.9680,12.1618,12.1910,0.0292
+high,492,PE 34:1,in_panel,,14.9620,13.2826,13.3050,0.0224
+high,492,SM 32:2;O2,in_panel,,9.5360,7.5793,7.2960,-0.2833
+high,492,PE 34:0,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,15.9610,14.4171,12.1600,-2.2571
+high,492,SM 32:1;O2,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,11.5650,9.4695,9.1200,-0.3495
+high,492,PE O-36:6,excluded_other,column_20 pick less than 2x the next candidate,13.3420,11.4749,1.9490,-9.5259
+high,492,SM 32:0;O2,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,12.2210,10.1899,9.8750,-0.3149
+high,492,PE O-36:5,in_panel,,14.2800,12.5067,12.5720,0.0653
+high,492,PE O-36:4,excluded_other,column_22 pick less than 2x the next candidate,14.5200,12.7770,12.9410,0.1640
+high,492,PE O-36:3,in_panel,,15.6510,14.0628,14.1030,0.0402
+high,492,PE O-36:2,excluded_other,usable on fewer than 3 columns,16.4520,14.9805,14.9750,-0.0055
+high,492,PE O-36:1,in_panel,,15.3230,13.6911,13.8780,0.1869
+high,492,SM 33:2;O2,excluded_other,column_22 pick less than 2x the next candidate,10.7610,8.6466,19.1010,10.4544
+high,492,SM 33:1;O2,in_panel,,12.1730,10.1351,10.2300,0.0949
+high,492,PE 36:5,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,12.7040,10.7410,12.1950,1.4540
+high,492,PC O-30:0,in_panel,,14.1440,12.3544,12.2770,-0.0774
+high,492,PE 36:4,excluded_other,column_22 pick less than 2x the next candidate,13.7010,11.8727,11.9170,0.0443
+high,492,PE 36:3,in_panel,,14.0100,12.2082,12.2860,0.0778
+high,492,PC 33:2,in_panel,,12.9650,11.0407,10.9940,-0.0467
+high,492,PC 33:1,in_panel,,14.0820,12.2868,12.2820,-0.0048
+high,492,SM 34:2;O2,in_panel,,11.7350,9.6518,9.3930,-0.2588
+high,492,PE O-38:7,in_panel,,13.8400,12.0247,12.1040,0.0793
+high,492,SM 34:1;O2,in_panel,,13.0370,11.1240,11.1840,0.0600
+high,492,PE O-38:6,in_panel,,14.3110,12.5416,12.6550,0.1134
+high,492,SM 34:0;O2,in_panel,,13.8410,12.0258,11.8260,-0.1998
+high,492,PE O-38:5,in_panel,,15.4480,13.8328,13.8610,0.0282
+high,492,PC O-35:4,excluded_other,column_22 pick less than 2x the next candidate,13.4570,11.6056,11.6620,0.0564
+high,492,PC O-35:3,excluded_other,column_22 pick less than 2x the next candidate,14.7080,12.9899,12.9250,-0.0649
+high,492,PE O-38:2,excluded_other,column_22 pick less than 2x the next candidate,15.3210,13.6889,13.3660,-0.3229
+high,492,SM 35:2;O2,in_panel,,12.6830,10.7171,10.4560,-0.2611
+high,492,PC O-32:2,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,14.0140,12.2126,11.1130,-1.0996
+high,492,SM 34:2;O3,in_panel,,11.1860,9.0729,8.7820,-0.2909
+high,492,SM 35:1;O2,in_panel,,13.7830,11.9624,12.0520,0.0896
+high,492,PE 38:6,in_panel,,13.2900,11.4156,11.4400,0.0244
+high,492,PC O-32:1,in_panel,,15.1840,13.5344,13.4790,-0.0554
+high,492,SM 34:1;O3,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,12.8610,10.9205,18.5450,7.6245
+high,492,PE 38:5,excluded_other,column_22 pick less than 2x the next candidate,13.6940,11.8650,12.0030,0.1380
+high,492,PC O-36:5,in_panel,,13.9460,12.1383,12.1730,0.0347
+high,492,PC O-32:0,in_panel,,15.2900,13.6539,13.6700,0.0161
+high,492,SM 34:0;O3,in_panel,,12.5110,10.5208,10.2780,-0.2428
+high,492,PE 38:4,excluded_other,usable on fewer than 3 columns,14.9460,13.2642,13.3140,0.0498
+high,492,PC 35:3,excluded_other,column_22 pick less than 2x the next candidate,13.0400,11.1274,11.4270,0.2996
+high,492,SM 36:3;O2,excluded_other,column_22 pick less than 2x the next candidate,12.3040,10.2846,9.9010,-0.3836
+high,492,PE O-40:8,excluded_other,column_20 pick less than 2x the next candidate,13.9280,12.1190,12.2120,0.0930
+high,492,SM 36:2;O2,in_panel,,13.4640,11.6135,11.3930,-0.2205
+high,492,PC 32:2,in_panel,,12.1690,10.1306,10.0260,-0.1046
+high,492,PE O-40:7,in_panel,,15.0640,13.3990,13.4660,0.0670
+high,492,SM 36:1;O2,in_panel,,14.7070,12.9887,12.8200,-0.1687
+high,492,PC 32:1,in_panel,,13.4190,11.5628,11.5050,-0.0578
+high,492,PE O-40:6,excluded_other,column_20 pick less than 2x the next candidate,15.4070,13.7863,13.8560,0.0697
+high,492,SM 36:0;O2,excluded_other,column_20 pick less than 2x the next candidate,15.1610,13.5085,13.3230,-0.1855
+high,492,PC 32:0,in_panel,,14.6400,12.9121,12.8890,-0.0231
+high,492,PC O-37:5,excluded_other,column_22 pick less than 2x the next candidate,14.2970,12.5258,12.6510,0.1252
+high,492,PC O-33:0,excluded_other,column_22 pick less than 2x the next candidate,15.7940,14.2254,14.2580,0.0326
+high,492,PC 36:4,in_panel,,13.4040,11.5457,11.5530,0.0073
+high,492,PC O-37:4,in_panel,,14.7000,12.9807,13.1310,0.1503
+high,492,PE O-40:3,excluded_other,usable on fewer than 3 columns,17.3490,15.9971,13.6700,-2.3271
+high,492,HexCer 40:1;O2,in_panel,,16.8930,15.4813,15.4440,-0.0373
+high,492,PE 40:8,in_panel,,12.0850,10.0360,10.2750,0.2390
+high,492,PC O-34:3,in_panel,,14.2240,12.4436,12.4640,0.0204
+high,492,PE 40:7,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,13.3590,11.4943,13.3100,1.8157
+high,492,PC O-38:7,in_panel,,13.5100,11.6638,11.6920,0.0282
+high,492,PC O-34:2,in_panel,,14.4390,12.6858,12.6980,0.0122
+high,492,SM 37:1;O2,excluded_other,column_22 pick less than 2x the next candidate,15.2280,13.5840,13.4790,-0.1050
+high,492,PE 40:6,excluded_other,column_22 pick less than 2x the next candidate,14.5630,12.8254,12.9190,0.0936
+high,492,PC O-34:1,in_panel,,15.3480,13.7194,13.7220,0.0026
+high,492,PC 33:0,excluded_other,column_22 pick less than 2x the next candidate,14.9970,13.3225,13.3100,-0.0125
+high,492,PC O-34:0,in_panel,,16.3030,14.8099,14.7970,-0.0129
+high,492,PC 37:3,excluded_other,column_22 pick less than 2x the next candidate,14.5650,12.8276,12.9150,0.0874
+high,492,HexCer 41:1;O2,in_panel,,17.2840,15.9235,15.8820,-0.0415
+high,492,PC 34:4,in_panel,,11.8460,9.7725,9.6920,-0.0805
+high,492,SM 38:3;O2,in_panel,,13.4260,11.5707,11.4310,-0.1397
+high,492,PC 34:3,excluded_other,column_22 pick less than 2x the next candidate,12.2940,10.2732,10.2480,-0.0252
+high,492,SM 38:2;O2,in_panel,,14.7670,13.0576,12.9450,-0.1126
+high,492,PC 34:2,in_panel,,13.6630,11.8311,11.8310,-0.0001
+high,492,PE O-42:7,excluded_other,column_22 pick less than 2x the next candidate,16.0170,14.4814,12.2080,-2.2734
+high,492,SM 38:1;O2,in_panel,,15.7990,14.2312,14.1030,-0.1282
+high,492,PC 34:1,in_panel,,14.6870,12.9658,12.9840,0.0182
+high,492,PE O-42:6,excluded_other,no candidate within 15 ppm on column_22,16.2620,14.7629,12.6940,-2.0689
+high,492,SM 38:0;O2,in_panel,,16.1710,14.6583,14.5200,-0.1383
+high,492,PC 34:0,in_panel,,15.7300,14.1524,14.1210,-0.0314
+high,492,PE O-42:5,excluded_other,no candidate within 15 ppm on column_22,15.2180,13.5727,13.1320,-0.4407
+high,492,PC O-36:6,excluded_other,column_22 pick less than 2x the next candidate,12.9860,11.0650,11.0500,-0.0150
+high,492,HexCer 42:2;O2,in_panel,,16.7920,15.3672,15.3700,0.0028
+high,492,PI 32:0,in_panel,,13.1050,11.2026,11.0630,-0.1396
+high,492,HexCer 42:1;O2,in_panel,,17.6460,16.3339,16.2890,-0.0449
+high,492,PC O-36:4,in_panel,,14.1800,12.3943,12.4380,0.0437
+high,492,PC O-36:3,excluded_other,column_22 pick less than 2x the next candidate,14.6320,12.9031,12.7500,-0.1531
+high,492,PC 35:2,excluded_other,column_22 pick less than 2x the next candidate,14.3100,12.5405,12.5770,0.0365
+high,492,PC O-36:2,in_panel,,15.5510,13.9495,13.9650,0.0155
+high,492,SM 39:1;O2,in_panel,,16.2740,14.7766,14.6500,-0.1266
+high,492,PC 35:1,in_panel,,15.2040,13.5569,13.6180,0.0611
+high,492,PC 36:6,excluded_other,column_22 pick less than 2x the next candidate,11.3150,9.2079,10.2300,1.0221
+high,492,PC 36:5,excluded_other,column_22 pick less than 2x the next candidate,12.3830,10.3748,10.3340,-0.0408
+high,492,HexCer 42:2;O3,excluded_other,column_20 pick less than 2x the next candidate,16.5940,15.1428,14.9410,-0.2018
+high,492,PC 36:3,excluded_other,column_22 pick less than 2x the next candidate,13.9730,12.1674,12.2120,0.0446
+high,492,SM 40:2;O2,in_panel,,15.6250,14.0334,14.1900,0.1566
+high,492,PC 36:2,in_panel,,14.8900,13.1995,13.2360,0.0365
+high,492,SM 40:1;O2,in_panel,,16.7270,15.2937,15.1620,-0.1317
+high,492,PC 36:1,in_panel,,15.7480,14.1729,14.1950,0.0221
+high,492,PI 34:2,in_panel,,12.0350,9.9800,10.1350,0.1550
+high,492,PI 34:1,excluded_other,column_22 pick less than 2x the next candidate,13.2260,11.3425,11.5140,0.1715
+high,492,PC O-38:6,excluded_other,column_22 pick less than 2x the next candidate,13.9680,12.1618,12.2560,0.0942
+high,492,PC 37:5,excluded_other,column_22 pick less than 2x the next candidate,12.7050,10.7422,10.8160,0.0738
+high,492,PC O-38:5,in_panel,,14.1800,12.3943,12.4900,0.0957
+high,492,PC 37:4,excluded_other,column_22 pick less than 2x the next candidate,14.0540,12.2562,12.3250,0.0688
+high,492,PC O-38:4,in_panel,,15.3180,13.6855,13.7390,0.0535
+high,492,SM 41:2;O2,in_panel,,16.2270,14.7226,14.7320,0.0094
+high,492,PC 37:2,in_panel,,15.4180,13.7988,13.8430,0.0442
+high,492,HexCer 40:1;O3,in_panel,,16.7000,15.2631,15.0140,-0.2491
+high,492,PC 37:1,excluded_other,no candidate within 15 ppm on column_22,16.1500,14.6341,14.7110,0.0769
+high,492,PC 38:7,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,11.9900,9.9306,11.5530,1.6224
+high,492,PC 38:6,in_panel,,12.9440,11.0164,11.0630,0.0466
+high,492,PC 38:5,excluded_other,column_22 pick less than 2x the next candidate,13.4180,11.5616,11.6050,0.0434
+high,492,SM 42:4;O2,excluded_other,column_22 pick less than 2x the next candidate,14.7700,13.0611,13.0450,-0.0161
+high,492,PC 38:4,in_panel,,14.6380,12.9098,13.0100,0.1002
+high,492,SM 42:3;O2,in_panel,,15.7370,14.1603,14.1250,-0.0353
+high,492,PC 38:3,in_panel,,15.1230,13.4656,13.5480,0.0824
+high,492,PI 36:4,in_panel,,11.7810,9.7011,9.8400,0.1389
+high,492,PC 38:2,in_panel,,15.8070,14.2403,14.2900,0.0497
+high,492,PI 36:3,in_panel,,12.1450,10.1035,10.2870,0.1835
+high,492,SM 42:1;O2,in_panel,,17.5050,16.1740,16.0640,-0.1100
+high,492,PC 38:1,in_panel,,16.5590,15.1031,15.1520,0.0489
+high,492,PC O-40:7,in_panel,,13.7550,11.9317,12.0390,0.1073
+high,492,PI 36:1,in_panel,,14.4370,12.6836,12.9190,0.2354
+high,492,PC 39:6,excluded_other,column_22 pick less than 2x the next candidate,13.6260,11.7906,11.8830,0.0924
+high,492,PC O-40:6,excluded_other,usable on fewer than 3 columns,14.9400,13.2572,13.3450,0.0878
+high,492,PC 39:5,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,13.8150,11.9974,12.3470,0.3496
+high,492,PC O-40:5,in_panel,,15.2560,13.6156,13.7220,0.1064
+high,492,PC 39:4,excluded_other,column_22 pick less than 2x the next candidate,15.1880,13.5389,13.6260,0.0871
+high,492,PC O-40:4,in_panel,,16.2550,14.7548,14.8150,0.0602
+high,492,PC O-40:3,excluded_other,column_20 pick less than 2x the next candidate,16.3630,14.8786,14.9410,0.0624
+high,492,SM 43:2;O2,excluded_other,column_22 pick less than 2x the next candidate,16.8650,15.4497,15.3870,-0.0627
+high,492,HexCer 42:1;O3,excluded_other,column_20 pick less than 2x the next candidate,17.4920,16.1593,15.9030,-0.2563
+high,492,PC 40:8,excluded_other,column_22 pick less than 2x the next candidate,11.8190,9.7428,11.6010,1.8582
+high,492,PC 40:7,excluded_other,column_22 pick less than 2x the next candidate,13.0030,11.0847,13.0100,1.9253
+high,492,Hex2Cer 32:1;O2,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,11.6670,9.5789,12.6030,3.0241
+high,492,PC 40:6,in_panel,,14.2650,12.4898,12.6030,0.1132
+high,492,PC 40:5,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,15.0660,13.4012,13.0190,-0.3822
+high,492,PI 38:6,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,11.2920,9.1838,13.0100,3.8262
+high,492,PC 40:4,in_panel,,15.4000,13.7784,13.8740,0.0956
+high,492,PI 38:5,excluded_other,column_20 pick less than 2x the next candidate,12.0870,10.0382,13.5480,3.5098
+high,492,PC 40:3,in_panel,,16.1140,14.5927,14.6460,0.0533
+high,492,PI 38:4,in_panel,,13.2370,11.3552,11.5880,0.2328
+high,492,PC 40:2,in_panel,,16.7350,15.3027,15.3530,0.0503
+high,492,PI 38:3,in_panel,,14.1830,12.3977,12.1990,-0.1987
+high,492,PC O-42:6,excluded_other,column_20 pick less than 2x the next candidate,15.3150,13.6821,13.8220,0.1399
+high,492,PC O-42:5,in_panel,,16.1690,14.6560,14.7450,0.0890
+high,492,PC O-42:4,excluded_other,column_22 pick less than 2x the next candidate,17.0670,15.6780,15.7210,0.0430
+high,492,PC 42:10,excluded_other,column_22 pick less than 2x the next candidate,11.3860,9.2822,11.5140,2.2318
+high,492,PC O-42:3,in_panel,,17.1450,15.7662,15.8170,0.0508
+high,492,PC O-42:2,excluded_other,column_22 pick less than 2x the next candidate,17.7650,16.4688,16.4800,0.0112
+high,492,PC 42:8,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,12.9720,11.0488,13.0190,1.9702
+high,492,PC 42:7,excluded_other,column_22 pick less than 2x the next candidate,14.2220,12.4414,12.6110,0.1696
+high,492,Hex2Cer 34:1;O2,in_panel,,13.3200,11.4499,11.2410,-0.2089
+high,492,PI 40:6,excluded_other,no candidate within 15 ppm on column_22,12.8420,10.8985,11.1500,0.2515
+high,492,PI 40:5,in_panel,,13.2360,11.3541,11.6100,0.2559
+high,492,PC O-44:6,in_panel,,16.2200,14.7146,14.8280,0.1134
+high,492,PC O-44:5,in_panel,,16.9700,15.5684,15.6470,0.0786
+high,492,PC 44:4,in_panel,,17.3260,15.9710,16.0250,0.0540
+high,182,CAR 16:0,in_panel,,2.6400,2.2089,2.1880,-0.0209
+high,182,CAR 18:1,in_panel,,2.7900,2.3534,2.2960,-0.0574
+high,182,CAR 18:2,in_panel,,2.1800,1.7656,1.8440,0.0784
+high,182,DG 32:0,in_panel,,16.0800,15.1320,14.9880,-0.1440
+high,182,DG 32:1,in_panel,,15.1200,14.2090,13.9470,-0.2620
+high,182,DG 34:0,excluded_other,column_22 pick less than 2x the next candidate,16.9600,15.9782,14.2250,-1.7532
+high,182,DG 34:1,in_panel,,16.0900,15.1417,15.0360,-0.1057
+high,182,DG 34:2,in_panel,,15.1300,14.2186,14.1560,-0.0626
+high,182,DG 36:1,in_panel,,16.9700,15.9878,15.9640,-0.0238
+high,182,DG 36:2,in_panel,,16.1100,15.1609,15.0880,-0.0729
+high,182,DG 36:3,in_panel,,15.2900,14.3724,14.2290,-0.1434
+high,182,DG 36:4,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,14.5300,13.6417,13.2840,-0.3577
+high,182,CE 16:0,in_panel,,20.6200,19.8288,19.6820,-0.1468
+high,182,CE 16:1,in_panel,,20.0700,19.2482,19.0750,-0.1732
+high,182,CE 18:0,in_panel,,21.0600,20.2756,20.1640,-0.1116
+high,182,CE 18:1,excluded_other,column_20 pick less than 2x the next candidate,20.5500,19.7583,19.6390,-0.1193
+high,182,CE 18:2,in_panel,,20.0900,19.2694,19.1350,-0.1344
+high,182,CE 18:3,in_panel,,19.6400,18.8049,18.6710,-0.1339
+high,182,CE 20:2,in_panel,,20.5400,19.7481,19.5260,-0.2221
+high,182,CE 20:3,in_panel,,20.1400,19.3216,19.2050,-0.1166
+high,182,CE 20:4,in_panel,,19.7700,18.9386,18.8400,-0.0986
+high,182,CE 20:5,in_panel,,19.3000,18.4484,18.3540,-0.0944
+high,182,CE 22:4,in_panel,,20.1800,19.3640,19.2740,-0.0900
+high,182,CE 22:5,excluded_other,column_22 pick less than 2x the next candidate,19.7300,18.8982,18.8270,-0.0712
+high,182,CE 22:6,in_panel,,19.4600,18.6186,18.5450,-0.0736
+high,182,TG 42:0,excluded_other,column_22 pick less than 2x the next candidate,19.0100,18.1391,13.4790,-4.6601
+high,182,TG 42:1,excluded_other,column_20 pick less than 2x the next candidate,18.4500,17.5625,17.5910,0.0285
+high,182,TG 42:2,in_panel,,17.8800,16.9529,17.0010,0.0481
+high,182,TG 44:0,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,19.5800,18.7428,14.6500,-4.0928
+high,182,TG 44:1,in_panel,,19.0100,18.1391,18.1940,0.0549
+high,182,TG 44:2,in_panel,,18.5100,17.6267,17.6600,0.0333
+high,182,TG 46:0,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,19.9900,19.1610,15.6300,-3.5310
+high,182,TG 46:1,excluded_other,column_22 pick less than 2x the next candidate,19.5100,18.6702,18.7190,0.0488
+high,182,TG 46:2,in_panel,,19.0100,18.1391,18.2330,0.0939
+high,182,TG 46:3,in_panel,,18.6400,17.7597,17.6650,-0.0947
+high,182,TG 48:0,in_panel,,20.4300,19.6207,19.6780,0.0573
+high,182,TG 48:1,in_panel,,19.9900,19.1610,19.2050,0.0440
+high,182,TG 48:2,in_panel,,19.5700,18.7324,18.7540,0.0216
+high,182,TG 48:3,in_panel,,19.0800,18.2109,18.2370,0.0261
+high,182,TG 49:0,excluded_other,column_20 pick less than 2x the next candidate,20.6200,19.8288,19.8640,0.0352
+high,182,TG 49:1,in_panel,,20.2100,19.3927,19.4260,0.0333
+high,182,TG 49:2,in_panel,,19.7700,18.9386,18.9790,0.0404
+high,182,TG 49:3,excluded_other,column_22 pick less than 2x the next candidate,19.2900,18.4376,18.5060,0.0684
+high,182,TG 50:0,in_panel,,20.8400,20.0405,20.0720,0.0315
+high,182,TG 50:1,in_panel,,20.3800,19.5623,19.6560,0.0937
+high,182,TG 50:2,in_panel,,19.9800,19.1501,19.2180,0.0679
+high,182,TG 50:3,in_panel,,19.4900,18.6495,18.7580,0.1085
+high,182,TG 50:4,in_panel,,19.0900,18.2217,18.3020,0.0803
+high,182,TG 51:0,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,20.9900,20.2008,19.6990,-0.5018
+high,182,TG 51:1,in_panel,,20.6100,19.8192,19.8470,0.0278
+high,182,TG 51:2,in_panel,,20.2100,19.3927,19.4130,0.0203
+high,182,TG 51:3,in_panel,,19.7200,18.8880,18.9970,0.1090
+high,182,TG 51:4,in_panel,,19.3000,18.4484,18.5580,0.1096
+high,182,TG 52:0,in_panel,,21.1700,20.3901,20.4500,0.0599
+high,182,TG 52:1,in_panel,,20.7600,19.9606,20.0550,0.0944
+high,182,TG 52:2,in_panel,,20.4100,19.5973,19.6340,0.0367
+high,182,TG 52:3,in_panel,,19.9700,19.1394,19.2310,0.0916
+high,182,TG 52:4,in_panel,,19.5500,18.7117,18.8060,0.0943
+high,182,TG 52:5,in_panel,,19.1800,18.3189,18.3850,0.0661
+high,182,TG 53:1,excluded_other,column_20 pick less than 2x the next candidate,20.9700,20.1794,19.4300,-0.7494
+high,182,TG 53:2,in_panel,,20.5300,19.7365,19.8290,0.0925
+high,182,TG 53:3,in_panel,,20.1800,19.3640,19.4300,0.0660
+high,182,TG 54:0,in_panel,,21.5300,20.7647,20.7930,0.0283
+high,182,TG 54:1,excluded_other,column_20 pick less than 2x the next candidate,21.1600,20.3797,20.4190,0.0393
+high,182,TG 54:2,in_panel,,20.7400,19.9417,20.0380,0.0963
+high,182,TG 54:3,in_panel,,20.3900,19.5740,19.6300,0.0560
+high,182,TG 54:4,in_panel,,20.0200,19.1937,19.2220,0.0283
+high,182,TG 54:5,in_panel,,19.5300,18.6910,18.8060,0.1150
+high,182,TG 54:6,excluded_other,column_22 pick less than 2x the next candidate,19.1000,18.2325,18.3630,0.1305
+high,182,TG 56:1,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,21.4300,20.6606,20.0550,-0.6056
+high,182,TG 56:2,excluded_other,column_20 pick less than 2x the next candidate,21.0800,20.2964,19.6130,-0.6834
+high,182,TG 56:3,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,20.6600,19.8664,19.2400,-0.6264
+high,182,TG 56:5,excluded_other,column_22 pick less than 2x the next candidate,20.1600,19.3428,19.3780,0.0352
+high,182,TG 56:6,in_panel,,19.8700,19.0390,19.0660,0.0270
+high,182,TG 56:7,excluded_other,column_22 pick less than 2x the next candidate,19.3600,18.5122,18.6320,0.1198
+high,182,TG 56:8,excluded_other,column_22 pick less than 2x the next candidate,18.9200,18.0468,18.4020,0.3552
+high,182,TG 58:2,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,21.3500,20.5774,20.0330,-0.5444
+high,182,TG 58:3,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,21.1300,20.3485,19.5950,-0.7535
+low,492,LPA 18:1,in_panel,,2.7260,2.1476,2.4230,0.2754
+low,492,LPA 20:3,in_panel,,2.2940,1.8161,2.0010,0.1849
+low,492,DMPE 32:2,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,12.1430,10.1013,12.1910,2.0897
+low,492,DMPE 32:1,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,13.3780,11.5160,13.3050,1.7890
+low,492,DMPE 32:0,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,14.6470,12.9201,12.1600,-0.7601
+low,492,DMPE 33:2,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,12.9090,10.9760,10.0260,-0.9500
+low,492,DMPE 34:4,excluded_other,column_22 pick less than 2x the next candidate,11.8040,9.7264,11.9170,2.1906
+low,492,DMPE 34:3,in_panel,,14.2580,12.4819,12.2860,-0.1959
+low,492,DMPE 34:2,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,13.6290,11.7939,10.9940,-0.7999
+low,492,DMPE 34:1,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,14.6560,12.9304,12.2820,-0.6484
+low,492,DMPE 34:0,excluded_other,column_22 pick less than 2x the next candidate,15.6970,14.1150,13.3100,-0.8050
+low,492,DMPE 35:2,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,14.0500,12.2519,11.8310,-0.4209
+low,492,DMPE 35:1,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,15.2030,13.5558,12.9840,-0.5718
+low,492,DMPE 36:5,excluded_other,column_22 pick less than 2x the next candidate,14.1350,12.3446,12.0030,-0.3416
+low,492,DMPE 36:4,excluded_other,usable on fewer than 3 columns,14.2800,12.5067,13.3140,0.8073
+low,492,DMPE 36:3,excluded_other,column_22 pick less than 2x the next candidate,13.6240,11.7885,11.4270,-0.3615
+low,492,DMPE 36:2,excluded_other,column_22 pick less than 2x the next candidate,14.8920,13.2019,12.5770,-0.6249
+low,492,DMPE 36:1,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,15.7500,14.1752,13.6180,-0.5572
+low,492,DMPE 37:4,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,13.8350,12.0192,11.5530,-0.4662
+low,492,DMPE 37:3,excluded_other,column_22 pick less than 2x the next candidate,14.3170,12.5484,12.2120,-0.3364
+low,492,DMPE 37:2,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,15.3800,13.7557,13.2360,-0.5197
+low,492,DMPE 38:6,excluded_other,column_22 pick less than 2x the next candidate,12.9650,11.0407,12.9190,1.8783
+low,492,DMPE 38:5,excluded_other,column_22 pick less than 2x the next candidate,13.4260,11.5707,10.8160,-0.7547
+low,492,DMPE 38:4,excluded_other,column_22 pick less than 2x the next candidate,14.0250,12.2246,12.3250,0.1004
+low,492,DMPE 38:3,excluded_other,column_22 pick less than 2x the next candidate,14.7360,13.0220,12.9150,-0.1070
+low,492,DMPE 38:2,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,15.7890,14.2197,13.8430,-0.3767
+low,492,DMPE 40:5,excluded_rule_h,column_20 pick more than 0.30 min from the vetted RT,14.5590,12.8209,12.3470,-0.4739
+low,492,DMPE 40:4,excluded_other,column_22 pick less than 2x the next candidate,15.4120,13.7920,13.6260,-0.1660

@@ -1,0 +1,11 @@
+loaded sample table: {'source_format': 'msdial', 'polarity': 'positive', 'n_features': 3741, 'mz_col': 'Average Mz', 'rt_col': 'Average Rt(min)', 'rt_unit': 'min', 'rt_min_minutes': 3.667, 'rt_max_minutes': 89.925, 'n_sample_columns': 4, 'sample_columns': ['P Sandie 100 Serum I_GD1_01_66531', 'P Sandie 100 Serum II_GD1_01_66532', 'P Sandie 100 Serum III_GD1_01_66533', 'P Sandie 100 Serum IV_GD1_01_66534'], 'n_total_columns': 41}
+loaded standards run: 291 features, RT 3.58-84.92 min
+reference: Column 25 [col35] — sample 610 features, standards 383 features
+panel: mix21 — 21 standards ionisable in positive mode
+sample-run pairs: 475 matched, 458 kept after masking the stage-2 anchor m/z
+stage 1: 641 pairs (183 standards + 458 sample), 612 kept after MAD trimming; source RT span 3.58-86.49 -> reference 1.33-22.11 min
+stage 2: 17/17 plasma lipids validated in both sample runs, 17 usable as anchors; no pick moved by isomer refinement
+stage 2 gate: class-aware correction engaged: LOO MSE 35% below no-correction (threshold 20%)
+stage 2 engaged: lam_g=0.0, lam_c=0.6, 17 anchors, sigma_anchor=0.205 min
+iRT (mix21): 21 landmarks, RT 1.46-21.78 min on the reference standards run
+detection QC on the user's standards run: 20/21 panel standards located (reporting only — it does not drive the calibration)

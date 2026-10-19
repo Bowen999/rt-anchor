@@ -1,0 +1,6 @@
+step,high_confidence,high_and_low,note
+ion targets (one per distinct ion m/z),409,414,
+effective ion targets (m/z within 10 ppm merged),407,412,
+effective ion targets with a feature within 10 ppm on >= 3/4/5/6 columns,345/325/309/287,346/325/309/287,any feature at the m/z; not an identification
+effective ion targets with a feature within 15 ppm on >= 3/4/5/6 columns,347/333/317/295,348/333/317/295,any feature at the m/z; not an identification
+panel: identity-checked usable ion target on >= 3/4/5/6 columns,219/213/194/149,222/215/195/149,195 lipids (high); per_ion_panel.py

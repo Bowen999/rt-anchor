@@ -1,0 +1,382 @@
+{
+  "method": "cross-column-v2",
+  "calibration_scope": "project",
+  "reference": {
+    "key": "col35",
+    "label": "Column 25",
+    "sample": "C:\\Users\\suppo\\Documents\\programs\\RT\\RT.Anchor-win64\\RT Anchor\\_internal\\rt_anchor\\reference_data\\col35\\reference_sample.csv",
+    "standards": "C:\\Users\\suppo\\Documents\\programs\\RT\\RT.Anchor-win64\\RT Anchor\\_internal\\rt_anchor\\reference_data\\col35\\reference_standards.csv",
+    "is_default": true,
+    "provenance": {
+      "key": "col35",
+      "label": "Column 25",
+      "column_id": "25",
+      "gradient_minutes": 35,
+      "matrix": "human serum",
+      "instrument": "QTOF (MS-DIAL alignment export)",
+      "polarity": "positive",
+      "mixture_run": "P Carly RT Mix 4p4 2Xdil (Mix 4.4 = the 21-standard panel)",
+      "note": "Reference dataset defining the Cal_RT time axis and the iRT ruler. Only the two bulky spectrum columns were removed; every row and every other column is byte-identical to the source MS-DIAL export.",
+      "files": {
+        "sample": {
+          "bundled_file": "reference_sample.csv",
+          "source_path": "v2/5 chroms/data/25/25_serum.csv",
+          "source_sha256_16": "710554140bb9e9c5",
+          "source_bytes": 304293,
+          "bundled_bytes": 270931,
+          "dropped_columns": [
+            "MS1 isotopic spectrum",
+            "MS/MS spectrum"
+          ],
+          "n_features": 610
+        },
+        "standards": {
+          "bundled_file": "reference_standards.csv",
+          "source_path": "v2/5 chroms/data/25/25_standards.csv",
+          "source_sha256_16": "f0b613524d75b8c2",
+          "source_bytes": 186242,
+          "bundled_bytes": 165216,
+          "dropped_columns": [
+            "MS1 isotopic spectrum",
+            "MS/MS spectrum"
+          ],
+          "n_features": 383
+        }
+      }
+    }
+  },
+  "panel": {
+    "key": "mix21",
+    "label": "21",
+    "n_standards": 21
+  },
+  "curve": {
+    "n_pairs": 641,
+    "n_pairs_kept": 612,
+    "n_pairs_standards": 183,
+    "n_pairs_sample": 458,
+    "rt_span_src_min": [
+      3.578,
+      86.491
+    ],
+    "rt_span_ref_min": [
+      1.442,
+      22.11
+    ],
+    "residual_min": {
+      "median_abs": 0.2070478960222486,
+      "p90_abs": 0.6173165272201846
+    }
+  },
+  "anchors": {
+    "engaged": true,
+    "class_aware": true,
+    "n_validated": 17,
+    "n_used": 17,
+    "lam_g": 0.0,
+    "lam_c": 0.6,
+    "gate_mse_reduction": 0.3486911759007324,
+    "gate_threshold": 0.2,
+    "gate_reason": "class-aware correction engaged: LOO MSE 35% below no-correction (threshold 20%)",
+    "sigma_anchor_min": 0.20541549676692278,
+    "loo_residual_min": {
+      "median": 0.09800071377000848,
+      "p90": 0.2523605665328922,
+      "max": 0.6029893813038048
+    },
+    "table": [
+      {
+        "label": "LPC 18:2",
+        "lipid_class": "LPC",
+        "rt_src": 12.541,
+        "rt_ref": 3.987,
+        "residual_min": -0.017945997965733262,
+        "loo_residual_min": 0.09277794184257004,
+        "n_isomer_candidates": 1,
+        "isomer_rts": "11.88",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      },
+      {
+        "label": "LPC 16:0",
+        "lipid_class": "LPC",
+        "rt_src": 13.553,
+        "rt_ref": 4.456,
+        "residual_min": 0.12471990646139464,
+        "loo_residual_min": -0.09800071377000848,
+        "n_isomer_candidates": 1,
+        "isomer_rts": "12.86",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      },
+      {
+        "label": "LPC 18:1",
+        "lipid_class": "LPC",
+        "rt_src": 14.412,
+        "rt_ref": 4.642,
+        "residual_min": 0.04453198781897694,
+        "loo_residual_min": 0.030299956057859845,
+        "n_isomer_candidates": 2,
+        "isomer_rts": "13.78;14.79",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      },
+      {
+        "label": "LPC 18:0",
+        "lipid_class": "LPC",
+        "rt_src": 16.191,
+        "rt_ref": 5.401,
+        "residual_min": 0.25491550100440374,
+        "loo_residual_min": -0.22819630831301757,
+        "n_isomer_candidates": 2,
+        "isomer_rts": "15.85;16.54",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      },
+      {
+        "label": "SM 34:1;O2",
+        "lipid_class": "SM",
+        "rt_src": 38.355,
+        "rt_ref": 11.057,
+        "residual_min": 0.20127079791177493,
+        "loo_residual_min": 0.23298031811874687,
+        "n_isomer_candidates": 0,
+        "isomer_rts": "",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      },
+      {
+        "label": "PC 36:4",
+        "lipid_class": "PC",
+        "rt_src": 40.653,
+        "rt_ref": 11.551,
+        "residual_min": 0.2121771732656832,
+        "loo_residual_min": -0.2095572175273052,
+        "n_isomer_candidates": 3,
+        "isomer_rts": "41.71;42.50;45.42",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      },
+      {
+        "label": "PC 34:2",
+        "lipid_class": "PC",
+        "rt_src": 42.463,
+        "rt_ref": 11.732,
+        "residual_min": 0.08041021394104853,
+        "loo_residual_min": -0.07779025820267052,
+        "n_isomer_candidates": 0,
+        "isomer_rts": "",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      },
+      {
+        "label": "SM 36:1;O2",
+        "lipid_class": "SM",
+        "rt_src": 43.381,
+        "rt_ref": 12.694,
+        "residual_min": 0.7237518600508697,
+        "loo_residual_min": -0.6029893813038048,
+        "n_isomer_candidates": 0,
+        "isomer_rts": "",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      },
+      {
+        "label": "PC 34:1",
+        "lipid_class": "PC",
+        "rt_src": 45.413,
+        "rt_ref": 12.901,
+        "residual_min": 0.04052295305804776,
+        "loo_residual_min": -0.03790299731966975,
+        "n_isomer_candidates": 0,
+        "isomer_rts": "",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      },
+      {
+        "label": "PC 36:2",
+        "lipid_class": "PC",
+        "rt_src": 47.093,
+        "rt_ref": 13.343,
+        "residual_min": 0.004366592897296684,
+        "loo_residual_min": 0.01994717893753197,
+        "n_isomer_candidates": 0,
+        "isomer_rts": "",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      },
+      {
+        "label": "PC 38:4",
+        "lipid_class": "PC",
+        "rt_src": 47.102,
+        "rt_ref": 13.161,
+        "residual_min": -0.18132828150801217,
+        "loo_residual_min": 0.20564205334284083,
+        "n_isomer_candidates": 0,
+        "isomer_rts": "",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      },
+      {
+        "label": "PC 36:1",
+        "lipid_class": "PC",
+        "rt_src": 49.778,
+        "rt_ref": 14.508,
+        "residual_min": -0.07001793359874142,
+        "loo_residual_min": 0.09433170543357008,
+        "n_isomer_candidates": 0,
+        "isomer_rts": "",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      },
+      {
+        "label": "CE 18:2",
+        "lipid_class": "CE",
+        "rt_src": 72.082,
+        "rt_ref": 21.158,
+        "residual_min": 0.35081481800775904,
+        "loo_residual_min": -0.1409103425671546,
+        "n_isomer_candidates": 0,
+        "isomer_rts": "",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      },
+      {
+        "label": "CE 18:1",
+        "lipid_class": "CE",
+        "rt_src": 75.859,
+        "rt_ref": 21.625,
+        "residual_min": 0.3498407924010074,
+        "loo_residual_min": -0.139351901596352,
+        "n_isomer_candidates": 0,
+        "isomer_rts": "",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      },
+      {
+        "label": "TG 52:3",
+        "lipid_class": "TG",
+        "rt_src": 77.917,
+        "rt_ref": 20.95,
+        "residual_min": -0.3251592075989933,
+        "loo_residual_min": 0.28143093915411016,
+        "n_isomer_candidates": 0,
+        "isomer_rts": "",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      },
+      {
+        "label": "TG 52:2",
+        "lipid_class": "TG",
+        "rt_src": 81.926,
+        "rt_ref": 21.318,
+        "residual_min": -0.04596401904073133,
+        "loo_residual_min": -0.08152280597163042,
+        "n_isomer_candidates": 0,
+        "isomer_rts": "",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      },
+      {
+        "label": "TG 54:3",
+        "lipid_class": "TG",
+        "rt_src": 82.77,
+        "rt_ref": 21.365,
+        "residual_min": -0.09979687577554586,
+        "loo_residual_min": -0.011540092216371534,
+        "n_isomer_candidates": 1,
+        "isomer_rts": "83.05",
+        "pick_refined": false,
+        "dropped_by_sanity_filter": false
+      }
+    ]
+  },
+  "irt": {
+    "n_landmarks": 21,
+    "landmark_rt_span_min": [
+      1.455,
+      21.779
+    ],
+    "irt_range": [
+      1.0,
+      100.0
+    ],
+    "definition": "affine on the reference-column RT axis",
+    "panel_used": "mix21",
+    "reason": "21 landmarks, RT 1.46-21.78 min on the reference standards run"
+  },
+  "detection_qc": {
+    "user_standards_run": {
+      "n_panel": 21,
+      "n_detected": 20,
+      "native_rt": {
+        "PC 6:0_6:0": 3.587,
+        "PC 7:0_7:0": 6.766,
+        "PC 8:0_8:0": 10.257,
+        "PC 9:0_9:0": 13.382,
+        "PC 10:0_10:0": 16.078,
+        "PC 11:0_11:0": 19.357,
+        "PC 12:0_12:0": 23.647,
+        "PC 13:0_13:0": 28.709,
+        "PC 14:0_14:0": 34.081,
+        "PC 14:0_16:0": 39.359,
+        "PC 16:0_18:2": 42.518,
+        "PC 16:0_18:1": 45.482,
+        "PC 18:0_18:1": 49.851,
+        "PC 18:0_18:0": 52.793,
+        "DG 16:0_18:0": 54.613,
+        "DG 18:0_18:0": 58.268,
+        "CE 20:5": 68.52,
+        "CE 18:2": 72.111,
+        "CE 18:1": 75.858,
+        "TG 18:0_18:2_18:0": 84.912
+      },
+      "rt_range_min": [
+        3.578,
+        84.925
+      ],
+      "n_features": 291,
+      "note": "QC only \u2014 does not drive the calibration"
+    }
+  },
+  "n_features": 3741,
+  "n_features_extrapolated": 33,
+  "confidence_counts": {
+    "medium": 2857,
+    "low": 884
+  },
+  "config": {
+    "match_mz_tol_ppm": 10.0,
+    "match_mz_tol_da": 0.008,
+    "mz_tol_ppm": 10.0,
+    "mz_tol_min_da": 0.0,
+    "rt_window_min": 0.5,
+    "rt_window_seed_min": 2.0,
+    "curve_frac": 0.1,
+    "curve_iter": 3,
+    "curve_mad_k": 3.0,
+    "curve_min_points": 20,
+    "use_sample_pairs": true,
+    "use_sample_anchors": true,
+    "class_aware": true,
+    "min_anchors": 3,
+    "anchor_gate_min_mse_reduction": 0.2,
+    "anchor_tie_tol_min": 0.15,
+    "isomer_sn_frac": 0.1,
+    "sigma_window_pairs": 50,
+    "conf_high_irt": 1.0,
+    "conf_low_irt": 2.0,
+    "irt_landmark_panel": "mix21",
+    "extrapolate": true,
+    "extrapolate_mode": "linear",
+    "tie_epsilon_min": 0.005,
+    "max_drop_anchors": 3,
+    "min_gaussian_similarity": 0.0,
+    "asymmetry_range": [
+      0.0,
+      1000000000.0
+    ],
+    "rt_unit": null,
+    "verbose": true
+  }
+}
