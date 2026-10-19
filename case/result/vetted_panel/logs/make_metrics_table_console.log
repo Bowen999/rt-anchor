@@ -1,5 +1,14 @@
 222 ion targets, 1003 used non-reference cells, 994 pooled points (a peak shared by two rows counted once)
 wrote vetted_panel_metrics.csv:
+                                     Before calibration After calibration
+Statistic                                                                
+Median Absolute Deviation (min)                   6.412             0.047
+90th Percentile Absolute Error (min)             34.885             0.246
+Deviation Range (min)                   -10.08 to 65.13    -9.48 to 16.26
+Within ±0.2 min (%)                                 4.4              85.4
+Within ±0.5 min (%)                                 7.3              96.9
+
+the same statistics per scope and stage:
       Scope              Stage   n  Median Absolute Deviation (min)  90th Percentile Absolute Error (min)  Deviation Range Min (min)  Deviation Range Max (min)  Within ±0.2 min (%)  Within ±0.5 min (%)
 All columns Before calibration 994                            6.412                                34.885                     -10.08                      65.13                  4.4                  7.3
 All columns  After calibration 994                            0.047                                 0.246                      -9.48                      16.26                 85.4                 96.9
