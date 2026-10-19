@@ -23,14 +23,13 @@ cd "$ROOT"
 codesign --force --deep --sign - "$DIST/RT Anchor.app"
 
 # 3. Stage + compressed dmg
-mkdir -p "$STAGE/Applications"
+mkdir -p "$STAGE/Applications" "$ROOT/dist/macos"   # dist/ is gitignored, so absent on a fresh checkout
 cp -R "$DIST/RT Anchor.app" "$STAGE/"
 cp "$ROOT/example/samples.txt" "$ROOT/example/standards.txt" "$STAGE/" 2>/dev/null || true
 hdiutil create -volname "RT Anchor" -srcfolder "$STAGE" -format UDZO \
     -ov "$ROOT/dist/macos/RT Anchor.dmg"
 
 # 4. Also drop the .app next to the .dmg
-mkdir -p "$ROOT/dist/macos"
 rm -rf "$ROOT/dist/macos/RT Anchor.app"
 cp -R "$DIST/RT Anchor.app" "$ROOT/dist/macos/"
 
