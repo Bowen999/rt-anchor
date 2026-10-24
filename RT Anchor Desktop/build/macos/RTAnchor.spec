@@ -105,7 +105,7 @@ app = BUNDLE(
         "LSMinimumSystemVersion": "11.0",
         "CFBundleName": "RT Anchor",
         "CFBundleDisplayName": "RT Anchor",
-        "CFBundleShortVersionString": "1.2.3",
-        "CFBundleVersion": "1.2.3",
+        "CFBundleShortVersionString": "1.2.4",
+        "CFBundleVersion": "1.2.4",
     },
 )
