@@ -39,6 +39,7 @@ from .errors import (
     ConfigError,
     InputFormatError,
     PanelError,
+    PolarityMismatchError,
     RtAnchorError,
     RTUnitError,
 )
@@ -96,4 +97,5 @@ __all__ = [
     # errors
     "RtAnchorError", "InputFormatError", "ColumnResolutionError", "RTUnitError",
     "PanelError", "AnchorIdentificationError", "CalibrationError", "ConfigError",
+    "PolarityMismatchError",
 ]

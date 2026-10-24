@@ -490,6 +490,20 @@ Guard rails to implement as clean `RtAnchorError` subclasses:
   `CalibrationError`: almost always a polarity mismatch or a wrong reference.
 * `reference_sample`/`reference_standards` supplied one without the other →
   `ConfigError`.
+* runs and reference not all in the declared polarity → `PolarityMismatchError`
+  (a `ConfigError`), raised before anything is fitted. Evidence, in order: the
+  adduct labels of the user's own tables; the bundled reference's provenance
+  `polarity`; the adduct labels of the reference tables; and, when a panel is
+  claimed, a reference standards run holding fewer than a quarter of the panel
+  standards located in the user's standards run (at least 5 located).
+* fewer than `curve_min_points` pairs and a straight line through them that is
+  flat or falling → `CalibrationError`; a `MonotoneCurve` refuses decreasing
+  knots outright. Elution order is preserved between reversed-phase columns.
+* an extrapolated `Cal_RT_min` below 0 → NaN (with `iRT`), counted in the log;
+  `is_extrapolated` stays True.
+* a reference file identical to the user's own (same path or same bytes) →
+  a logged warning and an entry in `model["warnings"]`, not an error: it is a
+  valid self-check, but `Cal_RT_min` then equals RT.
 
 **Per-injection tier** (`single_files`) is retained: each injection is
 m/z-matched against the reference *sample* run, gets its own curve, and the

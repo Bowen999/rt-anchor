@@ -106,6 +106,27 @@ class FeatureTable:
         col = self._find_col("adduct type", "adduct", "main_adduct")
         return None if col is None else self.df[col].astype(str)
 
+    def adduct_polarity(self, min_labelled: int = 10, min_share: float = 0.8) -> Optional[str]:
+        """Polarity the table's own adduct labels point to, or ``None``.
+
+        Reads the charge sign at the end of labels such as ``[M+H]+`` or
+        ``[M-H]-``. ``None`` when the table has no adduct column, fewer than
+        ``min_labelled`` signed labels, or no sign holds ``min_share`` of them —
+        the caller then has nothing to check against, not a mismatch.
+        """
+        labels = self.adducts()
+        if labels is None:
+            return None
+        sign = labels.str.strip().str.extract(r"\]\s*\d*([+-])$", expand=False).dropna()
+        if len(sign) < min_labelled:
+            return None
+        share_pos = float((sign == "+").mean())
+        if share_pos >= min_share:
+            return "positive"
+        if 1.0 - share_pos >= min_share:
+            return "negative"
+        return None
+
     def fill(self) -> Optional[pd.Series]:
         """Fraction of samples in which the feature was detected (0-1).
 

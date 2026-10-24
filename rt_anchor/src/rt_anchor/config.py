@@ -68,8 +68,9 @@ REMOVED_FIELDS = {
         "removed — the standards run is a required input of the v2 method, not a "
         "fallback for a sample whose own anchors ran out",
     "max_extrapolation_min":
-        "use extrapolate_mode ('linear' or 'clamp') — v2 always assigns a value "
-        "beyond the pair span and flags the row with is_extrapolated",
+        "use extrapolate_mode ('linear' or 'clamp') — v2 assigns a value beyond "
+        "the pair span (unless it would be negative) and flags the row with "
+        "is_extrapolated",
 }
 
 

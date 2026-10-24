@@ -255,6 +255,12 @@ class MonotoneCurve:
             raise CalibrationError(
                 f"Unknown extrapolate_mode '{mode}' (expected 'linear' or 'clamp')."
             )
+        if np.any(np.diff(uy) < 0):
+            raise CalibrationError(
+                "The retention-time curve must not decrease: elution order is "
+                "preserved between reversed-phase columns, so a curve that runs "
+                "backwards is not a calibration."
+            )
         self.mode = mode
         self.x_knots, self.y_knots = ux, uy
         self.x0, self.x1 = float(ux[0]), float(ux[-1])
@@ -345,6 +351,18 @@ def fit_robust_curve_sorted(rt_x: np.ndarray,
 
     if len(x) < min_points:
         coef = np.polyfit(x, y, 1)
+        if not coef[0] > 1e-9:
+            # Elution order is preserved between reversed-phase columns, so a map
+            # that runs backwards is not a calibration: with this few pairs it is
+            # almost always a set of false m/z matches.
+            raise CalibrationError(
+                f"Only {len(x)} matched pairs (fewer than {min_points}), and the "
+                f"straight line through them runs backwards or is flat (slope "
+                f"{coef[0]:.2f}): later on your column would not mean later on the "
+                f"reference. That is "
+                f"almost always false m/z matches — a polarity mismatch, or a "
+                f"reference from a different experiment — not a calibration."
+            )
         grid = np.linspace(x.min(), x.max(), 32)
         return MonotoneCurve(grid, np.polyval(coef, grid), mode=mode), keep, order
 

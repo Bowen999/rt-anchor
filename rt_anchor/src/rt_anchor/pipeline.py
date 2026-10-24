@@ -61,7 +61,7 @@ from .crosscolumn import (
     fit_robust_curve_sorted,
     match_features_by_mz,
 )
-from .errors import CalibrationError, ConfigError, RtAnchorError
+from .errors import CalibrationError, ConfigError, PolarityMismatchError, RtAnchorError
 from .identify import build_native_template
 from .io.loader import load_feature_table
 from .io.schema import RESULT_COLUMNS, FeatureTable
@@ -208,6 +208,10 @@ def calibrate(sample_table: str,
     log.append(f"reference: {ref.pair.label} [{ref.pair.key}] — sample "
                f"{ref.sample.n_features()} features, standards "
                f"{ref.standards.n_features()} features")
+    _check_polarity(pol, ft, std_ft, ref)
+    warns = _self_reference_warnings(sample_table, standards_table,
+                                     reference_sample, reference_standards)
+    log.extend(f"WARNING: {w}" for w in warns)
 
     panel_key, panel_manifest = _resolve_panel(panel, manifest)
     panel_obj = (None if panel_manifest is None
@@ -216,13 +220,20 @@ def calibrate(sample_table: str,
                + (f" — {len(panel_obj)} standards ionisable in {pol} mode"
                   if panel_obj is not None else " — no panel identity claimed"))
 
+    # The ruler and the detection QC do not depend on the curve. They are built
+    # first so a reference that holds none of the panel the user's standards run
+    # does (the other polarity, almost always) is refused before a curve is
+    # fitted through false pairs.
+    mapper, landmarks, panel_used, irt_reason = _build_irt(ref, panel_obj, cfg, pol,
+                                                          panel_key=panel_key)
+    qc = _detection_qc(std_ft, panel_obj, cfg)
+    _check_panel_on_reference(qc, landmarks, panel_obj, pol)
+
     # ---- stages 1 + 2 -----------------------------------------------------
     cal, anchors, stage_log = _fit_calibrator(ft, std_ft, ref, cfg)
     log.extend(stage_log)
 
     # ---- the iRT ruler ----------------------------------------------------
-    mapper, landmarks, panel_used, irt_reason = _build_irt(ref, panel_obj, cfg, pol,
-                                                          panel_key=panel_key)
     log.append(f"iRT ({panel_used}): {irt_reason}")
 
     # ---- evaluate -------------------------------------------------------—-
@@ -235,10 +246,14 @@ def calibrate(sample_table: str,
     else:
         res, n_inj = _per_project(rt, mz, cal, cfg, mapper), 0
 
+    n_neg = int(res.attrs.get("n_negative_cal_rt", 0))
+    if n_neg:
+        log.append(f"{n_neg} feature(s) extrapolated to a negative Cal_RT — "
+                   f"physically impossible, so Cal_RT_min and iRT are left empty "
+                   f"for them (is_extrapolated stays True)")
     out, colmap = _append_results(ft.df, res)
 
     # ---- detection QC (reporting only — it does not drive the calibration) -
-    qc = _detection_qc(std_ft, panel_obj, cfg)
     log.append(f"detection QC on the user's standards run: "
                f"{qc['n_detected']}/{qc['n_panel']} panel standards located "
                f"(reporting only — it does not drive the calibration)")
@@ -247,6 +262,7 @@ def calibrate(sample_table: str,
                         panel_key, panel_manifest, qc, res, cfg,
                         scope=res["calibration_scope"].iloc[0] if len(res) else "project",
                         n_injections=n_inj)
+    model["warnings"] = list(warns)
 
     result = CalibrationResult(
         table=out, anchors=anchors, pairs=_pair_frame(cal), landmarks=landmarks,
@@ -563,6 +579,9 @@ def _per_sample(rt: np.ndarray, mz: np.ndarray, single_files: Sequence[str], ref
             res["iRT"] = np.where(n_contrib > 0, np.nanmedian(irt_mat, axis=0),
                                   res["iRT"].to_numpy())
             res["RI_spread"] = _nanmad(irt_mat, axis=0)
+        # a row whose Cal_RT was refused (negative) gets no iRT from the injections either
+        refused = ~np.isfinite(res["Cal_RT_min"].to_numpy(dtype=float))
+        res.loc[refused, ["iRT", "RI_spread"]] = np.nan
     else:
         res["RI_spread"] = np.nan
     res["n_contributing"] = np.maximum(n_contrib, 1)
@@ -587,6 +606,12 @@ def _assemble(rt: np.ndarray, cal_rt: np.ndarray, unc: np.ndarray,
     unc = np.asarray(unc, dtype=float).copy()
     cal_rt[bad] = np.nan
     unc[bad] = np.nan
+    # An RT before injection does not exist: a negative Cal_RT can only come from
+    # extrapolating far past the matched pairs, so it is refused, not reported.
+    with np.errstate(invalid="ignore"):
+        negative = np.isfinite(cal_rt) & (cal_rt < 0)
+    cal_rt[negative] = np.nan
+    unc[negative] = np.nan
     extrapolated = np.asarray(extrapolated, dtype=bool).copy()
     extrapolated[bad] = False                    # unknown, not out-of-span
 
@@ -606,7 +631,7 @@ def _assemble(rt: np.ndarray, cal_rt: np.ndarray, unc: np.ndarray,
     rel[extrapolated] = "low"
     rel[~np.isfinite(np.asarray(irt, dtype=float))] = "none"
 
-    return pd.DataFrame({
+    out = pd.DataFrame({
         "Cal_RT_min": cal_rt,
         "Cal_RT_uncertainty_min": unc,
         "iRT": irt,
@@ -618,6 +643,8 @@ def _assemble(rt: np.ndarray, cal_rt: np.ndarray, unc: np.ndarray,
         "RI_spread": np.nan,
         "n_contributing": 1,
     })
+    out.attrs["n_negative_cal_rt"] = int(negative.sum())
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -663,6 +690,128 @@ def _detection_qc(std_ft: FeatureTable, panel_obj: Optional[Panel],
     info["native_rt"] = {k: float(v) for k, v in native.items()}
     info["n_detected"] = len(native)
     return info
+
+
+#: How to supply a reference pair, in words every front end can show.
+_REF_HOWTO = ("Use a reference pair acquired in {pol} mode on the reference column: in "
+              "the desktop app under Advanced → Reference sample / Reference standards; "
+              "on the command line with --reference-sample and --reference-standards.")
+
+
+def _check_polarity(pol: str, ft: FeatureTable, std_ft: FeatureTable, ref) -> None:
+    """Refuse runs that were not all acquired in the declared polarity.
+
+    m/z matching across polarities pairs unrelated molecules (an [M-H]- and an
+    [M+H]+ at the same m/z differ by 2.015 Da in neutral mass), and the curve
+    fitted through them looks plausible while being meaningless. Two sources of
+    evidence, both checked before anything is fitted: the bundled reference's
+    recorded polarity, and the adduct labels of every table that carries them.
+    A table with neither says nothing, which is not a mismatch.
+    """
+    own = {"sample table": ft, "standards run": std_ft}
+    wrong = {name: t.adduct_polarity() for name, t in own.items()}
+    wrong = {name: p for name, p in wrong.items() if p is not None and p != pol}
+    if wrong:
+        found = ", ".join(f"{name}: {p}" for name, p in wrong.items())
+        raise PolarityMismatchError(
+            f"Polarity is set to {pol}, but the adduct labels of your own runs say "
+            f"otherwise ({found}). Set the polarity to match how the data were acquired."
+        )
+
+    ref_pol = (ref.pair.provenance or {}).get("polarity")
+    if ref_pol and _norm_polarity(ref_pol) != pol:
+        raise PolarityMismatchError(
+            f"Your runs are {pol} mode, but the bundled reference '{ref.pair.label}' "
+            f"was acquired in {_norm_polarity(ref_pol)} mode. Features are paired by "
+            f"m/z, so a {pol}-mode run cannot be calibrated against it: every pair "
+            f"would be two different molecules. " + _REF_HOWTO.format(pol=pol)
+        )
+
+    theirs = {"reference sample": ref.sample, "reference standards": ref.standards}
+    wrong = {name: t.adduct_polarity() for name, t in theirs.items()}
+    wrong = {name: p for name, p in wrong.items() if p is not None and p != pol}
+    if wrong:
+        found = ", ".join(f"{name}: {p}" for name, p in wrong.items())
+        raise PolarityMismatchError(
+            f"Your runs are {pol} mode, but the reference pair's adduct labels say "
+            f"otherwise ({found}). Features are paired by m/z, so every pair would be "
+            f"two different molecules. " + _REF_HOWTO.format(pol=pol)
+        )
+
+
+#: The panel check engages only when the user's own standards run shows the panel.
+_PANEL_CHECK_MIN_DETECTED = 5
+#: ... and refuses when the reference holds less than this share of what was found.
+_PANEL_CHECK_MIN_SHARE = 0.25
+
+
+def _check_panel_on_reference(qc: Dict, landmarks: pd.DataFrame,
+                              panel_obj: Optional[Panel], pol: str) -> None:
+    """Refuse a reference that holds none of the panel the user's run plainly holds.
+
+    The backstop for tables without adduct labels or provenance (MZmine,
+    MassCube, a custom reference): the same mixture run in the same polarity
+    shows the same ions on both columns, so a reference standards run that
+    holds almost none of the standards located in the user's standards run was
+    acquired in the other polarity, or with another mixture. Skipped when no
+    panel is claimed (``panel="none"``).
+    """
+    if panel_obj is None:
+        return
+    n_user = int(qc.get("n_detected", 0))
+    n_ref = 0 if landmarks is None else int(len(landmarks))
+    if n_user >= _PANEL_CHECK_MIN_DETECTED and n_ref < _PANEL_CHECK_MIN_SHARE * n_user:
+        raise PolarityMismatchError(
+            f"{n_user} panel standards were located in your standards run as {pol} "
+            f"ions, but only {n_ref} in the reference standards run. The reference was "
+            f"almost certainly acquired in the other polarity (or with a different "
+            f"mixture), and m/z pairs between them would be false. "
+            + _REF_HOWTO.format(pol=pol)
+            + " If the reference genuinely holds a different mixture, choose the "
+              "panel 'none'."
+        )
+
+
+def _self_reference_warnings(sample_table: str, standards_table: str,
+                             reference_sample: Optional[str],
+                             reference_standards: Optional[str]) -> List[str]:
+    """Warn when a run is its own reference: the result is Cal_RT = RT.
+
+    Calibrating a run against itself is a valid self-check, which is why it is
+    a warning and not an error, but it is not a cross-column calibration, and
+    its perfect-looking output is easy to mistake for one.
+    """
+    out = []
+    for mine, ref, what in ((sample_table, reference_sample, "sample"),
+                            (standards_table, reference_standards, "standards")):
+        if ref and _same_file(mine, ref):
+            out.append(f"the reference {what} file is the same file as your own "
+                       f"{what} file, so it is calibrated onto itself and Cal_RT_min "
+                       f"equals its own RT. That is a self-check, not a cross-column "
+                       f"calibration — the reference should be a fixed pair from the "
+                       f"reference column.")
+    return out
+
+
+def _same_file(a: str, b: str) -> bool:
+    """Same path, or byte-identical content (a copy is still the same run)."""
+    import hashlib
+
+    try:
+        if os.path.samefile(a, b):
+            return True
+        if os.path.getsize(a) != os.path.getsize(b):
+            return False
+        digests = []
+        for p in (a, b):
+            h = hashlib.sha256()
+            with open(p, "rb") as fh:
+                for chunk in iter(lambda: fh.read(1 << 20), b""):
+                    h.update(chunk)
+            digests.append(h.digest())
+        return digests[0] == digests[1]
+    except (OSError, TypeError):
+        return False
 
 
 def _pair_frame(cal: Optional[ColumnCalibrator]) -> pd.DataFrame:

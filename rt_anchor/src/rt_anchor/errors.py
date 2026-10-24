@@ -16,6 +16,15 @@ class ConfigError(RtAnchorError):
     """The configuration is invalid (unknown keys, bad values)."""
 
 
+class PolarityMismatchError(ConfigError):
+    """The runs were not all acquired in the declared polarity.
+
+    The usual case is a negative-mode run calibrated against the bundled
+    reference, which is positive mode only: m/z matching then pairs unrelated
+    molecules and the curve is meaningless, so the run is refused.
+    """
+
+
 class InputFormatError(RtAnchorError):
     """The input file could not be parsed or its format could not be recognised."""
 

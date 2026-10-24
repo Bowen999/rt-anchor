@@ -44,7 +44,7 @@ Walk-through with bundled data: [`examples/quickstart.ipynb`](examples/quickstar
 | **Standards run** | standards mixture from the same column and gradient as the sample |
 | **Panel** | `mix15`, `mix21` (default) or `none` |
 | **Polarity** | `positive` or `negative` |
-| *Reference pair* (optional) | bundled `col35` by default |
+| *Reference pair* (optional) | bundled `col35` by default — **positive mode only**; a negative-mode run needs its own negative-mode reference pair |
 
 Outputs: `*_calibrated.csv` (the input table plus `Cal_RT_min`, `iRT`,
 uncertainties, reliability tier, extrapolation flag and series/lattice columns),
