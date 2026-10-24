@@ -1,3 +1,5 @@
+<img src="docs/images/logo.png" alt="RT Anchor logo" width="128" align="right">
+
 # RT Anchor
 
 **Cross-column retention-time calibration for LC-MS lipidomics.**

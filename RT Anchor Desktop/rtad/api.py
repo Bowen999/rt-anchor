@@ -48,6 +48,36 @@ def _pkg_version() -> str:
         return "unknown"
 
 
+#: Where releases are published, and the API that reports the newest one.
+RELEASES_API = "https://api.github.com/repos/Bowen999/rt-anchor/releases/latest"
+RELEASES_PAGE = "https://github.com/Bowen999/rt-anchor/releases/latest"
+RELEASES_PAGE_PREFIX = "https://github.com/Bowen999/rt-anchor/releases"
+
+
+def _version_tuple(v: str):
+    """``"1.2.4"`` / ``"v1.2.4"`` -> ``(1, 2, 4)``; ``None`` for anything else."""
+    import re
+    m = re.fullmatch(r"v?(\d+)\.(\d+)(?:\.(\d+))?", str(v).strip())
+    if not m:
+        return None
+    return tuple(int(x or 0) for x in m.groups())
+
+
+def _ssl_context():
+    """Verified TLS that also works inside a frozen bundle.
+
+    A PyInstaller build cannot see the CA file of the Python it was built with,
+    so prefer certifi's bundle when it is there and fall back to the system
+    defaults otherwise.
+    """
+    import ssl
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        return ssl.create_default_context()
+
+
 def _json_safe(obj):
     """Recursively replace NaN/inf with None so json.dump stays valid."""
     if isinstance(obj, dict):
@@ -214,6 +244,50 @@ class Api:
     def open_github(self) -> Dict:
         import webbrowser
         webbrowser.open("https://github.com/Bowen999/rt-anchor")
+        return {"ok": True}
+
+    # ---- update check ----
+    def check_for_update(self) -> Dict:
+        """Ask GitHub whether a newer release than the running one exists.
+
+        One anonymous GET to the public releases API, at most once per launch
+        (the front-end calls it after the input screen is up). Drafts and
+        pre-releases are never offered — ``releases/latest`` skips them. Every
+        failure (offline, rate limit, a proxy, a malformed tag) comes back as
+        ``ok: False`` and the UI stays silent. ``RT_ANCHOR_NO_UPDATE_CHECK=1``
+        turns the request off entirely.
+        """
+        if os.environ.get("RT_ANCHOR_NO_UPDATE_CHECK"):
+            return {"ok": False, "reason": "disabled by RT_ANCHOR_NO_UPDATE_CHECK"}
+        current = _pkg_version()
+        try:
+            import urllib.request
+            req = urllib.request.Request(RELEASES_API, headers={
+                "Accept": "application/vnd.github+json",
+                "User-Agent": f"RT-Anchor/{current}",
+            })
+            with urllib.request.urlopen(req, timeout=6, context=_ssl_context()) as fh:
+                data = json.loads(fh.read().decode("utf-8"))
+        except Exception as e:
+            return {"ok": False, "reason": f"{type(e).__name__}: {e}"}
+        latest = str(data.get("tag_name") or "").lstrip("vV")
+        newer_v, cur_v = _version_tuple(latest), _version_tuple(current)
+        if newer_v is None or cur_v is None:
+            return {"ok": False, "reason": f"unreadable version (latest {latest!r}, "
+                                           f"current {current!r})"}
+        url = str(data.get("html_url") or "")
+        if not url.startswith(RELEASES_PAGE_PREFIX):
+            url = RELEASES_PAGE
+        notes = str(data.get("body") or "").strip()
+        return {"ok": True, "current": current, "latest": latest,
+                "newer": newer_v > cur_v, "url": url,
+                "notes": notes[:600] + ("…" if len(notes) > 600 else "")}
+
+    def open_release_page(self, url: str = "") -> Dict:
+        """Open a release page of this project in the system browser — nothing else."""
+        import webbrowser
+        url = str(url or "")
+        webbrowser.open(url if url.startswith(RELEASES_PAGE_PREFIX) else RELEASES_PAGE)
         return {"ok": True}
 
     # ---- native file dialogs ----

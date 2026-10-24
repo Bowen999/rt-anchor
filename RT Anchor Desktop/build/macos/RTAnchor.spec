@@ -35,6 +35,8 @@ hiddenimports = [
     # them without help.
     "statsmodels.api", "statsmodels.nonparametric.smoothers_lowess",
     "sklearn.isotonic",
+    # the update check verifies TLS against certifi's CA bundle (rtad.api._ssl_context)
+    "certifi",
 ]
 
 # pywebview (cocoa backend) + rdkit (structure hover) + plotly (figure JSON) +

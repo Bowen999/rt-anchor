@@ -114,6 +114,16 @@ Individual exports (calibrated CSV, HTML report, run info) are also available.
 `gate_mse_reduction`, `gate_threshold`, `gate_reason`, `n_families`,
 `n_pairs_covered`, `n_features_corrected`).
 
+### Update notice
+Once per launch, after the input screen is up, the app asks GitHub's public
+releases API (`api.github.com/repos/Bowen999/rt-anchor/releases/latest`)
+whether a newer release exists. If one does, a dialog says so and offers
+**Download** (opens that release page in the browser), **Later**, and
+*Don't remind me about this version*. Drafts and pre-releases are never
+offered. It is one anonymous GET request: nothing about your data is sent, and
+every failure (offline, rate-limited, behind a proxy) is silent. Set
+`RT_ANCHOR_NO_UPDATE_CHECK=1` to turn it off.
+
 ## Run from source (dev)
 ```bash
 /opt/anaconda3/bin/python "app.py"        # macOS, needs rt_anchor installed
@@ -138,10 +148,12 @@ Shared source + per-platform build folders:
 ```
 app.py                shared entry (pywebview window + Api bridge + --selftest)
 app_win.py            Windows frozen entry (stdout/MPL/pythonnet guards, MOTW strip)
-rtad/api.py           JS-exposed API (file dialogs, run_calibration, references, export)
+rtad/api.py           JS-exposed API (file dialogs, run_calibration, references, export,
+                      update check)
 rtad/appviz.py        chart-data extraction for the app's own SVG charts
 rtad/mixtures.py      thin re-export of rt_anchor.mixtures (panels live in the engine)
-web/                  index.html · styles.css · app.js · charts.js (hand-authored SVG)
+web/                  index.html · styles.css · app.js · charts.js (hand-authored SVG) ·
+                      logo.png (from docs/images/logo.svg)
 example/              bundled demo dataset ("Load example" button)
 
 build/

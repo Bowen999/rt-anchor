@@ -71,6 +71,8 @@ const PREVIEW_API = {
             { kind: "report_html", label: "HTML report", name: "rt_anchor_run_report.html" },
             { kind: "run_info_json", label: "run info", name: "rt_anchor_run_run_info.json" }] }),
   open_github: async () => ({ ok: true }),
+  check_for_update: async () => ({ ok: false, reason: "preview" }),
+  open_release_page: async () => ({ ok: true }),
 };
 
 /* ---- toast ---- */
@@ -407,6 +409,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") hideModal();
    Ordered most-specific first; these are the v2 failure modes, in roughly the
    order they actually happen to people. */
 const ERROR_HINTS = [
+  [/PolarityMismatchError/i, "Polarity doesn't match", null],   // the engine's message says what to do
   [/must be given together|reference_sample|reference_standards/i, "Reference pair incomplete",
     "A custom reference needs BOTH runs — the reference sample and the reference standards, from " +
     "the same column and gradient. Set the other one under Advanced, or use “Reset to bundled " +
@@ -929,6 +932,39 @@ async function whenEngineReady() {
   }
 }
 
+/* ---- update notice ----
+   Once per launch, after the input screen is up, ask the backend whether GitHub
+   has a newer release. Quiet on every failure (offline, rate-limited, preview):
+   an update check must never get in the way of a calibration. */
+const UPDATE_SKIP_KEY = "rta-skip-version";
+function hideUpdate() { $("#update").classList.add("hidden"); }
+async function checkForUpdate() {
+  if (!api().check_for_update) return;
+  let r;
+  try { r = await api().check_for_update(); } catch (e) { return; }
+  if (!r || !r.ok || !r.newer) return;
+  let skipped = null;
+  try { skipped = localStorage.getItem(UPDATE_SKIP_KEY); } catch (e) { /* storage blocked */ }
+  if (skipped === r.latest) return;
+  $("#update-msg").textContent =
+    `RT Anchor ${r.latest} is available — you are running ${r.current}. ` +
+    `Download the new version from GitHub?`;
+  const notes = $("#update-notes");
+  notes.textContent = r.notes || "";
+  notes.style.display = r.notes ? "block" : "none";
+  $("#update-skip").checked = false;
+  const finish = () => {
+    if ($("#update-skip").checked) {
+      try { localStorage.setItem(UPDATE_SKIP_KEY, r.latest); } catch (e) { /* storage blocked */ }
+    }
+    hideUpdate();
+  };
+  $("#update-go").onclick = () => { if (api().open_release_page) api().open_release_page(r.url); finish(); };
+  $$("[data-update-close]").forEach(el => (el.onclick = finish));
+  $("#update").classList.remove("hidden");
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape") hideUpdate(); });
+
 async function boot_() {
   boot.say("Starting…");
   const bridged = await whenBridgeReady();
@@ -941,6 +977,7 @@ async function boot_() {
   boot.say("Loading standards panels…");
   await Promise.all([initMixtures(), initReference()]);
   boot.done();
+  if (bridged) setTimeout(checkForUpdate, 1500);
   if (!window.pywebview && window.__PREVIEW__ && window.__PREVIEW__.ok) {
     showResults(window.__PREVIEW__);
   }
