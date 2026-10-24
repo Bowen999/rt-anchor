@@ -127,8 +127,14 @@ def test_extrapolation_is_flagged_and_still_valued(qtof_samples, qtof_standards)
     assert ex.sum() > 0, "the example run must reach outside the matched-pair span"
     # the flag says exactly "outside the pair span" (NaN RT is not out-of-span)
     assert np.array_equal(ex, ((rt < x0) | (rt > x1)) & np.isfinite(rt))
-    # v2 assigns a value anyway (extrapolate defaults to True) ...
-    assert np.isfinite(cal[ex]).all()
+    # v2 assigns a value anyway (extrapolate defaults to True), except where the
+    # extrapolation lands before injection: a negative Cal_RT is refused (NaN) ...
+    mz = res.table[res.mz_col].to_numpy(dtype=float)
+    raw = res.calibrator.predict(rt, mz=mz)
+    refused = ex & (raw < 0)
+    assert np.isfinite(cal[ex & ~refused]).all()
+    assert np.isnan(cal[refused]).all()
+    assert (rt[refused] < x0).all(), "only the void end can extrapolate below zero"
     # ... and never calls it reliable
     rel = res.table[res.col("iRT_reliability")].to_numpy()[ex]
     assert set(rel) <= {"low", "none"}

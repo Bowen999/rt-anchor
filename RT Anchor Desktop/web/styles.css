@@ -58,6 +58,8 @@ button{font-family:inherit;cursor:pointer;color:inherit;}
 .view-input{display:grid;place-items:center;overflow:auto;padding:56px 24px;background:var(--bg);}
 .input-wrap{width:100%;max-width:660px;}
 .brand{margin-bottom:34px;padding-bottom:26px;border-bottom:1px solid var(--line);}
+.brand-id{display:flex;align-items:center;gap:16px;}
+.brand-logo{width:64px;height:64px;flex:none;}
 .wordmark{font-size:44px;line-height:1;color:var(--ink);}
 .wordmark span{color:var(--accent);margin-left:.14em;}
 .btn-example{margin-top:22px;background:var(--card);border:1px solid var(--line-2);color:var(--ink-2);
@@ -200,7 +202,8 @@ button{font-family:inherit;cursor:pointer;color:inherit;}
 /* ---- sidebar: light, hairline-separated ---- */
 .sidebar{background:var(--card);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:22px 0 16px;}
 .side-head{padding:0 20px 18px;margin-bottom:6px;border-bottom:1px solid var(--line);}
-.side-brand{font-size:21px;color:var(--ink);}
+.side-brand{font-size:21px;color:var(--ink);display:flex;align-items:center;}
+.side-logo{width:34px;height:34px;margin-right:9px;flex:none;}
 .side-brand span{color:var(--accent);}
 .side-sub{margin-top:6px;font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;
   text-transform:uppercase;color:var(--faint);font-weight:600;}
@@ -385,6 +388,14 @@ button{font-family:inherit;cursor:pointer;color:inherit;}
 .modal-ok{background:var(--accent);color:#FFF;border:none;border-radius:var(--r-sm);padding:11px 22px;
   font-weight:650;font-size:13px;transition:background .15s;}
 .modal-ok:hover{background:var(--accent-d);}
+/* the update notice: same card, informational (blue) instead of error (brick) */
+.modal-info .modal-bar{background:var(--accent-soft);border-bottom-color:var(--accent-ring);}
+.modal-info .modal-tag,.modal-info .modal-x{color:var(--accent);}
+.modal-actions{gap:10px;}
+.modal-later{background:var(--card);color:var(--ink-2);border:1px solid var(--line-2);border-radius:var(--r-sm);
+  padding:11px 18px;font-weight:600;font-size:13px;transition:.15s;}
+.modal-later:hover{border-color:var(--accent);color:var(--accent-d);}
+.update-skip{display:flex;align-items:center;gap:8px;margin:14px 22px 0;font-size:12.5px;color:var(--dim);cursor:pointer;}
 
 /* toast */
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(16px);

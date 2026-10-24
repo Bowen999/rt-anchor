@@ -140,7 +140,7 @@ pip install "rt-anchor[report,structures]"   # + HTML/PDF report and structure h
 | **Standards run** | The standards mixture, **from the same column and gradient as the sample**. Same formats. | yes |
 | **Panel** | `mix15` (15-standard Caley mix), `mix21` (Mix 4.4, default), or `none`. | yes |
 | **Polarity** | `positive` or `negative`. | yes |
-| **Reference pair** | The reference sample + standards runs. Defaults to the bundled **35-minute column** dataset. | no |
+| **Reference pair** | The reference sample + standards runs. Defaults to the bundled **35-minute column** dataset, which is **positive mode only**: a negative-mode run needs a negative-mode reference pair (see below). | no |
 
 The same-column requirement is the one assumption the method rests on: the
 standards run is what tells us how *your* time axis maps onto the reference
@@ -187,13 +187,24 @@ Both must be given together. Outputs then live on *that* column's axis and are
 no longer comparable with default-reference runs — the model JSON records which
 reference was used, so a result can always be traced back to its axis.
 
+The reference pair must be acquired in the **same polarity** as your runs.
+Features are paired by m/z alone, and an [M-H]⁻ and an [M+H]⁺ at the same m/z
+are two different molecules, so a cross-polarity calibration is meaningless
+while looking plausible. It is refused with a `PolarityMismatchError`, judged
+from the bundled reference's recorded polarity, the adduct labels of any table
+that carries them, and — as a backstop — whether the reference standards run
+holds the panel standards your own standards run does. The reference is a
+fixed pair from the reference column, not your own files: a run given as its
+own reference is calibrated onto itself (`Cal_RT_min` = RT), which is logged as
+a warning and listed under `warnings` in the model JSON.
+
 ## Output
 
 **`*_calibrated.csv`** — your original table with these columns appended:
 
 | Column | Meaning |
 |---|---|
-| `Cal_RT_min` | RT on the reference column's minute scale |
+| `Cal_RT_min` | RT on the reference column's minute scale; empty where extrapolation would give a negative RT (counted in the log) |
 | `Cal_RT_uncertainty_min` | 1σ, from the local scatter of the matched pairs about the curve, combined with the anchor LOO error |
 | `iRT` | dimensionless 1–100 retention index |
 | `iRT_uncertainty` | 1σ of `iRT` |

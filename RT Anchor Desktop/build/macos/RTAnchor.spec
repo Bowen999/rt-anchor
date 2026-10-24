@@ -35,6 +35,8 @@ hiddenimports = [
     # them without help.
     "statsmodels.api", "statsmodels.nonparametric.smoothers_lowess",
     "sklearn.isotonic",
+    # the update check verifies TLS against certifi's CA bundle (rtad.api._ssl_context)
+    "certifi",
 ]
 
 # pywebview (cocoa backend) + rdkit (structure hover) + plotly (figure JSON) +
@@ -103,7 +105,7 @@ app = BUNDLE(
         "LSMinimumSystemVersion": "11.0",
         "CFBundleName": "RT Anchor",
         "CFBundleDisplayName": "RT Anchor",
-        "CFBundleShortVersionString": "1.2.3",
-        "CFBundleVersion": "1.2.3",
+        "CFBundleShortVersionString": "1.2.4",
+        "CFBundleVersion": "1.2.4",
     },
 )

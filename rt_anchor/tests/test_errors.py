@@ -15,6 +15,7 @@ from rt_anchor.errors import (
     ConfigError,
     InputFormatError,
     PanelError,
+    PolarityMismatchError,
     RtAnchorError,
     RTUnitError,
 )
@@ -67,27 +68,17 @@ def test_no_features_at_all_raises(tmp_path):
         calibrate(str(p), "positive", standards_table=str(p))
 
 
-def test_negative_run_against_the_positive_reference_loses_the_irt_ruler(
-        lipidscreener_neg):
+def test_negative_run_against_the_positive_reference_is_refused(lipidscreener_neg):
     """A negative-mode run against the positive-mode bundled reference.
 
-    Honest about a real limit: enough m/z collide by chance (196 pairs here) that
-    the <5-pairs guard rail does NOT fire, so the mismatch is not refused. What
-    does happen is that the negative-mode panel adducts are absent from the
-    positive reference standards run, fewer than 2 landmarks are found, and §4
-    takes over — iRT is NaN everywhere with reliability "none", while Cal_RT is
-    still produced. The evidence is in the model: the curve's median absolute
-    pair residual is minutes rather than the ~0.1 min a genuine cross-column fit
-    gives.
+    Enough m/z collide by chance (196 pairs here) that the <5-pairs guard rail
+    does not fire, and the run used to produce a curve through pairs that
+    were all two different molecules. The bundled reference records its
+    polarity, so the mismatch is now refused before anything is fitted.
     """
-    res = calibrate(lipidscreener_neg, "negative", standards_table=lipidscreener_neg,
-                    panel="mix21")
-    assert res.irt is None
-    assert res.values("iRT").isna().all()
-    assert (res.table[res.col("iRT_reliability")] == "none").all()
-    assert res.values("Cal_RT_min").notna().any()      # Cal_RT is independent
-    assert "landmark" in res.model["irt"]["reason"]
-    assert res.model["curve"]["residual_min"]["median_abs"] > 0.5
+    with pytest.raises(PolarityMismatchError):
+        calibrate(lipidscreener_neg, "negative", standards_table=lipidscreener_neg,
+                  panel="mix21")
 
 
 # ------------------------------------------------------- panel / polarity -----

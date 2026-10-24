@@ -14,6 +14,7 @@
         color:#2B2B2B;font:14px/1.55 "Inter",-apple-system,"Segoe UI",Arial,sans-serif;
         transition:opacity .32s ease;}
   #boot.gone{opacity:0;pointer-events:none;}
+  #boot .blogo{width:96px;height:96px;}
   #boot .bw{font-weight:800;letter-spacing:-.045em;font-size:26px;color:#2B2B2B;}
   #boot .bw span{color:#2B5D7D;}
   #boot .bmsg{color:#4D4D4D;min-height:1.5em;text-align:center;max-width:30em;padding:0 24px;}
@@ -58,6 +59,7 @@
      without this the window appeared blank-then-half-populated and read as a
      hang. Dismissed by bootGate() in app.js. -->
 <div id="boot">
+  <img class="blogo" src="logo.png" alt="">
   <div class="bw">RT<span>ANCHOR</span></div>
   <div class="bbar" role="progressbar" aria-valuetext="Starting"><i></i></div>
   <div class="bmsg" id="boot-msg">Starting…</div>
@@ -68,7 +70,7 @@
 <section id="view-input" class="view view-input">
   <div class="input-wrap">
     <header class="brand">
-      <div class="wordmark">RT<span>ANCHOR</span></div>
+      <div class="brand-id"><img class="brand-logo" src="logo.png" alt=""><div class="wordmark">RT<span>ANCHOR</span></div></div>
       <button type="button" class="btn-example" id="load-example">↓ Load example dataset</button>
     </header>
 
@@ -221,7 +223,7 @@
 <section id="view-output" class="view view-output hidden">
   <aside class="sidebar">
     <div class="side-head">
-      <div class="side-brand">RT<span>ANCHOR</span></div>
+      <div class="side-brand"><img class="side-logo" src="logo.png" alt="">RT<span>ANCHOR</span></div>
       <div class="side-sub">cross-column calibration</div>
     </div>
     <nav class="nav" id="nav"></nav>
@@ -254,6 +256,25 @@
     <div class="modal-msg" id="modal-msg"></div>
     <div class="modal-detail" id="modal-detail"></div>
     <div class="modal-actions"><button class="modal-ok" id="modal-ok">Dismiss</button></div>
+  </div>
+</div>
+
+<!-- ============================ UPDATE NOTICE ========================= -->
+<div id="update" class="modal modal-info hidden">
+  <div class="modal-backdrop" data-update-close></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="update-title">
+    <div class="modal-bar">
+      <span class="modal-tag">Update available</span>
+      <button class="modal-x" data-update-close aria-label="Close">✕</button>
+    </div>
+    <h2 class="modal-title" id="update-title">A new version of RT Anchor is available</h2>
+    <div class="modal-msg" id="update-msg"></div>
+    <div class="modal-detail" id="update-notes"></div>
+    <label class="update-skip"><input type="checkbox" id="update-skip"> Don't remind me about this version</label>
+    <div class="modal-actions">
+      <button class="modal-later" id="update-later" data-update-close>Later</button>
+      <button class="modal-ok" id="update-go">Download</button>
+    </div>
   </div>
 </div>
 
