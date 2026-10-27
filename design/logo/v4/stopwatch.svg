@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>RT Anchor - stopwatch logo</title>
+  <g transform="translate(512 546)">
+    <!-- crown: stem + rounded button at 12 -->
+    <g fill="#141414">
+      <rect x="-28" y="-426" width="56" height="54"/>
+      <rect x="-78" y="-480" width="156" height="54" rx="22"/>
+    </g>
+    <!-- side pusher at 1:30 -->
+    <g fill="#141414" transform="rotate(45)">
+      <rect x="-18" y="-416" width="36" height="44"/>
+      <rect x="-48" y="-456" width="96" height="40" rx="16"/>
+    </g>
+    <!-- dial face and ring -->
+    <circle r="361" fill="#FFFFFF" stroke="#141414" stroke-width="62"/>
+    <!-- 12 hour markers, set inside the ring -->
+    <g stroke="#141414" stroke-linecap="round" fill="#141414">
+      <line x1="0" y1="-301" x2="0" y2="-283" stroke-width="26"/>
+      <circle cx="0" cy="-304" r="10" stroke="none" transform="rotate(30)"/>
+      <circle cx="0" cy="-304" r="10" stroke="none" transform="rotate(60)"/>
+      <line x1="0" y1="-301" x2="0" y2="-283" stroke-width="26" transform="rotate(90)"/>
+      <circle cx="0" cy="-304" r="10" stroke="none" transform="rotate(120)"/>
+      <circle cx="0" cy="-304" r="10" stroke="none" transform="rotate(150)"/>
+      <line x1="0" y1="-301" x2="0" y2="-283" stroke-width="26" transform="rotate(180)"/>
+      <circle cx="0" cy="-304" r="10" stroke="none" transform="rotate(210)"/>
+      <circle cx="0" cy="-304" r="10" stroke="none" transform="rotate(240)"/>
+      <line x1="0" y1="-301" x2="0" y2="-283" stroke-width="26" transform="rotate(270)"/>
+      <circle cx="0" cy="-304" r="10" stroke="none" transform="rotate(300)"/>
+      <circle cx="0" cy="-304" r="10" stroke="none" transform="rotate(330)"/>
+    </g>
+    <!-- minute hand -->
+    <g fill="#141414" transform="rotate(330)">
+      <path d="M -17 0 L -11 -271 A 11 11 0 0 1 11 -271 L 17 0 Z"/>
+    </g>
+    <!-- anchor = hour hand; ring of the anchor is the pivot -->
+    <g transform="rotate(-68) scale(0.84)">
+      <g fill="none" stroke="#141414" stroke-linejoin="round">
+        <circle cx="0" cy="0" r="46" stroke-width="52"/>
+        <line x1="0" y1="52" x2="0" y2="292" stroke-width="66"/>
+        <line x1="-62" y1="98" x2="62" y2="98" stroke-width="54" stroke-linecap="round"/>
+        <path d="M -96 188 A 96 96 0 0 0 96 188" stroke-width="64"/>
+        <path d="M -140 196 L -52 196 L -122 112 Z M 52 196 L 140 196 L 122 112 Z" fill="#141414" stroke-width="22"/>
+      </g>
+      <g fill="none" stroke="#C8F031">
+        <circle cx="0" cy="0" r="46" stroke-width="30"/>
+        <line x1="0" y1="52" x2="0" y2="292" stroke-width="44"/>
+        <line x1="-62" y1="98" x2="62" y2="98" stroke-width="32" stroke-linecap="round"/>
+        <path d="M -96 188 A 96 96 0 0 0 96 188" stroke-width="42"/>
+        <path d="M -140 196 L -52 196 L -122 112 Z M 52 196 L 140 196 L 122 112 Z" fill="#C8F031" stroke="none"/>
+      </g>
+    </g>
+    <!-- pivot cap -->
+    <circle r="21" fill="#141414" stroke="#FFFFFF" stroke-width="9"/>
+    <!-- band: gentle descent to the lower right, carries the name -->
+    <g transform="translate(0 258) rotate(9)">
+      <rect x="-446" y="-78" width="892" height="156" fill="#FFFFFF"/>
+      <rect x="-440" y="-72" width="880" height="144" fill="#2B1B5A"/>
+      <text x="-2" y="35" text-anchor="middle" fill="#C8F031"
+            font-family="Futura, 'Avenir Next', 'Helvetica Neue', Arial, sans-serif"
+            font-weight="800" font-size="94" letter-spacing="0.06em">RT ANCHOR</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>RT Anchor - draft 3, mascot anchor (circle)</title>
+  <defs>
+    <!-- background: deep navy edges, brighter blue centre -->
+    <radialGradient id="bg" cx="512" cy="470" r="620" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1f52cc"/>
+      <stop offset="0.5" stop-color="#0f3191"/>
+      <stop offset="1" stop-color="#050f34"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="512" cy="470" r="470" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9ad8ff" stop-opacity="0.95"/>
+      <stop offset="0.4" stop-color="#4f95ff" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#2f6bff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="640" x2="0" y2="1024" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8fc4ff" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#8fc4ff" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- anchor body: white at the top to soft blue at the flukes -->
+    <linearGradient id="body" x1="0" y1="110" x2="0" y2="890" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.38" stop-color="#eaf3ff"/>
+      <stop offset="0.72" stop-color="#b6d3ff"/>
+      <stop offset="1" stop-color="#7aa5f2"/>
+    </linearGradient>
+    <linearGradient id="faceG" x1="0" y1="215" x2="0" y2="462" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#d3e4ff"/>
+    </linearGradient>
+    <!-- inset look: dark lip at the top, light lip at the bottom -->
+    <linearGradient id="inset" x1="0" y1="205" x2="0" y2="470" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4c82e6"/>
+      <stop offset="0.5" stop-color="#9cc0f6"/>
+      <stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+    <linearGradient id="eyeG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c3f9c"/>
+      <stop offset="1" stop-color="#071a52"/>
+    </linearGradient>
+
+    <filter id="blur18" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="18"/></filter>
+    <filter id="blur8" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="8"/></filter>
+    <!-- bevel: bright rim on the top-left edge, soft shade on the bottom-right edge -->
+    <filter id="bevel" filterUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024" color-interpolation-filters="sRGB">
+      <feOffset in="SourceAlpha" dx="5" dy="8" result="a1"/>
+      <feComposite in="SourceAlpha" in2="a1" operator="out" result="rimTL"/>
+      <feGaussianBlur in="rimTL" stdDeviation="2" result="rimTLb"/>
+      <feFlood flood-color="#ffffff"/>
+      <feComposite in2="rimTLb" operator="in" result="hi"/>
+      <feComposite in="hi" in2="SourceAlpha" operator="in" result="hiC"/>
+      <feOffset in="SourceAlpha" dx="-7" dy="-12" result="a2"/>
+      <feComposite in="SourceAlpha" in2="a2" operator="out" result="rimBR"/>
+      <feGaussianBlur in="rimBR" stdDeviation="7" result="rimBRb"/>
+      <feFlood flood-color="#3b6fe0" flood-opacity="0.8"/>
+      <feComposite in2="rimBRb" operator="in" result="sh"/>
+      <feComposite in="sh" in2="SourceAlpha" operator="in" result="shC"/>
+      <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="shC"/><feMergeNode in="hiC"/></feMerge>
+    </filter>
+
+    <clipPath id="icon"><circle cx="512" cy="512" r="512"/></clipPath>
+
+    <!-- the anchor silhouette, no paint set here: <use> supplies fill + stroke -->
+    <g id="anchorShape">
+      <rect x="480" y="124" width="64" height="26" rx="13"/>                 <!-- crown cap -->
+      <rect x="499" y="146" width="26" height="44"/>                         <!-- crown stem -->
+      <rect x="-18" y="-22" width="36" height="44" rx="8" transform="translate(636 214) rotate(45)"/> <!-- side button -->
+      <circle cx="512" cy="338" r="158"/>                                    <!-- stopwatch bezel = anchor ring -->
+      <rect x="482" y="470" width="60" height="340"/>                        <!-- shank -->
+      <rect x="402" y="552" width="220" height="40" rx="20"/>                <!-- stock -->
+      <path d="M 271.7 557.6 A 244 244 0 1 0 752.3 557.6 L 705 566 A 196 196 0 1 1 319 566 Z"/> <!-- arms -->
+      <path d="M 226 556 L 352 574 L 262 484 Z"/>                            <!-- left fluke -->
+      <path d="M 798 556 L 672 574 L 762 484 Z"/>                            <!-- right fluke -->
+    </g>
+  </defs>
+
+  <g clip-path="url(#icon)">
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <circle cx="512" cy="480" r="470" fill="url(#glow)"/>
+
+    <!-- bokeh specks -->
+    <g fill="#bfe0ff">
+      <circle cx="238" cy="236" r="7" opacity="0.35"/>
+      <circle cx="800" cy="210" r="5" opacity="0.4"/>
+      <circle cx="858" cy="372" r="9" opacity="0.2"/>
+      <circle cx="170" cy="452" r="5" opacity="0.3"/>
+    </g>
+
+    <!-- faint chromatogram "water line" behind the anchor -->
+    <path d="M -20 742 L 20 742 C 47.5 742 45 682 70 682 C 95 682 92.5 742 120 742 L 144 742 C 169.3 742 167 617 190 617 C 213 617 210.7 742 236 742 L 292 742 C 312.9 742 311 702 330 702 C 349 702 347.1 742 368 742 L 486 742 C 504.7 742 503 714 520 714 C 537 714 535.3 742 554 742 L 660 742 C 682 742 680 692 700 692 C 720 692 718 742 740 742 L 792 742 C 818.4 742 816 612 840 612 C 864 612 861.6 742 888 742 L 908 742 C 931.1 742 929 667 950 667 C 971 667 968.9 742 992 742 L 1044 742 L 1044 1030 L -20 1030 Z" fill="url(#water)"/>
+    <path d="M -20 742 L 20 742 C 47.5 742 45 682 70 682 C 95 682 92.5 742 120 742 L 144 742 C 169.3 742 167 617 190 617 C 213 617 210.7 742 236 742 L 292 742 C 312.9 742 311 702 330 702 C 349 702 347.1 742 368 742 L 486 742 C 504.7 742 503 714 520 714 C 537 714 535.3 742 554 742 L 660 742 C 682 742 680 692 700 692 C 720 692 718 742 740 742 L 792 742 C 818.4 742 816 612 840 612 C 864 612 861.6 742 888 742 L 908 742 C 931.1 742 929 667 950 667 C 971 667 968.9 742 992 742 L 1044 742"
+          fill="none" stroke="#a8d2ff" stroke-opacity="0.38" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+
+    <!-- hero: same anchor, scaled to sit well inside the circle -->
+    <g transform="translate(512 514) scale(0.93) translate(-512 -497)">
+      <!-- anchor: shadow, then bevelled body -->
+      <use xlink:href="#anchorShape" fill="#020a2e" stroke="#020a2e" stroke-width="16" stroke-linejoin="round" opacity="0.5" transform="translate(0 28)" filter="url(#blur18)"/>
+      <g filter="url(#bevel)">
+        <use xlink:href="#anchorShape" fill="url(#body)" stroke="url(#body)" stroke-width="16" stroke-linejoin="round"/>
+      </g>
+
+      <!-- cylinder shine on the shank -->
+      <path d="M 497 520 L 497 770" stroke="#ffffff" stroke-opacity="0.65" stroke-width="9" stroke-linecap="round"/>
+      <path d="M 535 520 L 535 770" stroke="#4f86e8" stroke-opacity="0.22" stroke-width="9" stroke-linecap="round"/>
+      <!-- gloss streak on the arms -->
+      <path d="M 300 650 A 220 220 0 0 0 392 782" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="9" stroke-linecap="round"/>
+
+      <!-- stopwatch face -->
+      <circle cx="512" cy="338" r="132" fill="none" stroke="#46c8ff" stroke-width="12" opacity="0.8" filter="url(#blur8)"/>
+      <circle cx="512" cy="338" r="126" fill="url(#faceG)" stroke="url(#inset)" stroke-width="10"/>
+      <circle cx="512" cy="338" r="131" fill="none" stroke="#5fd0ff" stroke-width="4" opacity="0.9"/>
+      <g stroke="#9fbdf0" stroke-width="8" stroke-linecap="round">
+        <path d="M 512 226 L 512 240"/><path d="M 512 436 L 512 450"/>
+        <path d="M 400 338 L 414 338"/><path d="M 610 338 L 624 338"/>
+      </g>
+      <!-- eyes -->
+      <ellipse cx="470" cy="378" rx="17" ry="30" fill="url(#eyeG)"/>
+      <ellipse cx="554" cy="378" rx="17" ry="30" fill="url(#eyeG)"/>
+      <circle cx="465" cy="365" r="5.5" fill="#ffffff" opacity="0.85"/>
+      <circle cx="549" cy="365" r="5.5" fill="#ffffff" opacity="0.85"/>
+      <!-- single stopwatch hand, about 2 o'clock -->
+      <path d="M 512 326 L 592 280" stroke="#1d43a6" stroke-width="16" stroke-linecap="round"/>
+      <circle cx="512" cy="326" r="15" fill="#1d43a6"/>
+      <circle cx="512" cy="326" r="5.5" fill="#bcd6ff"/>
+    </g>
+
+    <!-- icon sheen and edge -->
+    <ellipse cx="512" cy="-110" rx="600" ry="420" fill="url(#sheen)"/>
+    <circle cx="512" cy="512" r="509" fill="none" stroke="#ffffff" stroke-opacity="0.14" stroke-width="6"/>
+    <circle cx="512" cy="512" r="478" fill="none" stroke="#9ad0ff" stroke-opacity="0.12" stroke-width="3"/>
+  </g>
+</svg>

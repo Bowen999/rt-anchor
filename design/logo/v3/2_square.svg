@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>RT Anchor - Anchor hand (rounded square)</title>
+
+  <!-- frame: very thick rounded square (side 700, stroke 84 = 12%, radius 168 = 24%) -->
+  <rect x="162" y="162" width="700" height="700" rx="168" ry="168" fill="none" stroke="#0A0A0A" stroke-width="84"/>
+
+  <!-- ticks at 12 / 3 / 6 / 9 -->
+  <g fill="#0A0A0A">
+    <rect x="497" y="196" width="30" height="46"/>
+    <rect x="497" y="782" width="30" height="46"/>
+    <rect x="782" y="497" width="46" height="30"/>
+    <rect x="196" y="497" width="46" height="30"/>
+  </g>
+
+  <!-- anchor hand, pivot at (512,512), pointing to 5 o'clock -->
+  <g transform="translate(512 512) rotate(-30)">
+    <!-- black outline layer -->
+    <g fill="none" stroke="#0A0A0A" stroke-linejoin="round">
+      <circle cx="0" cy="0" r="46" stroke-width="52"/>
+      <line x1="0" y1="52" x2="0" y2="292" stroke-width="66"/>
+      <line x1="-62" y1="98" x2="62" y2="98" stroke-width="54" stroke-linecap="round"/>
+      <path d="M -96 188 A 96 96 0 0 0 96 188" stroke-width="64"/>
+      <path d="M -140 196 L -52 196 L -122 112 Z M 52 196 L 140 196 L 122 112 Z" fill="#0A0A0A" stroke-width="22"/>
+    </g>
+    <!-- lime fill layer -->
+    <g fill="none" stroke="#C8F031">
+      <circle cx="0" cy="0" r="46" stroke-width="30"/>
+      <line x1="0" y1="52" x2="0" y2="292" stroke-width="44"/>
+      <line x1="-62" y1="98" x2="62" y2="98" stroke-width="32" stroke-linecap="round"/>
+      <path d="M -96 188 A 96 96 0 0 0 96 188" stroke-width="42"/>
+      <path d="M -140 196 L -52 196 L -122 112 Z M 52 196 L 140 196 L 122 112 Z" fill="#C8F031" stroke="none"/>
+    </g>
+  </g>
+
+  <!-- band: descends to the lower right at 13 deg, upper third, sticks out past the frame -->
+  <g transform="translate(512 330) rotate(13)">
+    <rect x="-440" y="-66" width="880" height="132" fill="#2B1B5A"/>
+    <text x="0" y="30" text-anchor="middle" fill="#C8F031"
+          font-family="Futura, 'Avenir Next', 'Helvetica Neue', Arial, sans-serif"
+          font-weight="800" font-size="86" letter-spacing="0.06em">RT ANCHOR</text>
+  </g>
+
+  <!-- centre pivot: black dot with white ring -->
+  <circle cx="512" cy="512" r="21" fill="#0A0A0A" stroke="#FFFFFF" stroke-width="10"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>RT Anchor - concept B, anchored to the peak (circle)</title>
+  <circle cx="512" cy="512" r="512" fill="#F5F1E8"/>
+  <path d="M171.8 477 L221.8 477 C276 472.6 268.9 365.7 310.1 365.7 C349.8 365.7 348.7 473.8 392.1 473.8 C456.8 473.8 454.6 285.4 512 285.4 C534.6 285.4 543.9 303.7 567.1 373.5 C583.8 423.6 599.9 470.8 625.5 470.8 C669.5 470.8 671.2 334.8 715.9 334.8 C764.8 334.8 753.4 472.2 819.6 477 L852.2 477" fill="none" stroke="#7FA88B" stroke-width="22.7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="512" cy="512" r="342" fill="none" stroke="#1E2B33" stroke-width="30.9"/>
+  <path d="M512 324.5V771.6M456.4 512H567.6M291.9 649.5A259.6 259.6 0 0 0 732.1 649.5" fill="none" stroke="#1E2B33" stroke-width="30.9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M272.7 661.6L266.8 609.4L311.1 637.5ZM751.3 661.6L757.2 609.4L712.9 637.5Z" fill="#1E2B33" stroke="#1E2B33" stroke-width="16.5" stroke-linejoin="round"/>
+  <circle cx="512" cy="285.4" r="39.1" fill="#F5F1E8" stroke="#1E2B33" stroke-width="30.9"/>
+  <circle cx="512" cy="285.4" r="16.5" fill="#E8794A"/>
+</svg>

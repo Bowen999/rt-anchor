@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>RT Anchor - draft 1 Dial (circle)</title>
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="0.25" y2="1"><stop offset="0" stop-color="#FFFCF3"/><stop offset="1" stop-color="#EBE0C9"/></linearGradient>
+    <radialGradient id="bodyR" cx="0.4" cy="0.28" r="0.85"><stop offset="0" stop-color="#FFFDF6"/><stop offset="1" stop-color="#E9DDC5"/></radialGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#FFFFFF" stop-opacity="0"/><stop offset="1" stop-color="#BFAE8A"/></linearGradient>
+    <linearGradient id="gloss" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="320"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".7"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+    <linearGradient id="recessA" x1="0.2" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#C9BCA0"/><stop offset="1" stop-color="#FFFFFF"/></linearGradient>
+    <linearGradient id="recessB" x1="0.2" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#9F937B"/><stop offset="1" stop-color="#F3EBD8"/></linearGradient>
+    <radialGradient id="face" cx="0.42" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFEFB"/><stop offset="1" stop-color="#F0E9D9"/></radialGradient>
+    <linearGradient id="faceGloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".55"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+    <linearGradient id="ink" gradientUnits="userSpaceOnUse" x1="-120" y1="0" x2="120" y2="240"><stop offset="0" stop-color="#5B5F69"/><stop offset="1" stop-color="#1F2125"/></linearGradient>
+    <linearGradient id="lcd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#46474B"/><stop offset="1" stop-color="#1C1C1F"/></linearGradient>
+    <radialGradient id="led" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#FFD08A"/><stop offset=".55" stop-color="#F58A2C"/><stop offset="1" stop-color="#D9660F"/></radialGradient>
+    <radialGradient id="hole" cx="0.5" cy="0.4" r="0.7"><stop offset="0" stop-color="#8A7F6A"/><stop offset="1" stop-color="#5E5546"/></radialGradient>
+    <filter id="blur8" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="9"/></filter>
+    <filter id="blur4" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="9" stdDeviation="7" flood-color="#3A2E18" flood-opacity=".38"/></filter>
+    <clipPath id="faceClip"><circle r="334"/></clipPath>
+    <path id="p16" d="M-14 -243 C-9 -246 -7 -262 0 -262 C7 -262 9 -246 14 -243 Z"/>
+    <path id="p32" d="M-14 -243 C-9 -246 -7 -278 0 -278 C7 -278 9 -246 14 -243 Z"/>
+    <path id="p52" d="M-14 -243 C-9 -246 -7 -298 0 -298 C7 -298 9 -246 14 -243 Z"/>
+    <path id="p74" d="M-14 -243 C-9 -246 -7 -320 0 -320 C7 -320 9 -246 14 -243 Z"/>
+    <clipPath id="bodyClip"><circle cx="512" cy="512" r="512"/></clipPath>
+  </defs>
+  <!-- warm off-white plastic badge -->
+  <circle cx="512" cy="512" r="512" fill="url(#bodyR)"/>
+  <ellipse cx="512" cy="-120" rx="620" ry="400" fill="url(#gloss)" clip-path="url(#bodyClip)"/>
+  <circle cx="512" cy="512" r="505" fill="none" stroke="url(#rim)" stroke-width="14"/>
+  <!-- recomposed: pill display on top, speaker dots below, dial centred -->
+  <rect x="402" y="50" width="220" height="68" rx="34.0" fill="url(#lcd)"/>
+  <rect x="405" y="53" width="214" height="62" rx="31.0" fill="none" stroke="#FFFFFF" stroke-opacity=".14" stroke-width="2"/>
+  <text x="478" y="100.0" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="46" letter-spacing="6" fill="#F6F1E4">RT</text>
+  <circle cx="574" cy="84.0" r="22" fill="#F58A2C" opacity=".5" filter="url(#blur4)"/>
+  <circle cx="574" cy="84.0" r="13" fill="url(#led)"/>
+  <circle cx="444" cy="904" r="10" fill="#FFFFFF" opacity=".85" transform="translate(0 3)"/><circle cx="444" cy="904" r="10" fill="url(#hole)"/>
+  <circle cx="478" cy="904" r="10" fill="#FFFFFF" opacity=".85" transform="translate(0 3)"/><circle cx="478" cy="904" r="10" fill="url(#hole)"/>
+  <circle cx="512" cy="904" r="10" fill="#FFFFFF" opacity=".85" transform="translate(0 3)"/><circle cx="512" cy="904" r="10" fill="url(#hole)"/>
+  <circle cx="546" cy="904" r="10" fill="#FFFFFF" opacity=".85" transform="translate(0 3)"/><circle cx="546" cy="904" r="10" fill="url(#hole)"/>
+  <circle cx="580" cy="904" r="10" fill="#FFFFFF" opacity=".85" transform="translate(0 3)"/><circle cx="580" cy="904" r="10" fill="url(#hole)"/>
+  <circle cx="461" cy="936" r="10" fill="#FFFFFF" opacity=".85" transform="translate(0 3)"/><circle cx="461" cy="936" r="10" fill="url(#hole)"/>
+  <circle cx="495" cy="936" r="10" fill="#FFFFFF" opacity=".85" transform="translate(0 3)"/><circle cx="495" cy="936" r="10" fill="url(#hole)"/>
+  <circle cx="529" cy="936" r="10" fill="#FFFFFF" opacity=".85" transform="translate(0 3)"/><circle cx="529" cy="936" r="10" fill="url(#hole)"/>
+  <circle cx="563" cy="936" r="10" fill="#FFFFFF" opacity=".85" transform="translate(0 3)"/><circle cx="563" cy="936" r="10" fill="url(#hole)"/>
+  <g transform="translate(512 508) scale(.965)">
+    <circle r="358" fill="url(#recessA)"/>
+    <circle r="346" fill="url(#recessB)"/>
+    <circle r="334" fill="url(#face)"/>
+    <g clip-path="url(#faceClip)"><circle r="346" fill="none" stroke="#6B5D44" stroke-opacity=".38" stroke-width="24" filter="url(#blur8)" transform="translate(0 9)"/></g>
+    <circle r="246" fill="none" stroke="#D3C9B3" stroke-width="4"/>
+    <g fill="#8F8571">
+      <use xlink:href="#p16" transform="rotate(0)"/><use xlink:href="#p16" transform="rotate(10)"/><use xlink:href="#p32" transform="rotate(20)"/><use xlink:href="#p16" transform="rotate(30)"/>
+      <use xlink:href="#p32" transform="rotate(40)"/><use xlink:href="#p32" transform="rotate(60)"/><use xlink:href="#p16" transform="rotate(70)"/><use xlink:href="#p16" transform="rotate(80)"/>
+      <use xlink:href="#p32" transform="rotate(90)"/><use xlink:href="#p32" transform="rotate(110)"/><use xlink:href="#p16" transform="rotate(120)"/><use xlink:href="#p16" transform="rotate(130)"/>
+      <use xlink:href="#p32" transform="rotate(140)"/><use xlink:href="#p32" transform="rotate(180)"/><use xlink:href="#p16" transform="rotate(190)"/><use xlink:href="#p16" transform="rotate(200)"/>
+      <use xlink:href="#p32" transform="rotate(210)"/><use xlink:href="#p32" transform="rotate(230)"/><use xlink:href="#p16" transform="rotate(240)"/><use xlink:href="#p16" transform="rotate(250)"/>
+      <use xlink:href="#p32" transform="rotate(260)"/><use xlink:href="#p16" transform="rotate(270)"/><use xlink:href="#p16" transform="rotate(280)"/><use xlink:href="#p32" transform="rotate(290)"/>
+      <use xlink:href="#p16" transform="rotate(300)"/><use xlink:href="#p16" transform="rotate(310)"/><use xlink:href="#p16" transform="rotate(320)"/><use xlink:href="#p16" transform="rotate(330)"/>
+      <use xlink:href="#p16" transform="rotate(340)"/><use xlink:href="#p16" transform="rotate(350)"/>
+    </g>
+    <g fill="#6FAF5C">
+      <use xlink:href="#p52" transform="rotate(50)"/><use xlink:href="#p74" transform="rotate(100)"/><use xlink:href="#p52" transform="rotate(150)"/><use xlink:href="#p74" transform="rotate(160)"/>
+      <use xlink:href="#p52" transform="rotate(170)"/><use xlink:href="#p52" transform="rotate(220)"/>
+    </g>
+    <ellipse cx="0" cy="-190" rx="250" ry="130" fill="url(#faceGloss)" clip-path="url(#faceClip)" opacity=".6"/>
+    <!-- anchor hand: ring on the pivot, shaft and arms pointing at the tall green peak (160 deg) -->
+    <g filter="url(#shadow)"><g transform="rotate(-20) scale(1.02)">
+      <g fill="url(#ink)" stroke="none">
+        <rect x="-13" y="30" width="26" height="204" rx="9"/>
+        <rect x="-58" y="66" width="116" height="24" rx="12"/>
+        <polygon points="-104,100 -140,162 -68,162"/>
+        <polygon points="104,100 140,162 68,162"/>
+      </g>
+      <path d="M-104 146 C-100 208 -52 230 0 230 C52 230 100 208 104 146" fill="none" stroke="url(#ink)" stroke-width="26" stroke-linecap="round"/>
+      <circle r="28" fill="none" stroke="url(#ink)" stroke-width="20"/>
+      <rect x="-7" y="46" width="4" height="172" rx="2" fill="#FFFFFF" opacity=".2"/>
+    </g></g>
+    <circle r="12" fill="url(#led)" stroke="#2A2C31" stroke-width="3"/>
+  </g>
+</svg>

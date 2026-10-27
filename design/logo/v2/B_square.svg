@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>RT Anchor - concept B, anchored to the peak (square)</title>
+  <rect width="1024" height="1024" rx="230" fill="#F5F1E8"/>
+  <path d="M181.7 478 L230.2 478 C282.9 473.7 276 370 316 370 C354.5 370 353.5 474.9 395.6 474.9 C458.4 474.9 456.2 292 512 292 C533.9 292 543 309.7 565.5 377.5 C581.7 426.2 597.3 472 622.2 472 C664.9 472 666.6 340 710 340 C757.4 340 746.3 473.3 810.7 478 L842.3 478" fill="none" stroke="#7FA88B" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="512" cy="512" r="332" fill="none" stroke="#1E2B33" stroke-width="30"/>
+  <path d="M512 330V764M458 512H566M298.3 645.5A252 252 0 0 0 725.7 645.5" fill="none" stroke="#1E2B33" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M279.6 657.2L273.9 606.5L316.9 633.9ZM744.4 657.2L750.1 606.5L707.1 633.9Z" fill="#1E2B33" stroke="#1E2B33" stroke-width="16" stroke-linejoin="round"/>
+  <circle cx="512" cy="292" r="38" fill="#F5F1E8" stroke="#1E2B33" stroke-width="30"/>
+  <circle cx="512" cy="292" r="16" fill="#E8794A"/>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>RT Anchor - draft 1, peak through the frame (rounded square)</title>
+  <!-- chromatogram peak (Gaussian spike); its tip meets the inner edge of the frame -->
+  <path fill="#FF5A1F" d="M382.0 724.0 L382.0 724.0 L385.0 724.0 L388.0 724.0 L391.0 723.9 L394.0 723.9 L397.0 723.8 L400.0 723.7 L403.0 723.6 L406.0 723.4 L409.0 723.2 L412.0 722.8 L415.0 722.3 L418.0 721.6 L421.0 720.6 L424.0 719.3 L427.0 717.7 L430.0 715.5 L433.0 712.6 L436.0 709.0 L439.0 704.4 L442.0 698.7 L445.0 691.8 L448.0 683.3 L451.0 673.1 L454.0 661.1 L457.0 647.0 L460.0 630.8 L463.0 612.4 L466.0 591.8 L469.0 569.1 L472.0 544.4 L475.0 517.9 L478.0 490.1 L481.0 461.4 L484.0 432.2 L487.0 403.3 L490.0 375.3 L493.0 348.8 L496.0 324.7 L499.0 303.5 L502.0 285.8 L505.0 272.4 L508.0 263.4 L511.0 259.3 L514.0 260.1 L517.0 265.9 L520.0 276.4 L523.0 291.3 L526.0 310.1 L529.0 332.4 L532.0 357.4 L535.0 384.5 L538.0 412.9 L541.0 442.0 L544.0 471.0 L547.0 499.5 L550.0 526.9 L553.0 552.8 L556.0 576.9 L559.0 598.9 L562.0 618.8 L565.0 636.5 L568.0 651.9 L571.0 665.3 L574.0 676.7 L577.0 686.3 L580.0 694.2 L583.0 700.8 L586.0 706.1 L589.0 710.3 L592.0 713.6 L595.0 716.3 L598.0 718.3 L601.0 719.8 L604.0 721.0 L607.0 721.8 L610.0 722.5 L613.0 722.9 L616.0 723.3 L619.0 723.5 L622.0 723.7 L625.0 723.8 L628.0 723.8 L631.0 723.9 L634.0 723.9 L637.0 724.0 L640.0 724.0 L642.0 724.0 L642.0 724.0 Z"/>
+  <!-- baseline spanning the lower interior -->
+  <rect x="240" y="711" width="544" height="26" fill="#000000"/>
+  <!-- rounded-square frame: outer side 684, stroke 89 (13%), outer corner radius 152 (22%) -->
+  <rect x="214.5" y="214.5" width="595" height="595" rx="107.5" ry="107.5" fill="none" stroke="#000000" stroke-width="89"/>
+  <!-- band: 8 degrees, rising to the upper left, a little below centre -->
+  <g transform="rotate(8 512 565)">
+    <rect x="62" y="490" width="900" height="150" fill="#2A2FD4"/>
+    <text x="509" y="606" text-anchor="middle" font-family="Futura, 'Avenir Next', 'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="104" letter-spacing="12" fill="#FFFFFF">RT ANCHOR</text>
+  </g>
+  <!-- anchor dot at the tip -->
+  <circle cx="512" cy="259" r="17" fill="#FFFFFF"/>
+</svg>

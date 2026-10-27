@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>RT Anchor - Two hands, pinned (circle)</title>
+  <defs>
+    <!-- Cuts a 14-unit gap above and below the band (band spans y 650-800) so ring and band stay distinct on a transparent background -->
+    <clipPath id="ringCut">
+      <path clip-rule="evenodd" d="M0 0H1024V1024H0Z M0 636H1024V814H0Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Frame: very thick circle ring (outer r 400, stroke 64) -->
+  <circle cx="512" cy="512" r="368" fill="none" stroke="#141414" stroke-width="64" clip-path="url(#ringCut)"/>
+
+  <!-- Hands: black outlines first so the two hands fuse into one fork at the pivot -->
+  <g transform="translate(512 428)" fill="#141414" stroke="#141414" stroke-width="26" stroke-linejoin="round">
+    <path transform="rotate(-25)" d="M-27 0L-16 -188A16 16 0 0 1 16 -188L27 0Z"/>
+    <path transform="rotate(25)" d="M-27 0L-16 -122A16 16 0 0 1 16 -122L27 0Z"/>
+  </g>
+  <!-- Long hand coral, short hand yellow -->
+  <g transform="translate(512 428)">
+    <path transform="rotate(-25)" fill="#FF4D3D" d="M-27 0L-16 -188A16 16 0 0 1 16 -188L27 0Z"/>
+    <path transform="rotate(25)" fill="#FFC21A" d="M-27 0L-16 -122A16 16 0 0 1 16 -122L27 0Z"/>
+  </g>
+
+  <!-- Anchor stub: shank + small curved crossbar arc with pointed flukes -->
+  <rect x="494" y="440" width="36" height="140" rx="7" fill="#141414"/>
+  <path d="M442 520A70 62 0 0 0 582 520" fill="none" stroke="#141414" stroke-width="30"/>
+  <path d="M427 520H457L436 480ZM567 520H597L588 480Z" fill="#141414"/>
+
+  <!-- Pivot: black dot with a small ring -->
+  <circle cx="512" cy="428" r="48" fill="#141414"/>
+  <circle cx="512" cy="428" r="31" fill="none" stroke="#FFC21A" stroke-width="8"/>
+
+  <!-- Band: level, notched ribbon tails, sticks out past the ring on both sides -->
+  <path d="M56 650H968L920 725L968 800H56L104 725Z" fill="#141414"/>
+  <text x="516" y="761" text-anchor="middle" fill="#FFC21A" font-family="Futura, 'Avenir Next', 'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="100" letter-spacing="8">RT ANCHOR</text>
+</svg>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>RT Anchor - Two hands, pinned (rounded square)</title>
+  <defs>
+    <!-- Cuts a 14-unit gap above and below the band (band spans y 650-800) so frame and band stay distinct on a transparent background -->
+    <clipPath id="frameCut">
+      <path clip-rule="evenodd" d="M0 0H1024V1024H0Z M0 636H1024V814H0Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Frame: very thick rounded-square outline (outer side 780, corner radius 172 = 22%, stroke 64) -->
+  <rect x="154" y="154" width="716" height="716" rx="140" ry="140" fill="none" stroke="#141414" stroke-width="64" clip-path="url(#frameCut)"/>
+
+  <!-- Hands: black outlines first so the two hands fuse into one fork at the pivot -->
+  <g transform="translate(512 432)" fill="#141414" stroke="#141414" stroke-width="28" stroke-linejoin="round">
+    <path transform="rotate(-25)" d="M-29 0L-17 -197A17 17 0 0 1 17 -197L29 0Z"/>
+    <path transform="rotate(25)" d="M-29 0L-17 -128A17 17 0 0 1 17 -128L29 0Z"/>
+  </g>
+  <!-- Long hand coral, short hand yellow -->
+  <g transform="translate(512 432)">
+    <path transform="rotate(-25)" fill="#FF4D3D" d="M-29 0L-17 -197A17 17 0 0 1 17 -197L29 0Z"/>
+    <path transform="rotate(25)" fill="#FFC21A" d="M-29 0L-17 -128A17 17 0 0 1 17 -128L29 0Z"/>
+  </g>
+
+  <!-- Anchor stub: shank + small curved crossbar arc with pointed flukes -->
+  <rect x="493" y="444" width="38" height="140" rx="7" fill="#141414"/>
+  <path d="M436 526A76 58 0 0 0 588 526" fill="none" stroke="#141414" stroke-width="30"/>
+  <path d="M421 526H451L430 484ZM573 526H603L594 484Z" fill="#141414"/>
+
+  <!-- Pivot: black dot with a small ring -->
+  <circle cx="512" cy="432" r="52" fill="#141414"/>
+  <circle cx="512" cy="432" r="34" fill="none" stroke="#FFC21A" stroke-width="8"/>
+
+  <!-- Band: level, notched ribbon tails, sticks out past the frame on both sides -->
+  <path d="M56 650H968L920 725L968 800H56L104 725Z" fill="#141414"/>
+  <text x="516" y="761" text-anchor="middle" fill="#FFC21A" font-family="Futura, 'Avenir Next', 'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="100" letter-spacing="8">RT ANCHOR</text>
+</svg>

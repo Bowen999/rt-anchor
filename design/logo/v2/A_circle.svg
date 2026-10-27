@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>RT Anchor - minimal dial (circle)</title>
+  <circle cx="512" cy="512" r="512" fill="#F5F1E8"/>
+  <g transform="translate(512 512)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle r="319.2" fill="#EFEBE2" stroke="#1E2B33" stroke-width="32"/>
+    <path id="ticks-minor" d="M135.6 -234.9L127.6 -221M234.9 -135.6L221 -127.6M234.9 135.6L221 127.6M135.6 234.9L127.6 221M-135.6 234.9L-127.6 221M-234.9 135.6L-221 127.6M-234.9 -135.6L-221 -127.6M-135.6 -234.9L-127.6 -221" stroke="#CFC7B8" stroke-width="16"/>
+    <path id="ticks-major" d="M0 -264.2L0 -246.2M264.2 0L246.2 0M0 264.2L0 246.2M-264.2 0L-246.2 0" stroke="#1E2B33" stroke-width="30"/>
+    <path id="peak" d="M51.3 116.8H59.8C92.9 116.8 81.9 37 114.9 37C148 37 137 116.8 170 116.8H178.6" fill="none" stroke="#7FA88B" stroke-width="28"/>
+    <g id="anchor" transform="rotate(30)" stroke="#1E2B33" stroke-width="32">
+      <circle r="46"/>
+      <path d="M0 46V188.1M-47.5 98.8H47.5"/>
+      <path d="M-135.3 130.7A188.1 188.1 0 0 0 135.3 130.7"/>
+      <path d="M-141.8 136.9L-118.5 114.4L-165.4 103.6ZM141.8 136.9L118.5 114.4L165.4 103.6Z" fill="#1E2B33" stroke-width="14"/>
+    </g>
+    <circle r="15" fill="#E8794A" stroke="none"/>
+  </g>
+</svg>

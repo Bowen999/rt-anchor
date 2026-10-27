@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>RT Anchor - draft 2, Handheld (square)</title>
+  <defs>
+    <!-- plastic body -->
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff6552"/>
+      <stop offset=".45" stop-color="#ee2a2d"/>
+      <stop offset="1" stop-color="#b3111e"/>
+    </linearGradient>
+    <linearGradient id="bevel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".75"/>
+      <stop offset=".22" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".78" stop-color="#3a0006" stop-opacity="0"/>
+      <stop offset="1" stop-color="#3a0006" stop-opacity=".6"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".4"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="clipBody"><rect width="1024" height="1024" rx="230"/></clipPath>
+
+    <!-- screen -->
+    <linearGradient id="well" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7d0915"/>
+      <stop offset="1" stop-color="#b3121f"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d2a38"/>
+      <stop offset="1" stop-color="#081822"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".5" r=".6">
+      <stop offset="0" stop-color="#1c6a68" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#1c6a68" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="lcd" width="8" height="8" patternUnits="userSpaceOnUse">
+      <path d="M8 0V8M0 8H8" stroke="#02121a" stroke-opacity=".34" stroke-width="2"/>
+    </pattern>
+    <clipPath id="clipScreen"><rect x="144" y="140" width="736" height="350" rx="44"/></clipPath>
+    <filter id="inner" x="-10%" y="-10%" width="120%" height="120%">
+      <feFlood flood-color="#000" flood-opacity=".75"/>
+      <feComposite in2="SourceAlpha" operator="out"/>
+      <feGaussianBlur stdDeviation="12"/>
+      <feOffset dy="10" result="sh"/>
+      <feComposite in="sh" in2="SourceAlpha" operator="in" result="sh2"/>
+      <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="sh2"/></feMerge>
+    </filter>
+    <filter id="neon" x="-10%" y="-30%" width="120%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- button -->
+    <linearGradient id="ring" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fffaf0"/>
+      <stop offset="1" stop-color="#d3c6b8"/>
+    </linearGradient>
+    <radialGradient id="cap" cx=".5" cy=".3" r=".8">
+      <stop offset="0" stop-color="#86e0ff"/>
+      <stop offset=".5" stop-color="#2290f7"/>
+      <stop offset="1" stop-color="#0a49be"/>
+    </radialGradient>
+    <radialGradient id="capLow" cx=".5" cy="1.05" r=".6">
+      <stop offset="0" stop-color="#6ff0ff" stop-opacity=".7"/>
+      <stop offset="1" stop-color="#6ff0ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="capGloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".85"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="cream" gradientUnits="userSpaceOnUse" x1="0" y1="680" x2="0" y2="890">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f3dfc2"/>
+    </linearGradient>
+    <filter id="drop" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#2a0006" flood-opacity=".55"/>
+    </filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="3"/></filter>
+
+    <!-- anchor (stroke/fill colour comes from <use>) -->
+    <g id="anc" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="512" cy="708" r="19" fill="none" stroke-width="16"/>
+      <path d="M512 727V874" fill="none" stroke-width="18"/>
+      <path d="M470 757H554" fill="none" stroke-width="16"/>
+      <path d="M428 800C432 856 474 878 512 878S592 856 596 800" fill="none" stroke-width="18"/>
+      <path d="M424 772L396 814L448 820Z" stroke-width="8"/>
+      <path d="M600 772L628 814L576 820Z" stroke-width="8"/>
+    </g>
+
+    <!-- LEDs -->
+    <radialGradient id="ledY" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fff7b8"/><stop offset=".5" stop-color="#ffd02a"/><stop offset="1" stop-color="#c78a00"/></radialGradient>
+    <radialGradient id="ledG" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#d4ffd9"/><stop offset=".5" stop-color="#3ddc6f"/><stop offset="1" stop-color="#0d8f3d"/></radialGradient>
+    <radialGradient id="ledC" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#e2f9ff"/><stop offset=".5" stop-color="#58cfff"/><stop offset="1" stop-color="#1678c8"/></radialGradient>
+  </defs>
+
+  <!-- body -->
+  <rect width="1024" height="1024" rx="230" fill="url(#body)"/>
+  <g clip-path="url(#clipBody)">
+    <ellipse cx="512" cy="-60" rx="640" ry="360" fill="url(#gloss)"/>
+  </g>
+  <rect x="5" y="5" width="1014" height="1014" rx="225" fill="none" stroke="url(#bevel)" stroke-width="10"/>
+
+  <!-- seam -->
+  <path d="M110 562H914" stroke="#8f0a16" stroke-opacity=".55" stroke-width="6" stroke-linecap="round"/>
+  <path d="M110 569H914" stroke="#fff" stroke-opacity=".28" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- screen well + screen -->
+  <rect x="104" y="106" width="816" height="430" rx="76" fill="#ff8a78" opacity=".55"/>
+  <rect x="104" y="100" width="816" height="430" rx="76" fill="url(#well)"/>
+  <g filter="url(#inner)">
+    <rect x="144" y="140" width="736" height="350" rx="44" fill="url(#glass)"/>
+  </g>
+  <g clip-path="url(#clipScreen)">
+    <rect x="144" y="140" width="736" height="350" fill="url(#glow)"/>
+    <!-- alignment lines -->
+    <path d="M360 158V466M530 158V466M700 158V466" stroke="#e8fff6" stroke-opacity=".8" stroke-width="6" stroke-dasharray="12 10"/>
+    <!-- reference trace (top) -->
+    <path filter="url(#neon)" fill="none" stroke="#7dffb4" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"
+      d="M170 295H221C239.7 295 241.4 259 255 259C268.6 259 270.3 295 289 295H314C339.3 295 341.6 200 360 200C378.4 200 380.7 295 406 295H478C506.6 295 509.2 180 530 180C550.8 180 553.4 295 582 295H654C679.3 295 681.6 220 700 220C718.4 220 720.7 295 746 295H777C792.4 295 793.8 267 805 267C816.2 267 817.6 295 833 295H856"/>
+    <!-- sample trace (bottom) -->
+    <path filter="url(#neon)" fill="none" stroke="#ffc94d" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"
+      d="M170 455H221C239.7 455 241.4 427 255 427C268.6 427 270.3 455 289 455H314C339.3 455 341.6 385 360 385C378.4 385 380.7 455 406 455H478C506.6 455 509.2 360 530 360C550.8 360 553.4 455 582 455H654C679.3 455 681.6 350 700 350C718.4 350 720.7 455 746 455H777C792.4 455 793.8 435 805 435C816.2 435 817.6 455 833 455H856"/>
+    <!-- apex nodes -->
+    <g fill="#fff">
+      <circle cx="360" cy="200" r="10"/><circle cx="530" cy="180" r="10"/><circle cx="700" cy="220" r="10"/>
+      <circle cx="360" cy="385" r="10"/><circle cx="530" cy="360" r="10"/><circle cx="700" cy="350" r="10"/>
+    </g>
+    <!-- time-axis ticks -->
+    <path d="M190 473H850" stroke="#7dffb4" stroke-opacity=".5" stroke-width="9" stroke-dasharray="3 37"/>
+    <!-- LCD dot grid + glass reflection -->
+    <rect x="144" y="140" width="736" height="350" fill="url(#lcd)"/>
+    <path d="M144 140H600L420 490H144Z" fill="#fff" opacity=".07"/>
+  </g>
+
+  <!-- LEDs -->
+  <g>
+    <g transform="translate(150 618)"><circle r="24" fill="#ff8a78" opacity=".5" cy="3"/><circle r="23" fill="#7a0a15"/><circle r="17" fill="url(#ledY)"/><ellipse cx="-5" cy="-7" rx="7" ry="4" fill="#fff" opacity=".8"/></g>
+    <g transform="translate(212 618)"><circle r="24" fill="#ff8a78" opacity=".5" cy="3"/><circle r="23" fill="#7a0a15"/><circle r="17" fill="url(#ledG)"/><ellipse cx="-5" cy="-7" rx="7" ry="4" fill="#fff" opacity=".8"/></g>
+    <g transform="translate(274 618)"><circle r="24" fill="#ff8a78" opacity=".5" cy="3"/><circle r="23" fill="#7a0a15"/><circle r="17" fill="url(#ledC)"/><ellipse cx="-5" cy="-7" rx="7" ry="4" fill="#fff" opacity=".8"/></g>
+  </g>
+  <!-- speaker slits -->
+  <g stroke-linecap="round" stroke-width="14">
+    <path d="M770 606H874M770 632H874M770 658H874" stroke="#ff8a78" stroke-opacity=".5" transform="translate(0 3)"/>
+    <path d="M770 606H874M770 632H874M770 658H874" stroke="#7a0a15"/>
+  </g>
+
+  <!-- hero anchor button -->
+  <g filter="url(#drop)">
+    <circle cx="512" cy="792" r="196" fill="#ff8a78" opacity=".5" transform="translate(0 6)"/>
+    <circle cx="512" cy="792" r="196" fill="#7a0a15"/>
+  </g>
+  <g filter="url(#drop)">
+    <circle cx="512" cy="792" r="178" fill="url(#ring)"/>
+  </g>
+  <circle cx="512" cy="792" r="152" fill="#0a3a9a"/>
+  <circle cx="512" cy="792" r="148" fill="url(#cap)"/>
+  <circle cx="512" cy="792" r="148" fill="url(#capLow)"/>
+  <ellipse cx="512" cy="722" rx="104" ry="58" fill="url(#capGloss)" opacity=".7"/>
+  <!-- embossed anchor -->
+  <g transform="translate(512 794) scale(1.1) translate(-512 -785)">
+    <use xlink:href="#anc" fill="#0a3a9a" stroke="#0a3a9a" opacity=".5" transform="translate(0 7)" filter="url(#soft)"/>
+    <use xlink:href="#anc" fill="#ffffff" stroke="#ffffff" opacity=".6" transform="translate(0 -3)"/>
+    <use xlink:href="#anc" fill="url(#cream)" stroke="url(#cream)"/>
+  </g>
+</svg>
