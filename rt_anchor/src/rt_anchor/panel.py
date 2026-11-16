@@ -53,6 +53,8 @@ def adduct_mz(exact_mass: float, adduct: str) -> Optional[float]:
 
 # ---- default 15-standard panel (Caley_RT lipid RT-calibration mix) ----
 # columns: name, class, exact_mass, adduct_pos, adduct_neg, rt_ref_min, endogenous, void
+# DG / CE adduct_neg = "ND": DGs ionise very poorly in negative ESI ([M+HCOO]- is
+# >1000x weaker than [M+NH4]+ in positive), so they are positive-only standards.
 _DEFAULT_ROWS = [
     ("PC 6:0_6:0",   "PC", 453.249150, "[M+H]+",   "[M+HCOO]-",  1.06, False, True),
     ("PC 9:0_9:0",   "PC", 537.343055, "[M+H]+",   "[M+HCOO]-",  1.81, False, True),
@@ -65,8 +67,8 @@ _DEFAULT_ROWS = [
     ("PC 16:0_18:1", "PC", 759.577806, "[M+H]+",   "[M+HCOO]-",  8.40, True,  False),
     ("PC 18:0_18:1", "PC", 787.609106, "[M+H]+",   "[M+HCOO]-",  9.79, True,  False),
     ("PC 18:0_18:0", "PC", 789.624756, "[M+H]+",   "[M+HCOO]-", 11.07, True,  False),
-    ("DG 16:0_18:0", "DG", 596.537976, "[M+NH4]+", "[M+HCOO]-", 12.65, True,  False),
-    ("DG 18:0_18:0", "DG", 624.569276, "[M+NH4]+", "[M+HCOO]-", 14.99, True,  False),
+    ("DG 16:0_18:0", "DG", 596.537976, "[M+NH4]+", "ND",        12.65, True,  False),
+    ("DG 18:0_18:0", "DG", 624.569276, "[M+NH4]+", "ND",        14.99, True,  False),
     ("CE 20:5",      "CE", 670.568881, "[M+NH4]+", "ND",        17.37, False, False),
     ("CE 18:1",      "CE", 650.600181, "[M+NH4]+", "ND",        18.39, False, False),
 ]

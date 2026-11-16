@@ -1,0 +1,86 @@
+name: Build macOS desktop app
+
+# Builds the RT Anchor desktop app (RT Anchor Desktop/) for macOS arm64 with the
+# same script a developer runs locally, build/macos/build_mac.sh, smoke-tests
+# the frozen app, and on a v* tag attaches the dmg to that tag's GitHub Release.
+# Pull requests and manual runs build + upload a workflow artifact only.
+#
+# NOTE: the app is AD-HOC signed (codesign --sign -), exactly like the script
+# does locally. There is no Developer ID signing and no notarization here, so
+# users still need right-click -> Open on first launch.
+
+on:
+  push:
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write          # required to upload assets to the Release
+
+jobs:
+  macos:
+    runs-on: macos-latest  # Apple silicon (arm64)
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # pip-only env, same philosophy as the Windows build (no conda/MKL).
+      # build_mac.sh would use /opt/anaconda3 by default; PYTHON overrides it.
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip wheel setuptools
+          python -m pip install "./rt_anchor[report,app]" "pyinstaller>=6.3"
+          python -m pip install rdkit || echo "::warning::rdkit did not install - structure hover disabled"
+          python -m pip uninstall -y pathlib || true   # the backport breaks PyInstaller
+
+      - name: Build (PyInstaller + ad-hoc codesign + dmg)
+        env:
+          PYTHON: python
+        run: bash "RT Anchor Desktop/build/macos/build_mac.sh"
+
+      - name: Self-test the frozen app
+        run: |
+          # --selftest prints SELFTEST_OK/SELFTEST_FAIL and exits 0/1; no window opens
+          app="RT Anchor Desktop/dist/macos/RT Anchor.app/Contents/MacOS/RT Anchor"
+          test -x "$app"
+          set +e
+          "$app" --selftest 2>&1 | tee selftest.log
+          rc=${PIPESTATUS[0]}
+          set -e
+          if [ "$rc" -ne 0 ] || ! grep -q '^SELFTEST_OK' selftest.log; then
+            echo "selftest failed (exit code $rc)"; exit 1
+          fi
+          echo 'selftest passed'
+
+      - name: Verify the dmg
+        run: hdiutil verify "RT Anchor Desktop/dist/macos/RT Anchor.dmg"
+
+      - name: Name the dmg + checksum
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then ver="${GITHUB_REF_NAME#v}"; else ver="dev-${GITHUB_SHA:0:7}"; fi
+          name="RT-Anchor-${ver}-macOS-arm64.dmg"
+          mv "RT Anchor Desktop/dist/macos/RT Anchor.dmg" "$name"
+          shasum -a 256 "$name" | cut -d' ' -f1 | tee "$name.sha256.txt"
+          echo "ASSET=$name" >> "$GITHUB_ENV"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rt-anchor-macos
+          path: |
+            RT-Anchor-*-macOS-arm64.dmg
+            RT-Anchor-*-macOS-arm64.dmg.sha256.txt
+
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ env.ASSET }}
+            ${{ env.ASSET }}.sha256.txt
+          fail_on_unmatched_files: true

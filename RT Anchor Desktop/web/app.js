@@ -44,7 +44,7 @@ const PREVIEW_API = {
              { name: "PC 12:0_12:0", class: "PC", mz_pos: 622.4448, mz_neg: 666.4362, rt_ref_min: 3.6 },
              { name: "PC 14:0_14:0", class: "PC", mz_pos: 678.5069, mz_neg: 722.4983, rt_ref_min: 5.63 },
              { name: "PC 16:0_18:1", class: "PC", mz_pos: 760.5856, mz_neg: 804.5766, rt_ref_min: 8.4 },
-             { name: "DG 16:0_18:0", class: "DG", mz_pos: 614.5723, mz_neg: 641.5367, rt_ref_min: 12.65 },
+             { name: "DG 16:0_18:0", class: "DG", mz_pos: 614.5723, mz_neg: null, rt_ref_min: 12.65 },
              { name: "CE 18:1", class: "CE", mz_pos: 668.6345, mz_neg: null, rt_ref_min: 18.39 }] },
     { key: "mix21", label: "21", sub: "Li lab 21 lipids mixture", n_standards: 21,
       rows: [{ name: "PC 6:0_6:0", class: "PC", mz_pos: 454.2561, mz_neg: 498.2474, rt_ref_min: 1.5 },
@@ -52,7 +52,7 @@ const PREVIEW_API = {
              { name: "PC 12:0_12:0", class: "PC", mz_pos: 622.444, mz_neg: 666.4352, rt_ref_min: 6.8 },
              { name: "PC 14:0_16:0", class: "PC", mz_pos: 706.5381, mz_neg: 750.5291, rt_ref_min: 11.1 },
              { name: "PC 16:0_18:1", class: "PC", mz_pos: 760.5846, mz_neg: 804.576, rt_ref_min: 12.9 },
-             { name: "DG 18:0_18:0", class: "DG", mz_pos: 642.6031, mz_neg: 669.5675, rt_ref_min: 18.0 },
+             { name: "DG 18:0_18:0", class: "DG", mz_pos: 642.6031, mz_neg: null, rt_ref_min: 18.0 },
              { name: "CE 20:5", class: "CE", mz_pos: 688.6027, mz_neg: null, rt_ref_min: 20.5 },
              { name: "TG 18:0_18:2_18:0", class: "TG", mz_pos: 904.8328, mz_neg: null, rt_ref_min: 21.8 }] },
     { key: "none", label: "Others", sub: "other mixtures", n_standards: 0, rows: [] },
@@ -73,6 +73,13 @@ const PREVIEW_API = {
   open_github: async () => ({ ok: true }),
   check_for_update: async () => ({ ok: false, reason: "preview" }),
   open_release_page: async () => ({ ok: true }),
+  /* browser preview only: no Python side, so the skip lives in localStorage */
+  get_skipped_version: async () => {
+    try { return localStorage.getItem("rta-skip-version"); } catch (e) { return null; }
+  },
+  set_skipped_version: async (tag) => {
+    try { localStorage.setItem("rta-skip-version", tag); return true; } catch (e) { return false; }
+  },
 };
 
 /* ---- toast ---- */
@@ -936,7 +943,9 @@ async function whenEngineReady() {
    Once per launch, after the input screen is up, ask the backend whether GitHub
    has a newer release. Quiet on every failure (offline, rate-limited, preview):
    an update check must never get in the way of a calibration. */
-const UPDATE_SKIP_KEY = "rta-skip-version";
+/* The skipped tag is stored by the Python side (a JSON file in the per-user
+   app-data folder): pywebview runs in private mode, so localStorage would be
+   wiped on every launch. */
 function hideUpdate() { $("#update").classList.add("hidden"); }
 async function checkForUpdate() {
   if (!api().check_for_update) return;
@@ -944,7 +953,8 @@ async function checkForUpdate() {
   try { r = await api().check_for_update(); } catch (e) { return; }
   if (!r || !r.ok || !r.newer) return;
   let skipped = null;
-  try { skipped = localStorage.getItem(UPDATE_SKIP_KEY); } catch (e) { /* storage blocked */ }
+  try { skipped = api().get_skipped_version ? await api().get_skipped_version() : null; }
+  catch (e) { /* unreadable: treat as not skipped */ }
   if (skipped === r.latest) return;
   $("#update-msg").textContent =
     `RT Anchor ${r.latest} is available — you are running ${r.current}. ` +
@@ -955,7 +965,8 @@ async function checkForUpdate() {
   $("#update-skip").checked = false;
   const finish = () => {
     if ($("#update-skip").checked) {
-      try { localStorage.setItem(UPDATE_SKIP_KEY, r.latest); } catch (e) { /* storage blocked */ }
+      try { if (api().set_skipped_version) api().set_skipped_version(r.latest); }
+      catch (e) { /* not saved: the notice will simply show again */ }
     }
     hideUpdate();
   };

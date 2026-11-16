@@ -3,11 +3,13 @@ name: Build Windows desktop app
 # Builds the RT Anchor desktop app (RT Anchor Desktop/) for Windows with the
 # same script a developer runs locally, build/windows/build_win.bat, smoke-tests
 # the frozen exe, and on a v* tag attaches the zip to that tag's GitHub Release.
-# Manual runs (workflow_dispatch) build + upload a workflow artifact only.
+# Pull requests and manual runs (workflow_dispatch) build + upload a workflow
+# artifact only.
 
 on:
   push:
     tags: ['v*']
+  pull_request:
   workflow_dispatch:
 
 permissions:
