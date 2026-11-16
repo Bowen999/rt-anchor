@@ -118,6 +118,36 @@ LAMBDA_GRID = np.round(np.arange(0, 1.05, 0.1), 2)
 
 PAIR_COLUMNS = ["idx_a", "idx_b", "mz_a", "rt_a", "rt_b"]
 
+
+# ---------------------------------------------------------------------------
+# Deterministic ordering
+#
+# Retention times and m/z values are heavily tied (hundreds of matched pairs
+# share one RT after rounding to the scan grid; features repeat an exact m/z),
+# and the order in which tied rows are visited decides which candidate wins an
+# m/z match (``_best_match``), which pairs fall in a sigma window, which side of
+# a LOESS neighbourhood a point lands on, and so which pairs survive MAD
+# trimming. numpy's default ``np.argsort`` (quicksort) is *not* stable, and its
+# SIMD implementations differ between x86-64 and arm64 builds, so the same
+# input gave different pairs, curves, uncertainties and even a different
+# stage-2 gate decision on different CPUs. Every sort in this module therefore
+# either breaks ties by the data (:func:`_order` -> ``np.lexsort``, a stable
+# indirect sort by documented contract) or asks for ``kind="stable"`` (timsort /
+# radix sort, stable by contract on every platform), so the result depends only
+# on the input and never on the platform.
+# ---------------------------------------------------------------------------
+
+def _order(x, *tiebreak) -> np.ndarray:
+    """Indices that sort ``x`` ascending, ties broken by ``tiebreak`` in turn.
+
+    A stable, platform-independent replacement for ``np.argsort(x)``: rows
+    that are still tied after every key keep their input order. Equivalent to
+    ``np.lexsort((*reversed(tiebreak), x))`` (``lexsort`` takes its primary key
+    last).
+    """
+    return np.lexsort((*reversed(tiebreak), x))
+
+
 # Anchor-residual MSE below which there is nothing for stage 2 to correct
 # (1e-12 min^2 = 1 microsecond RMS — far below any real chromatographic scale,
 # so this only ever catches the exactly-zero case, e.g. self-calibration).
@@ -243,6 +273,8 @@ class MonotoneCurve:
     def __init__(self, x_knots: np.ndarray, y_knots: np.ndarray, mode: str = "linear"):
         x_knots = np.asarray(x_knots, dtype=float)
         y_knots = np.asarray(y_knots, dtype=float)
+        # return_index makes np.unique use a stable mergesort, so a repeated knot
+        # keeps its first occurrence on every platform
         ux, idx = np.unique(x_knots, return_index=True)
         uy = y_knots[idx]
         if ux.size < 2:
@@ -345,7 +377,9 @@ def fit_robust_curve_sorted(rt_x: np.ndarray,
             "The usual causes are a polarity mismatch between the two runs, an "
             "m/z tolerance that is far too tight, or the wrong reference dataset."
         )
-    order = np.argsort(rt_x)
+    # ties in rt_x are broken by rt_y, so the fit depends on the data and not on
+    # the order the pairs happen to arrive in (see "Deterministic ordering")
+    order = _order(rt_x, rt_y)
     x, y = rt_x[order], rt_y[order]
     keep = np.ones(len(x), dtype=bool)
 
@@ -369,7 +403,10 @@ def fit_robust_curve_sorted(rt_x: np.ndarray,
     curve = None
     for _ in range(n_iter):
         xs, ys = x[keep], y[keep]
-        est = lowess(ys, xs, frac=frac, it=3, return_sorted=True)
+        # xs is already sorted (ties broken by rt_y above). is_sorted=True stops
+        # statsmodels re-sorting it with a plain, unstable np.argsort, which would
+        # reorder tied points on some CPUs and move LOESS neighbourhood edges.
+        est = lowess(ys, xs, frac=frac, it=3, return_sorted=True, is_sorted=True)
         iso = IsotonicRegression(increasing=True, out_of_bounds="clip")
         y_iso = iso.fit_transform(est[:, 0], est[:, 1])
         curve = MonotoneCurve(est[:, 0], y_iso, mode=mode)
@@ -401,9 +438,11 @@ class AnchorRefiner:
     """
 
     def __init__(self, anchor_rt_src: np.ndarray, residuals: np.ndarray, lam: float = 1.0):
-        order = np.argsort(anchor_rt_src)
-        self._x = np.asarray(anchor_rt_src, dtype=float)[order]
-        self._r = np.asarray(residuals, dtype=float)[order]
+        x = np.asarray(anchor_rt_src, dtype=float)
+        r = np.asarray(residuals, dtype=float)
+        order = _order(x, r)
+        self._x = x[order]
+        self._r = r[order]
         self.lam = float(lam)
 
     def correction(self, x, classes=None) -> np.ndarray:
@@ -431,7 +470,7 @@ class ClassAwareRefiner:
         x = np.asarray(x, dtype=float)
         r = np.asarray(resid, dtype=float)
         cls = np.asarray(classes)
-        order = np.argsort(x)
+        order = _order(x, r)
         self._x = x[order]
         self.m_global = float(np.median(r))
         self.m_class = {c: float(np.median(r[cls == c])) for c in np.unique(cls)}
@@ -452,7 +491,7 @@ def loo_residuals_global(x, r, lam: float) -> np.ndarray:
     """Leave-one-anchor-out prediction errors of the plain shrunk correction."""
     x = np.asarray(x, dtype=float)
     r = np.asarray(r, dtype=float)
-    order = np.argsort(x)
+    order = _order(x, r)
     x, r = x[order], r[order]
     n = len(x)
     if n < 3:
@@ -498,7 +537,7 @@ def loo_residuals_class(x, r, cls, lam_g: float, lam_c: float) -> np.ndarray:
     x = np.asarray(x, dtype=float)
     r = np.asarray(r, dtype=float)
     cls = np.asarray(cls)
-    order = np.argsort(x)
+    order = _order(x, r)
     x, r, cls = x[order], r[order], cls[order]
     n = len(x)
     if n < 3:
@@ -686,7 +725,7 @@ class ColumnCalibrator:
                 kept = sub
         x = kept["rt_a"].to_numpy(dtype=float)
         r = kept["rt_b"].to_numpy(dtype=float) - self.curve.predict(x)
-        order = np.argsort(x)
+        order = _order(x, r)
         x, r = x[order], r[order]
         n = len(x)
         w = int(min(max(self.sigma_window_pairs, 3), n))
@@ -712,8 +751,9 @@ class ColumnCalibrator:
         rt_src = out["rt_src"].to_numpy(dtype=float)
         out["residual_min"] = out["rt_ref"].to_numpy(dtype=float) - self._stage1_basis(out, rt_src)
         if self.loo_residuals.size == len(out):
-            # loo_residuals are computed in RT-sorted order
-            order = np.argsort(rt_src)
+            # loo_residuals are computed in (rt_src, residual)-sorted order, the
+            # same order the loo_residuals_* functions sort their inputs into
+            order = _order(rt_src, out["residual_min"].to_numpy(dtype=float))
             loo = np.empty(len(out), dtype=float)
             loo[order] = self.loo_residuals
             out["loo_residual_min"] = loo
@@ -1010,7 +1050,7 @@ def _match_arrays(ft: FeatureTable):
 def _best_match(mz_from: np.ndarray, tol_from: np.ndarray,
                 mz_to: np.ndarray, rank_to: np.ndarray) -> np.ndarray:
     """For each element of ``from``, the highest-ranked in-window index of ``to``."""
-    order = np.argsort(mz_to)
+    order = np.argsort(mz_to, kind="stable")    # equal m/z keep row order
     mz_sorted = mz_to[order]
     out = np.full(len(mz_from), -1, dtype=int)
     for i, (m, tol) in enumerate(zip(mz_from, tol_from)):

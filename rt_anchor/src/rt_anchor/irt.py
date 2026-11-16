@@ -153,7 +153,9 @@ def landmark_panel(manifest: pd.DataFrame,
             "endogenous": bool(r.get("endogenous", False)),
             "void": bool(r.get("void", False)),
         })
-    targets = pd.DataFrame(rows).sort_values("rt_ref_min").reset_index(drop=True)
+    # kind="stable": tied reference RTs keep their input order on every platform
+    targets = (pd.DataFrame(rows).sort_values("rt_ref_min", kind="stable")
+               .reset_index(drop=True))
     return Panel(polarity=("positive" if col == "adduct_pos" else "negative"),
                  targets=targets)
 
@@ -188,7 +190,8 @@ def detect_landmarks(ref_std_table: FeatureTable,
     } for name, rt in template.items()]
     if not rows:
         return pd.DataFrame(columns=LANDMARK_COLUMNS[:-1])
-    return pd.DataFrame(rows).sort_values("rt_ref_run_min").reset_index(drop=True)
+    return (pd.DataFrame(rows).sort_values("rt_ref_run_min", kind="stable")
+            .reset_index(drop=True))
 
 
 def build_irt(ref_std_table: FeatureTable,

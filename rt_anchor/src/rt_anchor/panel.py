@@ -177,7 +177,9 @@ def build_panel(polarity: str,
         })
     if not rows:
         raise PanelError(f"No standards are ionisable in polarity '{pol}'.")
-    targets = pd.DataFrame(rows).sort_values("rt_ref_min").reset_index(drop=True)
+    # kind="stable": tied reference RTs keep their manifest order on every platform
+    targets = (pd.DataFrame(rows).sort_values("rt_ref_min", kind="stable")
+               .reset_index(drop=True))
     return Panel(polarity=pol, targets=targets)
 
 

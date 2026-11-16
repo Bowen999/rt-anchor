@@ -106,7 +106,7 @@ def tie_points(result) -> pd.DataFrame:
     rt_b = "rt_b" if "rt_b" in pairs.columns else "rt_ref"
     if "kept" in pairs.columns:
         pairs = pairs[pairs["kept"].astype(bool)]
-    pairs = pairs.sort_values(rt_a)
+    pairs = pairs.sort_values(rt_a, kind="stable")   # tied RTs keep input order
     if not len(pairs):
         return pd.DataFrame(columns=cols)
     idx = np.unique(np.linspace(0, len(pairs) - 1, min(MAX_PAIR_TIES, len(pairs)))

@@ -78,7 +78,7 @@ def compute_anchors(result) -> Dict:
     if "lipid_class" not in a.columns:
         a["lipid_class"] = ""
     a["lipid_class"] = a["lipid_class"].astype(str)
-    a = a.sort_values("rt_src").reset_index(drop=True)
+    a = a.sort_values("rt_src", kind="stable").reset_index(drop=True)   # ties keep input order
 
     cal = getattr(result, "calibrator", None)
     engaged = bool(getattr(result, "anchors_used", False))

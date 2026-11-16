@@ -140,7 +140,8 @@ def _mix21lpc_manifest() -> pd.DataFrame:
         })
     lpc = pd.DataFrame(out, columns=_MANIFEST_COLS)
     man = pd.concat([_mix21_manifest(), lpc], ignore_index=True)
-    return man.sort_values("rt_ref_min").reset_index(drop=True)
+    # kind="stable": tied reference RTs keep their manifest order on every platform
+    return man.sort_values("rt_ref_min", kind="stable").reset_index(drop=True)
 
 
 _MANIFESTS: Dict[str, Optional[pd.DataFrame]] = {

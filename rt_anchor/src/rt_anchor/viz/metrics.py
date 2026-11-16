@@ -228,7 +228,7 @@ def _ladder_rows(result) -> Dict:
     targets = _panel_targets(result)
     order: List[str] = []
     if len(targets):
-        order = [str(v) for v in targets.sort_values("rt_ref_min")["name"]]
+        order = [str(v) for v in targets.sort_values("rt_ref_min", kind="stable")["name"]]
     for nm in sorted(lm_rt, key=lambda k: lm_rt[k]):
         if nm not in order:
             order.append(nm)

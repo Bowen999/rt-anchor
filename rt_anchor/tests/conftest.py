@@ -19,6 +19,15 @@ import numpy as np
 import pandas as pd
 import pytest
 
+# Headless backend, selected before anything imports pyplot: on Windows (and on
+# any machine with a Tk but no display) matplotlib otherwise picks TkAgg and the
+# figure tests die with a _tkinter.TclError.
+try:
+    import matplotlib
+    matplotlib.use("Agg")
+except ImportError:                                 # report extras not installed
+    pass
+
 from rt_anchor.config import CalibrationConfig
 from rt_anchor.io.schema import FeatureTable
 from rt_anchor.panel import build_panel
@@ -38,11 +47,12 @@ PROCESSED = PKG_ROOT.parent / "processed no RT"   # real LipidScreener files
 def _stage1_fingerprint(res) -> dict:
     """The stage-1 fit as *this* platform produced it.
 
-    Which pairs survive MAD trimming depends on how tied rows happen to be
-    ordered, and numpy/pandas order ties differently across versions and CPUs,
-    so the kept set is legitimately platform-dependent. The fingerprint is the
-    number of matched pairs, the number kept, and a sha1 over the kept pairs'
-    ``(mz_src, rt_src)`` rounded to 6 decimals and sorted.
+    Every sort in the engine breaks ties deterministically (see "Deterministic
+    ordering" in ``crosscolumn.py``; ``test_determinism.py`` enforces it), so
+    the set of pairs that survive MAD trimming is the same on every CPU and
+    OS. The fingerprint is the number of matched pairs, the number kept, and a
+    sha1 over the kept pairs' ``(mz_src, rt_src)`` rounded to 6 decimals and
+    sorted.
     """
     pairs = res.pairs
     kept = pairs[pairs["kept"].astype(bool)]
@@ -57,14 +67,16 @@ def _stage1_fingerprint(res) -> dict:
 def _skip_unless_reference_stage1_fit(res, fingerprint: dict) -> None:
     """Skip (not fail) when this platform's stage-1 fit is not the recorded one.
 
-    The pinned numbers were produced in the reference environment; a different
-    tie ordering changes which pairs survive trimming, and every number that
-    follows from the fit then differs legitimately.
+    Tie order no longer varies between platforms, so this only trips when a
+    library upgrade changes the fit itself (a different LOWESS / isotonic
+    implementation moving a pair across the MAD threshold). Every number that
+    follows from the fit then differs legitimately and the goldens need
+    regenerating, rather than the test failing on a number nobody changed.
     """
     if _stage1_fingerprint(res) != fingerprint:
-        pytest.skip("the stage-1 fit on this platform differs from the reference "
-                    "environment (tied pairs ordered differently) — the pinned "
-                    "numbers apply to the reference environment only")
+        pytest.skip("the stage-1 fit on this platform differs from the one the "
+                    "pinned numbers were generated from (library versions?) — "
+                    "regenerate the goldens if this is the new normal")
 
 
 # ----------------------------------------------------------------- paths ------
