@@ -20,6 +20,9 @@ eventually disagrees with it.
   known masses of the overlapping species (< 0.001 Da). Reference RTs are the
   sheet's "Carly 35 min approximate times" (Column 25); approximate is fine, because the
   panel is only ever *located* in a real standards run, never trusted blind.
+  DGs are positive-only (``adduct_neg`` = "ND"): they ionise very poorly in
+  negative ESI ([M+HCOO]- is >1000x weaker than [M+NH4]+ in positive), so they
+  are never used as negative-mode standards or landmarks. Same for CE/TG.
 * ``none`` — the user's mixture is unknown, or there is none. Under the v2
   cross-column method this costs nothing for the calibration itself (stage 1
   matches features by m/z and claims no identities); it only means the engine
@@ -84,8 +87,8 @@ def _mix21_manifest() -> pd.DataFrame:
         ("PC 16:0_18:1",      "PC", 760.5846, 804.5760, 12.9, True,  False),
         ("PC 18:0_18:1",      "PC", 788.6161, 832.6073, 14.5, True,  False),
         ("PC 18:0_18:0",      "PC", 790.6315, 834.6230, 15.8, True,  False),
-        ("DG 16:0_18:0",      "DG", 614.5718, 641.5362, 17.0, True,  False),
-        ("DG 18:0_18:0",      "DG", 642.6031, 669.5675, 18.0, True,  False),
+        ("DG 16:0_18:0",      "DG", 614.5718, None,     17.0, True,  False),
+        ("DG 18:0_18:0",      "DG", 642.6031, None,     18.0, True,  False),
         ("CE 20:5",           "CE", 688.6027, None,     20.5, False, False),
         ("CE 18:2",           "CE", 666.6183, None,     21.2, False, False),
         ("TG 16:0_18:1_16:0", "TG", 850.7858, None,     21.3, True,  False),
@@ -137,7 +140,8 @@ def _mix21lpc_manifest() -> pd.DataFrame:
         })
     lpc = pd.DataFrame(out, columns=_MANIFEST_COLS)
     man = pd.concat([_mix21_manifest(), lpc], ignore_index=True)
-    return man.sort_values("rt_ref_min").reset_index(drop=True)
+    # kind="stable": tied reference RTs keep their manifest order on every platform
+    return man.sort_values("rt_ref_min", kind="stable").reset_index(drop=True)
 
 
 _MANIFESTS: Dict[str, Optional[pd.DataFrame]] = {

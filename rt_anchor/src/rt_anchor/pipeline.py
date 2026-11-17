@@ -846,7 +846,10 @@ def _anchor_frame(cal: Optional[ColumnCalibrator]) -> pd.DataFrame:
         if c not in out.columns:
             out[c] = np.nan
     rest = [c for c in out.columns if c not in ANCHOR_COLUMNS]
-    return out[ANCHOR_COLUMNS + rest].sort_values("rt_src").reset_index(drop=True)
+    # kind="stable": tied RTs keep their input order on every platform (the
+    # default quicksort does not), so the anchors file is reproducible
+    return (out[ANCHOR_COLUMNS + rest].sort_values("rt_src", kind="stable")
+            .reset_index(drop=True))
 
 
 def _append_results(df: pd.DataFrame, res: pd.DataFrame):

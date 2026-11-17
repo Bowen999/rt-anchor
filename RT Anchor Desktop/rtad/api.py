@@ -78,6 +78,30 @@ def _ssl_context():
         return ssl.create_default_context()
 
 
+def _settings_path() -> str:
+    """Per-user settings file, outside the webview (whose storage is private mode)."""
+    if sys.platform == "darwin":
+        base = os.path.join(os.path.expanduser("~"), "Library", "Application Support",
+                            "RT Anchor")
+    elif sys.platform.startswith("win"):
+        base = os.path.join(os.environ.get("APPDATA") or os.path.expanduser("~"),
+                            "RT Anchor")
+    else:
+        base = os.path.join(os.environ.get("XDG_CONFIG_HOME")
+                            or os.path.join(os.path.expanduser("~"), ".config"),
+                            "rt-anchor")
+    return os.path.join(base, "settings.json")
+
+
+def _read_settings() -> dict:
+    try:
+        with open(_settings_path(), "r", encoding="utf-8") as fh:
+            data = json.load(fh)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
 def _json_safe(obj):
     """Recursively replace NaN/inf with None so json.dump stays valid."""
     if isinstance(obj, dict):
@@ -289,6 +313,34 @@ class Api:
         url = str(url or "")
         webbrowser.open(url if url.startswith(RELEASES_PAGE_PREFIX) else RELEASES_PAGE)
         return {"ok": True}
+
+    def get_skipped_version(self) -> Optional[str]:
+        """The release tag the user chose not to be reminded about, or ``None``.
+
+        Kept in a JSON file under the per-user app-data folder because the
+        webview runs in private mode (its localStorage is wiped every launch).
+        Never raises.
+        """
+        try:
+            v = _read_settings().get("skipped_version")
+            return str(v) if v else None
+        except Exception:
+            return None
+
+    def set_skipped_version(self, tag: str = "") -> bool:
+        """Remember ``tag`` as skipped. Returns ``False`` on any failure; never raises."""
+        try:
+            path = _settings_path()
+            data = _read_settings()
+            data["skipped_version"] = str(tag or "")
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            tmp = path + ".tmp"
+            with open(tmp, "w", encoding="utf-8") as fh:
+                json.dump(data, fh)
+            os.replace(tmp, path)
+            return True
+        except Exception:
+            return False
 
     # ---- native file dialogs ----
     def pick_file(self, title: str = "Choose a file") -> Optional[str]:

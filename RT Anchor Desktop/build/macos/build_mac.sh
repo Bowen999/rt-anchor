@@ -11,11 +11,13 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"     # app root (build/macos/ -> ../.
 STAGE="$(mktemp -d /private/tmp/rtad_dmg.XXXXXX)"
 DIST="/private/tmp/rtad_dist"
 WORK="/private/tmp/rtad_build"
+# CI (build-macos.yml) points PYTHON at its own interpreter; locally it stays anaconda.
+PYTHON="${PYTHON:-/opt/anaconda3/bin/python}"
 
 cd "$ROOT"
 
 # 1. Bundle
-/opt/anaconda3/bin/python -m PyInstaller --noconfirm --clean \
+"$PYTHON" -m PyInstaller --noconfirm --clean \
     --distpath "$DIST" --workpath "$WORK" \
     build/macos/RTAnchor.spec
 

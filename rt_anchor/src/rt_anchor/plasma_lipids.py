@@ -381,7 +381,9 @@ def build_anchor_table(picks: pd.DataFrame,
            .rename(columns={"rt": "rt_ref"}))
     a = src.merge(ref, on="lipid").rename(columns={"lipid": "label"})
     a["lipid_class"] = a["label"].map(candidates.set_index("lipid")["lipid_class"])
-    return a.sort_values("rt_src").reset_index(drop=True)
+    # kind="stable": tied RTs keep their input order on every platform (the
+    # default quicksort does not), so the anchor order is reproducible
+    return a.sort_values("rt_src", kind="stable").reset_index(drop=True)
 
 
 # ---------------------------------------------------------------- internals ---

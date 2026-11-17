@@ -40,11 +40,23 @@ stage-1c (lattice term) numbers for the three datasets above — family counts,
 sizes and offsets, gate statistics, and per-row raw corrections — and is
 asserted against in `test_lattice.py`.
 
-All four files also record a fingerprint of the stage-1 fit as this machine
-produces it: the number of matched pairs, the number kept, and a sha1 of the
-kept pairs' (m/z, RT). Which pairs survive trimming depends on how tied rows
-happen to be ordered, so a platform whose fit legitimately differs skips the
-pinned-number comparison instead of failing.
+All four files also record a fingerprint of the stage-1 fit they were generated
+from: the number of matched pairs, the number kept, and a sha1 of the kept
+pairs' (m/z, RT). Tie order is deterministic on every platform (every sort in
+the engine is stable or keyed on the data; `../test_determinism.py` enforces
+it), so the fingerprint only differs when a library upgrade changes the fit
+itself, and the pinned-number comparison is then skipped instead of failing.
+
+**Regenerated for deterministic tie-breaking.** Before that change the kept-pair
+set, `Cal_RT_uncertainty_min` and the Orbitrap stage-2 gate depended on the
+platform's unstable argsort (macOS arm64 and Linux/Windows x64 disagreed), so
+the goldens were one of several equally valid answers. `expected_v121_*` and
+`expected_v122_*` were regenerated in full with the snapshot functions in
+`test_series.py` / `test_lattice.py` (the generator reproduced the old files to
+1e-8 before the change); in `expected_series_repo_datasets.json` and
+`expected_lattice_repo_datasets.json` only the `Orbitrap` and `QTOF` entries
+changed (`QTOF_full`'s kept pairs and numbers did not) and they are now this
+engine's numbers, not the independent reference implementation's.
 
 Copies elsewhere in the repository: `Orbitrap/` is byte-identical to
 [`examples/mix15/`](../../../examples/mix15/), and the `QTOF_full/` aligned

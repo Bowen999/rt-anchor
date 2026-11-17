@@ -135,7 +135,7 @@ def test_series_headline_states():
     assert v == "on · 27%" and n == "20 series · 106 of 405 features corrected"
     v, n = metrics.series_headline({**base, "series_reduction": 0.09})
     assert v == "off · 9%" and n == "below the 20% gate · stage-1 curve only"
-    # a measured *loss* (the Orbitrap run: reduction -0.345) is not "off · -35%"
+    # a measured *loss* (here -0.345) is not "off · -35%"
     v, n = metrics.series_headline({**base, "series_reduction": -0.34535720991053154})
     assert v == "off" and n == "35% worse than the curve alone · stage-1 curve only"
     v, n = metrics.series_headline({**base, "series_reduction": 0.0,
@@ -228,8 +228,14 @@ def test_kpi_tiles(proj_result):
 def test_terms_tile_carries_the_anchor_state_when_requested(anchors_result):
     label, value, note = metrics.kpi_tiles(anchors_result)[3]
     assert label == "Series + lattice"
-    # stage 2 was requested and gated off on Orbitrap: the note says so
-    assert note.endswith(" · anchors off")
+    # stage 2 was requested and its gate passes on Orbitrap (27% LOO reduction
+    # against the 20% threshold): the note carries the gate's own figure
+    blk = anchors_result.model["anchors"]
+    assert blk["engaged"] and blk["gate_mse_reduction"] > blk["gate_threshold"]
+    assert note.endswith(f" · anchors on {100 * blk['gate_mse_reduction']:.0f}%")
+    # the same result with the gate flipped reads "anchors off"
+    off = _with_block(anchors_result, "anchors", engaged=False)
+    assert metrics.kpi_tiles(off)[3][2].endswith(" · anchors off")
 
 
 def test_terms_tile_when_a_term_is_disabled(no_series_result, no_lattice_result):
@@ -279,7 +285,11 @@ def test_terms_tile_when_both_terms_are_engaged_and_anchors_requested(anchors_re
     both = _engaged_result(anchors_result, series=True, lattice=True)
     label, value, note = metrics.kpi_tiles(both)[3]
     assert value == [("series", "on · 27%"), ("lattice", "on · 43%")]
-    assert note == f"405 + 300 of {len(both.table):,} features corrected · anchors off"
+    pct = 100 * both.model["anchors"]["gate_mse_reduction"]      # engaged on Orbitrap
+    assert note == (f"405 + 300 of {len(both.table):,} features corrected"
+                    f" · anchors on {pct:.0f}%")
+    both = _with_block(both, "anchors", engaged=False)
+    assert metrics.kpi_tiles(both)[3][2].endswith(" · anchors off")
     both.model["anchors"].update(engaged=True, gate_mse_reduction=0.72)
     assert metrics.kpi_tiles(both)[3][2].endswith(" · anchors on 72%")
 

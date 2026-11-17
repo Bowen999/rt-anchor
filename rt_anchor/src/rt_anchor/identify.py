@@ -142,7 +142,9 @@ def identify_anchors(table: FeatureTable,
             "No standards identified. Check polarity, m/z tolerance (mz_tol_ppm), "
             "the RT window, and that the standards are actually present/spiked."
         )
-    anchors = pd.DataFrame(rows).sort_values("rt_ref_min").reset_index(drop=True)
+    # kind="stable": tied reference RTs keep their panel order on every platform
+    anchors = (pd.DataFrame(rows).sort_values("rt_ref_min", kind="stable")
+               .reset_index(drop=True))
     anchors = _drop_nonmonotone(anchors, config)
     return anchors
 

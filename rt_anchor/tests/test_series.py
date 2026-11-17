@@ -8,13 +8,12 @@ reproduction is pinned by the numeric goldens in
 ``tests/data/expected_v121_orbitrap_golden.json`` (compared to 1e-8 — a text
 hash would break on another numpy/pandas build although the engine is right).
 
-Both goldens also record a **fingerprint** of the stage-1 fit as the reference
-environment produced it (pairs matched, pairs kept, and a sha1 of the kept
-pairs' (m/z, RT)): which pairs survive MAD trimming depends on how tied rows
-happen to be ordered, and numpy/pandas order ties differently across versions
-and CPUs. A platform whose fit legitimately differs skips the pinned-number
-comparison instead of failing (the fingerprint helpers live in ``conftest.py``,
-shared with ``test_lattice.py``).
+Both goldens also record a **fingerprint** of the stage-1 fit they were
+generated from (pairs matched, pairs kept, and a sha1 of the kept pairs'
+(m/z, RT)). Tie order is deterministic on every platform (``test_determinism.py``),
+so the fingerprint only differs when a library upgrade changes the fit itself;
+the pinned-number comparison is then skipped instead of failing (the fingerprint
+helpers live in ``conftest.py``, shared with ``test_lattice.py``).
 """
 
 from __future__ import annotations
@@ -365,9 +364,11 @@ def test_shipped_datasets_match_the_reference_implementation(dataset_result):
     assert s["gate_mse_reduction"] == pytest.approx(exp["gate_mse_reduction"], abs=1e-9)
     if name == "Orbitrap":
         # a gated-off run whose leave-own-out error is a *loss* (reduction
-        # -0.345 here) must not read "only -35% below" — say it plainly
-        assert "35% above curve-only" in st.gate_reason
-        assert "-35" not in st.gate_reason
+        # -0.085 here) must not read "only -8% below" — say it plainly
+        assert exp["gate_mse_reduction"] < 0
+        pct = round(-100 * exp["gate_mse_reduction"])
+        assert f"{pct}% above curve-only" in st.gate_reason
+        assert f"-{pct}" not in st.gate_reason
 
     mz = pd.to_numeric(res.table[res.mz_col], errors="coerce").to_numpy(dtype=float)
     rt = res.rt_minutes().to_numpy(dtype=float)
@@ -399,7 +400,9 @@ def test_shipped_datasets_match_the_reference_implementation(dataset_result):
 
 #: The golden is ``tests/data/expected_v121_orbitrap_golden.json``, generated
 #: from this tree with the series term off (the configuration the reviewer
-#: verified reproduces v1.2.1 exactly on six independent datasets). Numbers are
+#: verified reproduces v1.2.1 exactly on six independent datasets — up to the
+#: order of tied RTs, which is now deterministic, so the Orbitrap numbers moved
+#: slightly when the golden was regenerated). Numbers are
 #: compared to 1e-8 — a text hash would break on another numpy/pandas build
 #: although the engine is right.
 GOLDEN_V121_PATH = DATA / "expected_v121_orbitrap_golden.json"
